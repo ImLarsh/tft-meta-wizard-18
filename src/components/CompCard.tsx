@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TFTComp } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
@@ -5,7 +6,7 @@ import ItemIcon from './ItemIcon';
 import BoardPositioning from './BoardPositioning';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronDown, ChevronRight, Star, Trophy, BarChart, Brain, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronRight, Star, Trophy, BarChart, Brain, MapPin, Triangle, Square, Circle } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 
 interface CompCardProps {
@@ -17,6 +18,16 @@ interface CompCardProps {
 const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
   const { traitMappings } = useComps();
+  
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case 'S': return <Star className="h-5 w-5 text-yellow-400" />;
+      case 'A': return <Triangle className="h-5 w-5 text-cyan-400" />;
+      case 'B': return <Square className="h-5 w-5 text-purple-400" />;
+      case 'C': return <Circle className="h-5 w-5 text-red-400" />;
+      default: return null;
+    }
+  };
   
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -40,7 +51,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
       <div className="flex items-center justify-between p-4 border-b border-border/40">
         <div className="flex items-center gap-3">
           <div className={`flex items-center justify-center w-8 h-8 rounded-md ${getTierColor(comp.tier)}`}>
-            {comp.tier}
+            {getTierIcon(comp.tier)}
           </div>
           <h3 className="text-lg font-bold">{comp.name}</h3>
         </div>

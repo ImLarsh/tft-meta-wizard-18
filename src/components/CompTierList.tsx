@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CompCard from './CompCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SearchX, Filter, Sparkles } from 'lucide-react';
+import { SearchX, Filter, Sparkles, HelpCircle, Star, Triangle, Square, Circle } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import { 
   AlertDialog,
@@ -19,6 +18,7 @@ import {
 import { toast } from '@/components/ui/use-toast';
 import { TFTComp } from '@/data/comps';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TierLegend from './TierLegend';
 
 const CompTierList: React.FC = () => {
   const { comps, removeComp, traitMappings } = useComps();
@@ -31,6 +31,7 @@ const CompTierList: React.FC = () => {
   const [compToDelete, setCompToDelete] = useState<string | null>(null);
   const [groupedComps, setGroupedComps] = useState<Record<string, TFTComp[]>>({});
   const [activeTab, setActiveTab] = useState('S');
+  const [showLegend, setShowLegend] = useState(false);
   const navigate = useNavigate();
   const [availableVersions, setAvailableVersions] = useState<string[]>([]);
 
@@ -106,6 +107,16 @@ const CompTierList: React.FC = () => {
 
   const shouldShowFilteredView = !(filters.tier === 'all' && filters.playstyle === 'all' && filters.tftVersion === 'all' && searchTerm === '');
 
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case 'S': return <Star className="h-5 w-5 text-yellow-400" />;
+      case 'A': return <Triangle className="h-5 w-5 text-cyan-400" />;
+      case 'B': return <Square className="h-5 w-5 text-purple-400" />;
+      case 'C': return <Circle className="h-5 w-5 text-red-400" />;
+      default: return null;
+    }
+  };
+
   return (
     <section className="py-12">
       <div className="container">
@@ -131,6 +142,20 @@ const CompTierList: React.FC = () => {
           </div>
         </div>
         
+        <div className="flex justify-between items-center mb-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1" 
+            onClick={() => setShowLegend(!showLegend)}
+          >
+            <HelpCircle className="h-4 w-4" />
+            {showLegend ? "Hide Tier Legend" : "Show Tier Legend"}
+          </Button>
+        </div>
+        
+        {showLegend && <TierLegend className="mb-6" />}
+        
         <div className="flex flex-wrap gap-3 mb-6">
           <div>
             <span className="text-sm font-medium mr-2 flex items-center">
@@ -154,7 +179,8 @@ const CompTierList: React.FC = () => {
                   onClick={() => handleFilterChange('tier', tier)}
                   className={`${filters.tier === tier ? 'gaming-button' : 'opacity-80'}`}
                 >
-                  {tier}
+                  {getTierIcon(tier)}
+                  <span className="ml-1">{tier}</span>
                 </Button>
               ))}
             </div>
@@ -249,7 +275,10 @@ const CompTierList: React.FC = () => {
             <TabsList className="mb-6">
               {['S', 'A', 'B', 'C'].map(tier => (
                 <TabsTrigger key={tier} value={tier} className="flex-1">
-                  Tier {tier}
+                  <div className="flex items-center gap-2">
+                    {getTierIcon(tier)}
+                    <span>Tier {tier}</span>
+                  </div>
                 </TabsTrigger>
               ))}
             </TabsList>

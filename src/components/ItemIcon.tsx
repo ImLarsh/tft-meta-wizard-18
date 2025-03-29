@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
@@ -6,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "@/hooks/use-toast";
 
 interface ItemIconProps {
   name: string;
@@ -49,58 +51,96 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); 
   
+  // Expanded special cases with more variations
   const specialCaseNames: Record<string, string[]> = {
-    "Blue Buff": ["bluebuff", "blue", "blue-buff"],
-    "Jeweled Gauntlet": ["jeweledgauntlet", "gauntlet", "jewelgauntlet", "jeweled-gauntlet"],
-    "Giant Slayer": ["giantslayer", "giant", "giant-slayer"],
-    "Spear of Shojin": ["spearofshojin", "shojin", "spear", "spear-of-shojin"],
-    "Guinsoo's Rageblade": ["guinsoosrageblade", "guinsoo", "rageblade", "guinsoos-rageblade"],
-    "Infinity Edge": ["infinityedge", "ie", "infinity-edge"],
-    "Rapid Firecannon": ["rapidfirecannon", "rfc", "rapid-firecannon"],
-    "Runaan's Hurricane": ["runaanshurricane", "runaan", "hurricane", "runaans-hurricane"],
-    "Titan's Resolve": ["titansresolve", "titan", "resolve", "titans-resolve"],
-    "Hand of Justice": ["handofjustice", "hoj", "justice", "hand-of-justice"],
-    "Bloodthirster": ["bloodthirster", "bt"],
-    "Quicksilver": ["quicksilver", "qss"],
-    "Ionic Spark": ["ionicspark", "ionic", "spark", "ionic-spark"],
-    "Last Whisper": ["lastwhisper", "lw", "last-whisper"],
-    "Sunfire Cape": ["sunfirecape", "sunfire", "cape", "sunfire-cape"],
-    "Warmog's Armor": ["warmogsarmor", "warmogs", "armor", "warmogs-armor"],
-    "Death's Defiance": ["deathsdefiance", "deaths", "defiance", "deaths-defiance"],
-    "Hextech Gunblade": ["hextechgunblade", "hextech", "gunblade", "hextech-gunblade"],
+    "Blue Buff": ["bluebuff", "blue", "blue-buff", "bluebuff", "blue_buff"],
+    "Jeweled Gauntlet": ["jeweledgauntlet", "gauntlet", "jewelgauntlet", "jeweled-gauntlet", "jeweled_gauntlet", "jg"],
+    "Giant Slayer": ["giantslayer", "giant", "giant-slayer", "giant_slayer", "gs"],
+    "Spear of Shojin": ["spearofshojin", "shojin", "spear", "spear-of-shojin", "spear_of_shojin", "sos"],
+    "Guinsoo's Rageblade": ["guinsoosrageblade", "guinsoo", "rageblade", "guinsoos-rageblade", "guinsoos_rageblade", "guinsoos"],
+    "Infinity Edge": ["infinityedge", "ie", "infinity-edge", "infinity_edge", "infinity", "edge"],
+    "Rapid Firecannon": ["rapidfirecannon", "rfc", "rapid-firecannon", "rapid_firecannon", "firecannon", "cannon"],
+    "Runaan's Hurricane": ["runaanshurricane", "runaan", "hurricane", "runaans-hurricane", "runaans_hurricane", "runaans"],
+    "Titan's Resolve": ["titansresolve", "titan", "resolve", "titans-resolve", "titans_resolve", "titans"],
+    "Hand of Justice": ["handofjustice", "hoj", "justice", "hand-of-justice", "hand_of_justice", "hand"],
+    "Bloodthirster": ["bloodthirster", "bt", "blood-thirster", "blood_thirster", "blood"],
+    "Quicksilver": ["quicksilver", "qss", "quick-silver", "quick_silver", "silver"],
+    "Ionic Spark": ["ionicspark", "ionic", "spark", "ionic-spark", "ionic_spark"],
+    "Last Whisper": ["lastwhisper", "lw", "last-whisper", "last_whisper", "whisper"],
+    "Sunfire Cape": ["sunfirecape", "sunfire", "cape", "sunfire-cape", "sunfire_cape"],
+    "Warmog's Armor": ["warmogsarmor", "warmogs", "armor", "warmogs-armor", "warmogs_armor", "warmog"],
+    "Death's Defiance": ["deathsdefiance", "deaths", "defiance", "deaths-defiance", "deaths_defiance", "death"],
+    "Hextech Gunblade": ["hextechgunblade", "hextech", "gunblade", "hextech-gunblade", "hextech_gunblade"],
+    "Bramble Vest": ["bramblevest", "bramble", "vest", "bramble-vest", "bramble_vest"],
+    "Dragon's Claw": ["dragonsclaw", "dragon", "claw", "dragons-claw", "dragons_claw"],
+    "Zeke's Herald": ["zekesherald", "zekes", "herald", "zekes-herald", "zekes_herald", "zeke"],
+    "Zz'Rot Portal": ["zzrotportal", "zzrot", "portal", "zzrot-portal", "zzrot_portal"],
+    "Gargoyle Stoneplate": ["gargoylestoneplate", "gargoyle", "stoneplate", "gargoyle-stoneplate", "gargoyle_stoneplate"],
+    "Chalice of Power": ["chaliceofpower", "chalice", "power", "chalice-of-power", "chalice_of_power"],
+    "Locket of the Iron Solari": ["locketoftheironsolari", "locket", "solari", "locket-of-the-iron-solari", "locket_of_the_iron_solari"],
+    "Statikk Shiv": ["statikkshiv", "statikk", "shiv", "statikk-shiv", "statikk_shiv"],
+    "Redemption": ["redemption", "redeem", "redemp", "redempt"],
+    "Shroud of Stillness": ["shroudofstillness", "shroud", "stillness", "shroud-of-stillness", "shroud_of_stillness"],
+    "Banshee's Claw": ["bansheesclaw", "banshee", "claw", "banshees-claw", "banshees_claw"],
+    "Thief's Gloves": ["thiefsgloves", "thief", "gloves", "thiefs-gloves", "thiefs_gloves"],
+    "Archangel's Staff": ["archangelsstaff", "archangel", "staff", "archangels-staff", "archangels_staff"],
+    "Morellonomicon": ["morellonomicon", "morello", "nomicon", "morello-nomicon", "morello_nomicon"],
+    "Deathblade": ["deathblade", "death", "blade", "death-blade", "death_blade"],
+    "Frozen Heart": ["frozenheart", "frozen", "heart", "frozen-heart", "frozen_heart"],
+    "Spirit Visage": ["spiritvisage", "spirit", "visage", "spirit-visage", "spirit_visage"],
+    "Edge of Night": ["edgeofnight", "edge", "night", "edge-of-night", "edge_of_night"],
   };
   
   const specialCaseVariations = specialCaseNames[name] || [];
   
+  // Expanded sources list with more CDNs and variations
   const sources = [
+    // Main sources with normalized names
+    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${normalizedName}.png`,
+    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${normalizedNameKebab}.png`,
+    
+    // TFT Tools variations
     `https://cdn.tft.tools/items/${normalizedName}.png`,
     `https://cdn.tft.tools/items/${normalizedNameKebab}.png`,
+    
+    // Special case variations
     ...specialCaseVariations.map(variant => `https://cdn.tft.tools/items/${variant}.png`),
     
+    // TFT Tactics variations
+    `https://tactics.tools/img/items/${normalizedName}.png`, 
+    `https://tactics.tools/img/items/${normalizedNameKebab}.png`,
     `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${normalizedName}.png`,
     `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${normalizedNameKebab}.png`,
     ...specialCaseVariations.map(variant => `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${variant}.png`),
     
+    // Mobalytics variations
     `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName}.png`,
     `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedName}.png`,
     `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedNameCamelCase}.png`,
     `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedNameCamelCase}.png`,
     
+    // Additional Mobalytics prefixed variations
     `https://cdn.mobalytics.gg/assets/tft/images/items/set10/tft10_${normalizedName}.png`,
     `https://cdn.mobalytics.gg/assets/tft/images/items/tft_${normalizedName}.png`,
     
+    // MetaTFT and Reroll variations
     `https://cdn.metatft.com/file/metatft/items/${normalizedName}.png`,
     `https://cdn.metatft.com/file/metatft/items/${normalizedNameSimple}.png`,
     `https://rerollcdn.com/items/${normalizedName}.png`,
     `https://rerollcdn.com/items/${normalizedNameKebab}.png`,
     
+    // League of Legends variations
     `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/${normalizedName}.png`,
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/${normalizedName}.png`,
     
+    // Community Dragon variations
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/standard/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/set10/${normalizedName}.png`,
     `https://raw.communitydragon.org/pbe/game/assets/items/icons2d/tft_item_${normalizedName}.tft_set10.png`,
+    
+    // Additional variations with special cases
+    ...specialCaseVariations.map(variant => `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${variant}.png`),
   ];
   
   const fallbackUrl = 'https://cdn.tft.tools/items/deathblade.png';
@@ -112,11 +152,11 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   };
   
   const handleImageError = () => {
-    console.log(`Source ${currentSourceIndex} failed for ${name}, trying source ${currentSourceIndex + 1}`);
     const nextIndex = currentSourceIndex + 1;
     if (nextIndex < sources.length) {
       setCurrentSourceIndex(nextIndex);
     } else {
+      console.log(`All sources failed for ${name}`);
       setImgError(true);
     }
   };

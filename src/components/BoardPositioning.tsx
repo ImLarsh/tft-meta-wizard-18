@@ -124,7 +124,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
         const isEvenRow = row % 2 === 0;
         
         const cellSize = compact ? 10 : 16;
-        const hexSpacing = compact ? 1 : 2;
+        const hexSpacing = compact ? 2 : 4;
         
         rowCells.push(
           <div 
@@ -143,7 +143,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             }}
           >
             <div className={`hexagon ${
-              championAtPosition ? 'bg-black/70 border-champion-glow' : 'bg-black/50'
+              championAtPosition ? 'tft-board-hex-occupied' : 'tft-board-hex-empty'
             } ${
               !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
             } w-full h-full`}>
@@ -197,7 +197,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
 
   return (
     <div className={`space-y-4 ${compact ? 'scale-75 origin-top-left' : ''}`}>
-      <div className={`flex flex-col items-center bg-blue-950/95 p-4 rounded-md border border-blue-900/80 ${compact ? 'p-2' : ''}`}>
+      <div className={`flex flex-col items-center tft-board p-4 rounded-md ${compact ? 'p-2' : ''}`}>
         {!readonly && !compact && (
           <div className="flex items-center mb-4 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4 mr-1" />
@@ -213,7 +213,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           </div>
         )}
         
-        <div className={`board-container ${compact ? 'p-1' : 'p-2'} bg-blue-950/90 rounded-md`}>
+        <div className={`board-container ${compact ? 'p-1' : 'p-2'} rounded-md`}>
           <div className="board-wrapper">
             {renderBoard()}
           </div>

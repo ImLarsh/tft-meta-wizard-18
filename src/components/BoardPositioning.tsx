@@ -3,17 +3,19 @@ import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
 
-interface PositionedChampion extends Champion {
-  position: { row: number; col: number; } | null;
-}
-
 interface BoardPositioningProps {
   champions: Champion[];
   onChange?: (champions: Champion[]) => void;
+  onUpdatePositions?: (champions: Champion[]) => void;
   readonly?: boolean;
 }
 
-const BoardPositioning: React.FC<BoardPositioningProps> = ({ champions, onChange, readonly = false }) => {
+const BoardPositioning: React.FC<BoardPositioningProps> = ({ 
+  champions, 
+  onChange, 
+  onUpdatePositions,
+  readonly = false 
+}) => {
   const [positionedChampions, setPositionedChampions] = useState<Champion[]>([]);
   const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
   
@@ -40,6 +42,11 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({ champions, onChange
       // Notify parent of change
       if (onChange) {
         onChange(updatedChampions);
+      }
+      
+      // Support for the onUpdatePositions prop used in CompForm
+      if (onUpdatePositions) {
+        onUpdatePositions(updatedChampions);
       }
     } else {
       // Check if there's a champion at this position and select it
@@ -89,7 +96,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({ champions, onChange
                 }`}
               >
                 <ChampionIcon
-                  champion={championAtPosition.name}
+                  name={championAtPosition.name}
                   cost={championAtPosition.cost}
                   size="md"
                   isCarry={championAtPosition.isCarry}
@@ -127,7 +134,12 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({ champions, onChange
               onClick={() => handleChampionClick(champion)}
             >
               <div className="flex flex-col items-center">
-                <ChampionIcon champion={champion.name} cost={champion.cost} size="sm" isCarry={champion.isCarry} />
+                <ChampionIcon
+                  name={champion.name}
+                  cost={champion.cost}
+                  size="sm"
+                  isCarry={champion.isCarry}
+                />
                 <div className="text-xs mt-1 text-center truncate w-full">
                   {champion.name}
                 </div>

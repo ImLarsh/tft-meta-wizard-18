@@ -7,21 +7,30 @@ interface ChampionIconProps {
   cost: 1 | 2 | 3 | 4 | 5;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  isCarry?: boolean;
+  onClick?: () => void;
 }
 
 const ChampionIcon: React.FC<ChampionIconProps> = ({ 
   name, 
   cost, 
   size = 'md',
-  className
+  className,
+  isCarry,
+  onClick
 }) => {
   const [imgError, setImgError] = useState(false);
   
   // Normalize the champion name for different API formats
   let normalizedName;
   
+  // Guard against undefined or null name
+  if (!name) {
+    normalizedName = '';
+    console.error('ChampionIcon received undefined or null name');
+  }
   // Special case handling for champions with known naming issues
-  if (name === "MissFortune" || name === "Miss Fortune") {
+  else if (name === "MissFortune" || name === "Miss Fortune") {
     normalizedName = "missfortune";
   } else if (name === "AurelionSol" || name === "Aurelion Sol") {
     normalizedName = "aurelionsol";
@@ -46,7 +55,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   }
   
   // For display in fallback
-  const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
+  const displayName = name ? name.replace(/([A-Z])/g, ' $1').trim() : 'Unknown'; // Add spaces before capital letters
   
   // New and more reliable image sources
   const sources = [
@@ -59,9 +68,9 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     
     // Then try with original name (for Data Dragon which sometimes uses spaces)
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name.replace(/\s+/g, '')}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name.replace(/\s+/g, '')}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name.replace(/\s+/g, '')}_0.jpg`,
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name ? name.replace(/\s+/g, '') : 'Unknown'}_0.jpg`,
     
     // Community Dragon
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
@@ -132,6 +141,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
         costClasses[cost],
         className
       )}
+      onClick={onClick}
     >
       {imgError ? (
         <div className={cn(
@@ -143,7 +153,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       ) : (
         <img
           src={sources[currentSourceIndex]}
-          alt={name}
+          alt={name || 'Unknown Champion'}
           className="w-full h-full object-cover"
           onError={handleImageError}
           loading="lazy"
@@ -155,6 +165,11 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       )}>
         {cost}
       </div>
+      {isCarry && (
+        <div className="absolute top-0 right-0 w-3 h-3 bg-primary rounded-bl-md flex items-center justify-center">
+          <span className="text-[8px] font-bold text-white">★</span>
+        </div>
+      )}
     </div>
   );
 };

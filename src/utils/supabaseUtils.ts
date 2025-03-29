@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { TFTComp } from '@/data/comps';
+import { ChampionTraitMap } from '@/types/champion';
 
 /**
  * Checks if the application is using the default Supabase credentials

@@ -361,12 +361,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px currentColor;
-  }
-  50% {
-    box-shadow: 0 0 15px currentColor;
-  }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.98); }
 }
 
 /* Enhanced Existing Animations */
@@ -546,7 +542,7 @@
   background: linear-gradient(
     to right, 
     rgba(255, 255, 255, 0) 0%, 
-    rgba(255, 255, 255, 0.4) 50%, 
+    rgba(255, 255, 255, 0.3) 50%,
     rgba(255, 255, 255, 0) 100%
   );
   transform: rotate(30deg);
@@ -884,3 +880,9 @@
     to right, 
     rgba(255, 255, 255, 0) 0%, 
     rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  animation: shine 3s ease-in-out infinite;
+  opacity: 0;
+}

@@ -142,15 +142,27 @@
   background-color: rgba(155, 135, 245, 0.3);
   pointer-events: none;
   animation: fall linear infinite;
+  transition: all 0.3s ease;
 }
 
 .dark .particle {
   background-color: rgba(155, 135, 245, 0.2);
 }
 
+.particle-glow {
+  animation: fall linear infinite, pulse-glow 3s ease-in-out infinite alternate;
+}
+
+.special-particle {
+  animation: special-fall linear infinite, float 15s ease-in-out infinite;
+  border-radius: 30%;
+  opacity: 0.7;
+}
+
+/* Enhanced Animations */
 @keyframes fall {
   from {
-    transform: translateY(-10vh) translateX(0);
+    transform: translateY(-10vh) translateX(0) rotate(0deg);
     opacity: 0;
   }
   10% {
@@ -160,7 +172,197 @@
     opacity: 1;
   }
   to {
-    transform: translateY(100vh) translateX(10px);
+    transform: translateY(100vh) translateX(10px) rotate(360deg);
     opacity: 0;
+  }
+}
+
+@keyframes special-fall {
+  from {
+    transform: translateY(-20vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  to {
+    transform: translateY(100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 15px currentColor;
+  }
+}
+
+/* Enhanced Existing Animations */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.98); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(155, 135, 245, 0.3);
+    filter: brightness(0.95);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(155, 135, 245, 0.7);
+    filter: brightness(1.05);
+  }
+}
+
+/* New Animation Utilities */
+.animate-float {
+  animation: float-animation 6s ease-in-out infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-in-out forwards;
+}
+
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s ease-in-out infinite;
+  background: linear-gradient(90deg, 
+    rgba(155, 135, 245, 0) 0%, 
+    rgba(155, 135, 245, 0.3) 50%, 
+    rgba(155, 135, 245, 0) 100%);
+  background-size: 200% 100%;
+}
+
+/* Enhance card animations */
+.tft-card {
+  @apply bg-card rounded-lg border border-border/40 shadow-sm hover:shadow-md transition-all overflow-hidden
+    hover:translate-y-[-5px] hover:shadow-lg;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tft-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(155, 135, 245, 0.4);
+}
+
+/* New Animation Keyframes */
+@keyframes float-animation {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Enhance button animations */
+.gaming-button {
+  @apply relative overflow-hidden bg-primary text-white shadow-lg 
+    after:absolute after:inset-0 after:z-0 after:bg-gradient-to-r after:from-transparent after:via-white/30 after:to-transparent
+    after:opacity-0 hover:after:translate-x-full hover:after:opacity-100 after:transition-all after:duration-700
+    hover:translate-y-[-2px] hover:shadow-[0_0_15px_rgba(155,135,245,0.5)];
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Page transition animations */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Section animations */
+.section-fade-in {
+  animation: section-fade-in 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes section-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Add sequential animations for lists */
+.staggered-item {
+  opacity: 0;
+  animation: fade-in-up 0.5s ease forwards;
+}
+
+.staggered-item:nth-child(1) { animation-delay: 0.1s; }
+.staggered-item:nth-child(2) { animation-delay: 0.2s; }
+.staggered-item:nth-child(3) { animation-delay: 0.3s; }
+.staggered-item:nth-child(4) { animation-delay: 0.4s; }
+.staggered-item:nth-child(5) { animation-delay: 0.5s; }
+.staggered-item:nth-child(6) { animation-delay: 0.6s; }
+.staggered-item:nth-child(7) { animation-delay: 0.7s; }
+.staggered-item:nth-child(8) { animation-delay: 0.8s; }
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

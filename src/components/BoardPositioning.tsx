@@ -218,7 +218,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   selectedChampion === champion ? 'bg-primary/20 ring-1 ring-primary' : 'bg-card/50'
                 } ${champion.position ? 'border-primary/30' : ''}`}
                 onClick={() => handleChampionClick(champion)}
-                draggable
+                draggable={!readonly}
                 onDragStart={(e) => handleDragStart(e, champion)}
               >
                 <div className="flex flex-col items-center">

@@ -28,18 +28,15 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
     }
   };
   
-  // Get the set name from tftVersion
   const getSetName = () => {
     if (!comp.tftVersion) return null;
     return traitMappings[comp.tftVersion]?.name || comp.tftVersion;
   };
   
-  // Check if any champions have position data
   const hasPositioningData = comp.boardPositions || comp.finalComp.some(champ => champ.position);
   
   return (
     <div className={`tft-card ${expanded ? 'col-span-full' : 'col-span-1'} transition-all duration-300`}>
-      {/* Card Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/40">
         <div className="flex items-center gap-3">
           <div className={`flex items-center justify-center w-8 h-8 rounded-md ${getTierColor(comp.tier)}`}>
@@ -56,10 +53,8 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
         </div>
       </div>
       
-      {/* Card Summary */}
       <div className="p-4">
         <div className="flex flex-wrap gap-3 items-center mb-4">
-          {/* Traits */}
           {comp.traits.map((trait) => (
             <div key={trait.name} className="flex items-center px-2 py-1 bg-secondary/50 rounded text-xs">
               <span className="font-medium">{trait.name}</span>
@@ -88,7 +83,6 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
           </div>
         </div>
         
-        {/* Champions Overview (always visible) */}
         <div className="flex flex-wrap gap-2 mb-3">
           {comp.finalComp.map((champion) => (
             <div key={champion.name} className={`relative ${champion.isCarry ? 'animate-pulse-subtle' : ''}`}>
@@ -103,7 +97,6 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
         </div>
       </div>
       
-      {/* Action Bar */}
       <div className="border-t border-border/40 px-4 py-2 flex justify-between items-center">
         <Button 
           variant="ghost" 
@@ -125,7 +118,6 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
           )}
         </Button>
 
-        {/* Admin buttons - only show if handlers are provided */}
         {(onEdit || onDelete) && (
           <div className="flex gap-2">
             {onEdit && (
@@ -253,6 +245,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
                   <h4 className="text-sm font-medium text-primary mb-4">Recommended Positioning</h4>
                   <BoardPositioning
                     champions={comp.finalComp.map(champ => ({ ...champ, position: champ.position || null }))}
+                    readonly={true}
                   />
                   <p className="text-xs text-muted-foreground mt-4">
                     This shows the recommended positioning for the late game board. Position your units as shown for optimal performance.

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import CompCard from './CompCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,11 +6,8 @@ import { SearchX, Filter, Sparkles, HelpCircle, Star, Triangle, Square, Circle, 
 import { useComps } from '@/contexts/CompsContext';
 import { 
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -21,18 +17,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TierLegend from './TierLegend';
 
 const CompTierList: React.FC = () => {
-  const { comps, removeComp, traitMappings, loading } = useComps();
+  const { comps, traitMappings, loading } = useComps();
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     tier: 'all',
     playstyle: 'all',
     tftVersion: 'all',
   });
-  const [compToDelete, setCompToDelete] = useState<string | null>(null);
   const [groupedComps, setGroupedComps] = useState<Record<string, TFTComp[]>>({});
   const [activeTab, setActiveTab] = useState('S');
   const [showLegend, setShowLegend] = useState(false);
-  const navigate = useNavigate();
   const [availableVersions, setAvailableVersions] = useState<string[]>([]);
 
   useEffect(() => {
@@ -87,21 +81,6 @@ const CompTierList: React.FC = () => {
       [key]: value
     }));
   };
-
-  const handleDeleteComp = (compId: string) => {
-    removeComp(compId);
-    setCompToDelete(null);
-    toast({
-      title: "Composition Deleted",
-      description: "The composition has been removed successfully",
-    });
-  };
-
-  const handleEditComp = (compId: string) => {
-    navigate(`/edit/${compId}`);
-  };
-
-  const shouldShowFilteredView = !(filters.tier === 'all' && filters.playstyle === 'all' && filters.tftVersion === 'all' && searchTerm === '');
 
   const getTierIcon = (tier: string) => {
     switch (tier) {
@@ -252,8 +231,6 @@ const CompTierList: React.FC = () => {
                       <CompCard 
                         key={comp.id}
                         comp={comp}
-                        onEdit={handleEditComp}
-                        onDelete={(compId) => setCompToDelete(compId)}
                       />
                     ))}
                   </div>
@@ -295,8 +272,6 @@ const CompTierList: React.FC = () => {
                           <CompCard 
                             key={comp.id}
                             comp={comp}
-                            onEdit={handleEditComp}
-                            onDelete={(compId) => setCompToDelete(compId)}
                           />
                         ))}
                       </div>
@@ -312,23 +287,6 @@ const CompTierList: React.FC = () => {
           </>
         )}
       </div>
-
-      <AlertDialog open={!!compToDelete} onOpenChange={() => setCompToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Composition</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this composition? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => compToDelete && handleDeleteComp(compToDelete)}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </section>
   );
 };

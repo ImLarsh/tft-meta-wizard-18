@@ -11,11 +11,9 @@ import CompVoteSystem from './CompVoteSystem';
 
 interface CompCardProps {
   comp: TFTComp;
-  onEdit?: (compId: string) => void;
-  onDelete?: (compId: string) => void;
 }
 
-const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
+const CompCard: React.FC<CompCardProps> = ({ comp }) => {
   const [expanded, setExpanded] = useState(false);
   const { traitMappings } = useComps();
   
@@ -131,33 +129,6 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
 
         <div className="flex items-center">
           <CompVoteSystem compId={comp.id} className="mr-2" />
-          
-          {(onEdit || onDelete) && (
-            <div className="flex gap-2">
-              {onEdit && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-xs"
-                  onClick={() => onEdit(comp.id)}
-                  aria-label="Edit composition"
-                >
-                  Edit
-                </Button>
-              )}
-              {onDelete && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="text-xs border-destructive/30 text-destructive hover:bg-destructive/10"
-                  onClick={() => onDelete(comp.id)}
-                  aria-label="Delete composition"
-                >
-                  Delete
-                </Button>
-              )}
-            </div>
-          )}
         </div>
       </div>
       

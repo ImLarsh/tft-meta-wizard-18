@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TFTComp } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronDown, ChevronRight, Star, Trophy, BarChart, Brain, MapPin, Triangle, Square, Circle } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
+import CompVoteSystem from './CompVoteSystem';
 
 interface CompCardProps {
   comp: TFTComp;
@@ -21,10 +21,10 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
   
   const getTierIcon = (tier: string) => {
     switch (tier) {
-      case 'S': return <Star className="h-5 w-5 text-yellow-400" />;
-      case 'A': return <Triangle className="h-5 w-5 text-cyan-400" />;
-      case 'B': return <Square className="h-5 w-5 text-purple-400" />;
-      case 'C': return <Circle className="h-5 w-5 text-red-400" />;
+      case 'S': return <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />;
+      case 'A': return <Triangle className="h-5 w-5 text-cyan-400 fill-cyan-400" />;
+      case 'B': return <Square className="h-5 w-5 text-purple-400 fill-purple-400" />;
+      case 'C': return <Circle className="h-5 w-5 text-red-400 fill-red-400" />;
       default: return null;
     }
   };
@@ -129,32 +129,36 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
           )}
         </Button>
 
-        {(onEdit || onDelete) && (
-          <div className="flex gap-2">
-            {onEdit && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="text-xs"
-                onClick={() => onEdit(comp.id)}
-                aria-label="Edit composition"
-              >
-                Edit
-              </Button>
-            )}
-            {onDelete && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="text-xs border-destructive/30 text-destructive hover:bg-destructive/10"
-                onClick={() => onDelete(comp.id)}
-                aria-label="Delete composition"
-              >
-                Delete
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex items-center">
+          <CompVoteSystem compId={comp.id} className="mr-2" />
+          
+          {(onEdit || onDelete) && (
+            <div className="flex gap-2">
+              {onEdit && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-xs"
+                  onClick={() => onEdit(comp.id)}
+                  aria-label="Edit composition"
+                >
+                  Edit
+                </Button>
+              )}
+              {onDelete && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="text-xs border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={() => onDelete(comp.id)}
+                  aria-label="Delete composition"
+                >
+                  Delete
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       
       {expanded && (

@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      comp_votes: {
+        Row: {
+          comp_id: string
+          created_at: string | null
+          id: string
+          user_id: string | null
+          vote_type: string
+        }
+        Insert: {
+          comp_id: string
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+          vote_type: string
+        }
+        Update: {
+          comp_id?: string
+          created_at?: string | null
+          id?: string
+          user_id?: string | null
+          vote_type?: string
+        }
+        Relationships: []
+      }
       tft_comps: {
         Row: {
           comps: Json

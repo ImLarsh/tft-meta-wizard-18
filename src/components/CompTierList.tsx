@@ -35,16 +35,13 @@ const CompTierList: React.FC = () => {
   const navigate = useNavigate();
   const [availableVersions, setAvailableVersions] = useState<string[]>([]);
 
-  // Get available TFT versions
   useEffect(() => {
     const versions = Object.keys(traitMappings);
-    // Sort versions to get the latest sets first
     const sortedVersions = [...versions].sort().reverse();
     setAvailableVersions(sortedVersions);
   }, [traitMappings]);
 
   useEffect(() => {
-    // Sort comps to show latest sets first
     const sortedComps = [...comps].sort((a, b) => {
       const versionA = a.tftVersion || "Set 10";
       const versionB = b.tftVersion || "Set 10";
@@ -74,7 +71,6 @@ const CompTierList: React.FC = () => {
     
     return matchesSearch && matchesTier && matchesPlaystyle && matchesVersion;
   }).sort((a, b) => {
-    // Sort by version (latest first) then by tier
     const versionA = a.tftVersion || "Set 10";
     const versionB = b.tftVersion || "Set 10";
     const versionCompare = versionB.localeCompare(versionA);
@@ -109,10 +105,10 @@ const CompTierList: React.FC = () => {
 
   const getTierIcon = (tier: string) => {
     switch (tier) {
-      case 'S': return <Star className="h-5 w-5 text-yellow-400" />;
-      case 'A': return <Triangle className="h-5 w-5 text-cyan-400" />;
-      case 'B': return <Square className="h-5 w-5 text-purple-400" />;
-      case 'C': return <Circle className="h-5 w-5 text-red-400" />;
+      case 'S': return <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />;
+      case 'A': return <Triangle className="h-5 w-5 text-cyan-400 fill-cyan-400" />;
+      case 'B': return <Square className="h-5 w-5 text-purple-400 fill-purple-400" />;
+      case 'C': return <Circle className="h-5 w-5 text-red-400 fill-red-400" />;
       default: return null;
     }
   };

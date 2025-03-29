@@ -117,7 +117,8 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
   };
 
   const addItemToChampion = () => {
-    if (!selectedItem || selectedItems.includes(selectedItem) || selectedItems.length >= 3) return;
+    if (!selectedItem || selectedItems.length >= 3) return;
+    // Removed the check for duplicates
     setSelectedItems([...selectedItems, selectedItem]);
     setSelectedItem("");
   };

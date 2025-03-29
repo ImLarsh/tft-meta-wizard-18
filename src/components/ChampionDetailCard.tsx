@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -94,7 +93,7 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
   };
   
   const addItem = (item: string) => {
-    if (items.length < 3 && !items.includes(item)) {
+    if (items.length < 3) {
       onUpdate({
         ...champion,
         items: [...items, item]
@@ -184,8 +183,7 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
                       <DropdownMenuItem 
                         key={item}
                         onClick={() => addItem(item)}
-                        disabled={items.includes(item)}
-                        className={items.includes(item) ? "opacity-50" : ""}
+                        disabled={items.length >= 3}
                       >
                         {item}
                       </DropdownMenuItem>
@@ -203,8 +201,7 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
                           <DropdownMenuItem 
                             key={item}
                             onClick={() => addItem(item)}
-                            disabled={items.includes(item)}
-                            className={items.includes(item) ? "opacity-50" : ""}
+                            disabled={items.length >= 3}
                           >
                             {item}
                           </DropdownMenuItem>

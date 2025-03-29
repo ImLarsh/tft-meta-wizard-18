@@ -7,6 +7,13 @@ import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
 import ItemSearchBar from './ItemSearchBar';
 import { Champion } from '@/data/comps';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface ChampionDetailCardProps {
   champion: Champion;
@@ -20,6 +27,7 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
   onRemove 
 }) => {
   const items = champion.items || [];
+  const [selectedItem, setSelectedItem] = useState<string>("");
   
   const toggleCarry = () => {
     onUpdate({
@@ -45,6 +53,16 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
       items: newItems
     });
   };
+
+  // TFT items - a basic list
+  const tftItems = [
+    "B.F. Sword", "Recurve Bow", "Needlessly Large Rod", "Tear of the Goddess", 
+    "Chain Vest", "Negatron Cloak", "Giant's Belt", "Spatula", "Sparring Gloves",
+    "Infinity Edge", "Rapid Firecannon", "Rabadon's Deathcap", "Seraph's Embrace",
+    "Thornmail", "Dragon's Claw", "Warmog's Armor", "Force of Nature", "Thief's Gloves",
+    "Bloodthirster", "Guinsoo's Rageblade", "Jeweled Gauntlet", "Spear of Shojin",
+    "Sunfire Cape", "Quicksilver", "Morellonomicon", "Zeke's Herald", "Titan's Resolve"
+  ];
   
   return (
     <Card className="relative border border-border group">
@@ -85,11 +103,45 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
         <div className="mt-3">
           <div className="text-sm font-medium mb-2">Items</div>
           
-          {/* Item search */}
+          {/* Item selection dropdown */}
+          <div className="flex gap-2 mb-3">
+            <Select
+              value={selectedItem}
+              onValueChange={setSelectedItem}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Item" />
+              </SelectTrigger>
+              <SelectContent>
+                {tftItems.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    <div className="flex items-center gap-2">
+                      <span>{item}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button 
+              size="sm" 
+              disabled={!selectedItem || items.length >= 3}
+              onClick={() => {
+                if (selectedItem) {
+                  addItem(selectedItem);
+                  setSelectedItem("");
+                }
+              }}
+            >
+              Add
+            </Button>
+          </div>
+          
+          {/* Alternate item search */}
           <ItemSearchBar 
             onSelectItem={addItem} 
             currentItemCount={items.length}
-            placeholder="Add items..."
+            placeholder="Or search items..."
           />
           
           {/* Item display */}

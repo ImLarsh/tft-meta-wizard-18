@@ -56,7 +56,10 @@ export default {
 				tft: {
 					blue: '#0A1428',
 					gold: '#C8AA6E',
-					purple: '#5B3B85',
+					purple: '#9B87F5', // Updated to match our theme
+					darkPurple: '#1A1F2C',
+					lightPurple: '#D6BCFA',
+					vividPurple: '#8B5CF6',
 					cyan: '#0AC8B9',
 					red: '#E84057',
 					dark: '#091428',
@@ -106,12 +109,21 @@ export default {
 				'pulse-subtle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.8' }
+				},
+				'glow': {
+					'0%, 100%': { 
+						boxShadow: '0 0 5px rgba(155, 135, 245, 0.3)' 
+					},
+					'50%': { 
+						boxShadow: '0 0 15px rgba(155, 135, 245, 0.6)' 
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+				'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'glow': 'glow 2s ease-in-out infinite'
 			}
 		}
 	},

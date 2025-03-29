@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CompCard from './CompCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SearchX, Filter, Sparkles, HelpCircle, Star, Triangle, Square, Circle } from 'lucide-react';
+import { SearchX, Filter, Sparkles, HelpCircle, Star, Triangle, Square, Circle, Loader2 } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import { 
   AlertDialog,
@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TierLegend from './TierLegend';
 
 const CompTierList: React.FC = () => {
-  const { comps, removeComp, traitMappings } = useComps();
+  const { comps, removeComp, traitMappings, loading } = useComps();
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     tier: 'all',
@@ -236,54 +236,19 @@ const CompTierList: React.FC = () => {
           </div>
         </div>
         
-        {shouldShowFilteredView ? (
-          <>
-            {filteredComps.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredComps.map(comp => (
-                  <CompCard 
-                    key={comp.id}
-                    comp={comp}
-                    onEdit={handleEditComp}
-                    onDelete={(compId) => setCompToDelete(compId)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <SearchX className="h-12 w-12 mx-auto text-muted mb-3" />
-                <h3 className="text-xl font-medium mb-2">No comps found</h3>
-                <p className="text-muted-foreground mb-4">Try adjusting your search or filters</p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSearchTerm('');
-                    setFilters({ tier: 'all', playstyle: 'all', tftVersion: 'all' });
-                  }}
-                >
-                  Reset Filters
-                </Button>
-              </div>
-            )}
-          </>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-xl font-medium">Loading compositions...</p>
+            <p className="text-muted-foreground">Please wait while we fetch the data</p>
+          </div>
         ) : (
-          <Tabs defaultValue="S" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-6">
-              {['S', 'A', 'B', 'C'].map(tier => (
-                <TabsTrigger key={tier} value={tier} className="flex-1">
-                  <div className="flex items-center gap-2">
-                    {getTierIcon(tier)}
-                    <span>Tier {tier}</span>
-                  </div>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            
-            {['S', 'A', 'B', 'C'].map(tier => (
-              <TabsContent key={tier} value={tier} className="space-y-4">
-                {groupedComps[tier]?.length > 0 ? (
+          <>
+            {shouldShowFilteredView ? (
+              <>
+                {filteredComps.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {groupedComps[tier]?.map(comp => (
+                    {filteredComps.map(comp => (
                       <CompCard 
                         key={comp.id}
                         comp={comp}
@@ -293,13 +258,58 @@ const CompTierList: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No compositions in Tier {tier}</p>
+                  <div className="text-center py-16">
+                    <SearchX className="h-12 w-12 mx-auto text-muted mb-3" />
+                    <h3 className="text-xl font-medium mb-2">No comps found</h3>
+                    <p className="text-muted-foreground mb-4">Try adjusting your search or filters</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setSearchTerm('');
+                        setFilters({ tier: 'all', playstyle: 'all', tftVersion: 'all' });
+                      }}
+                    >
+                      Reset Filters
+                    </Button>
                   </div>
                 )}
-              </TabsContent>
-            ))}
-          </Tabs>
+              </>
+            ) : (
+              <Tabs defaultValue="S" value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="mb-6">
+                  {['S', 'A', 'B', 'C'].map(tier => (
+                    <TabsTrigger key={tier} value={tier} className="flex-1">
+                      <div className="flex items-center gap-2">
+                        {getTierIcon(tier)}
+                        <span>Tier {tier}</span>
+                      </div>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                
+                {['S', 'A', 'B', 'C'].map(tier => (
+                  <TabsContent key={tier} value={tier} className="space-y-4">
+                    {groupedComps[tier]?.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {groupedComps[tier]?.map(comp => (
+                          <CompCard 
+                            key={comp.id}
+                            comp={comp}
+                            onEdit={handleEditComp}
+                            onDelete={(compId) => setCompToDelete(compId)}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">No compositions in Tier {tier}</p>
+                      </div>
+                    )}
+                  </TabsContent>
+                ))}
+              </Tabs>
+            )}
+          </>
         )}
       </div>
 

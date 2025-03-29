@@ -8,13 +8,14 @@ import { ArrowLeft, Sparkles, Save } from 'lucide-react';
 import { TFTComp } from '@/data/comps';
 import { toast } from '@/components/ui/use-toast';
 import { useComps } from '@/contexts/CompsContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const CompEditor: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addComp, traitMappings } = useComps();
 
-  const handleSubmit = (compData: TFTComp) => {
+  const handleSubmit = async (compData: TFTComp) => {
     setIsSubmitting(true);
     
     try {
@@ -23,8 +24,8 @@ const CompEditor: React.FC = () => {
         throw new Error(`Invalid TFT version: ${compData.tftVersion}`);
       }
       
-      // Save the comp to our context/localStorage
-      addComp(compData);
+      // Save the comp to our context (which will save to Supabase)
+      await addComp(compData);
       
       // Log the data that would be saved
       console.log('Saving comp data:', compData);
@@ -32,7 +33,7 @@ const CompEditor: React.FC = () => {
       // Show success message
       toast({
         title: "Success",
-        description: "Your composition has been saved!",
+        description: "Your composition has been saved and is now public!",
       });
       
       // Navigate back to the main page

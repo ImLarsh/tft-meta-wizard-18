@@ -9,14 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash, X, Loader2, MapPin, Crown } from 'lucide-react';
+import { Loader2, MapPin, Crown } from 'lucide-react';
 import ChampionIcon from './ChampionIcon';
 import { useComps } from '@/contexts/CompsContext';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import TFTBoardBuilder from './TFTBoardBuilder';
+import BoardPositioning from './BoardPositioning';
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -38,8 +37,6 @@ interface SimpleCompFormProps {
 const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, isSubmitting = false }) => {
   const [finalComp, setFinalComp] = useState<Champion[]>(initialData?.finalComp || []);
   const [activeTab, setActiveTab] = useState("general");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredChampions, setFilteredChampions] = useState<string[]>([]);
   const [newChampName, setNewChampName] = useState("");
   const [newChampCost, setNewChampCost] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [newChampIsCarry, setNewChampIsCarry] = useState(false);
@@ -72,15 +69,12 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
 
   const currentTftVersion = form.watch("tftVersion") || availableSets[0] || "Set 10";
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
-
+  
   useEffect(() => {
-    const championsInCurrentSet = Object.keys(currentTraitMap);
-    setFilteredChampions(championsInCurrentSet);
-    
-    if (newChampName && !championsInCurrentSet.includes(newChampName)) {
-      setNewChampName("");
+    if (initialData?.finalComp) {
+      setFinalComp(initialData.finalComp);
     }
-  }, [currentTftVersion, currentTraitMap, newChampName]);
+  }, [initialData]);
 
   const handleAddChampion = () => {
     if (!newChampName) return;
@@ -102,9 +96,8 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
     setFinalComp(finalComp.filter((_, i) => i !== index));
   };
 
-  const handleSaveBoard = (champions: Champion[]) => {
+  const handleUpdatePositions = (champions: Champion[]) => {
     setFinalComp(champions);
-    setActiveTab("general");
   };
 
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
@@ -139,21 +132,17 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
       finalComp,
       traits: traitsArray,
       boardPositions: finalComp.some(champ => champ.position !== null),
+      // These fields were missing and causing the build error:
+      earlyGame: [],
+      keyItems: [],
+      strengthsWeaknesses: {
+        strengths: [],
+        weaknesses: [],
+      },
     };
 
     onSubmit(newComp);
   };
-
-  // Prepare champions for board builder
-  const availableChampions = filteredChampions.map(name => {
-    const cost = Math.floor(Math.random() * 5) + 1; // This is a placeholder, you'd need to get the actual cost
-    return {
-      name,
-      cost: cost as 1 | 2 | 3 | 4 | 5,
-      isCarry: false,
-      position: null
-    };
-  });
 
   return (
     <Form {...form}>
@@ -347,7 +336,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
             <Card className="p-6 border border-primary/20 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <Crown className="h-5 w-5 text-primary" />
-                <h3 className="text-xl font-medium">Final Composition</h3>
+                <h3 className="text-xl font-medium">Team Composition</h3>
               </div>
               
               {finalComp.length > 0 ? (
@@ -361,7 +350,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                           : 'bg-card border-border hover:border-primary/40'
                       }`}
                     >
-                      <ChampionIcon name={champ.name} cost={champ.cost} size="lg" />
+                      <ChampionIcon name={champ.name} cost={champ.cost} size="lg" isCarry={champ.isCarry} />
                       <div className="ml-3 flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className="font-medium truncate">{champ.name}</p>
@@ -372,11 +361,14 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                             className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={() => removeChampion(index)}
                           >
-                            <X className="h-4 w-4" />
+                            <span className="sr-only">Remove</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                           </Button>
                         </div>
                         
-                        <div className="flex items-center gap-1 text-xs">
+                        <div className="flex items-center gap-1 text-xs mt-1">
                           <span className={`px-1.5 py-0.5 rounded ${
                             champ.cost >= 4 ? 'bg-primary/20 text-primary' : 'bg-muted'
                           }`}>
@@ -403,78 +395,59 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                 </div>
               ) : (
                 <div className="text-center py-6 bg-muted/40 rounded-md mb-6">
-                  <p className="text-muted-foreground">No champions added yet. Add champions or use the Positioning tab to drag champions to the board.</p>
+                  <p className="text-muted-foreground">No champions added yet. Add champions below or use the Positioning tab to place champions on the board.</p>
                 </div>
               )}
               
               <div className="space-y-4 border border-border rounded-md p-4 bg-card/50">
                 <h4 className="font-medium text-sm">Add Champion</h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <Label className="mb-2 block">Champion Name</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Input 
-                          value={newChampName} 
-                          onChange={(e) => setNewChampName(e.target.value)}
-                          placeholder={filteredChampions.length > 0 ? "Search champions..." : `No champions for ${currentTftVersion}`}
-                          disabled={filteredChampions.length === 0}
-                        />
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0" align="start">
-                        <div className="max-h-[200px] overflow-y-auto">
-                          {filteredChampions
-                            .filter(name => name.toLowerCase().includes(newChampName.toLowerCase()))
-                            .map((name, index) => (
-                              <Button
-                                key={index}
-                                variant="ghost"
-                                className="w-full justify-start rounded-none text-left font-normal"
-                                onClick={() => setNewChampName(name)}
-                              >
-                                {name}
-                              </Button>
-                            ))
-                          }
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    <select
+                      value={newChampName}
+                      onChange={(e) => setNewChampName(e.target.value)}
+                      className="w-full p-2 rounded-md border border-input bg-background"
+                    >
+                      <option value="">Select a champion</option>
+                      {Object.keys(currentTraitMap).map(name => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </select>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="mb-2 block">Cost</Label>
-                      <Select 
-                        value={newChampCost.toString()} 
-                        onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Cost" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1 Cost</SelectItem>
-                          <SelectItem value="2">2 Cost</SelectItem>
-                          <SelectItem value="3">3 Cost</SelectItem>
-                          <SelectItem value="4">4 Cost</SelectItem>
-                          <SelectItem value="5">5 Cost</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex items-end mb-1">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id="carry-checkbox"
-                          checked={newChampIsCarry}
-                          onChange={(e) => setNewChampIsCarry(e.target.checked)}
-                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <Label htmlFor="carry-checkbox" className="cursor-pointer">
-                          Is Carry?
-                        </Label>
-                      </div>
+                  <div>
+                    <Label className="mb-2 block">Cost</Label>
+                    <Select 
+                      value={newChampCost.toString()} 
+                      onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Cost" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 Cost</SelectItem>
+                        <SelectItem value="2">2 Cost</SelectItem>
+                        <SelectItem value="3">3 Cost</SelectItem>
+                        <SelectItem value="4">4 Cost</SelectItem>
+                        <SelectItem value="5">5 Cost</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex items-end mb-1">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="carry-checkbox"
+                        checked={newChampIsCarry}
+                        onChange={(e) => setNewChampIsCarry(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="carry-checkbox" className="cursor-pointer">
+                        Is Carry?
+                      </Label>
                     </div>
                   </div>
                 </div>
@@ -482,24 +455,19 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                 <Button 
                   type="button" 
                   onClick={handleAddChampion}
-                  disabled={!newChampName || filteredChampions.length === 0}
+                  disabled={!newChampName}
                   className="w-full"
                 >
                   Add Champion
                 </Button>
               </div>
               
-              {filteredChampions.length > 0 && (
-                <div className="mt-4 bg-secondary/20 p-4 rounded-md">
-                  <h4 className="text-sm font-medium mb-2">Champions in {traitMappings[currentTftVersion]?.name || currentTftVersion}</h4>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    {filteredChampions.length} champions available in this set
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Use the Positioning tab to drag and drop champions onto the board for a more visual way to build your comp.
-                  </p>
-                </div>
-              )}
+              <div className="mt-4 bg-secondary/20 p-4 rounded-md">
+                <h4 className="text-sm font-medium mb-2">Need to position your champions?</h4>
+                <p className="text-xs text-muted-foreground">
+                  Use the Positioning tab to drag and drop champions onto the board to create your ideal team formation.
+                </p>
+              </div>
             </Card>
           </TabsContent>
 
@@ -511,13 +479,14 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                   Champion Positioning
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Drag and drop champions onto the board to create your ideal positioning.
+                  Drag champions to place them on the board in optimal positions.
                 </p>
               </div>
-              <TFTBoardBuilder 
-                initialChampions={finalComp}
-                availableChampions={availableChampions}
-                onSave={handleSaveBoard}
+              
+              <BoardPositioning 
+                champions={finalComp}
+                onUpdatePositions={handleUpdatePositions}
+                readonly={false}
               />
             </div>
           </TabsContent>
@@ -530,7 +499,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
             className="w-full md:w-auto"
           >
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Comp
+            Save Composition
           </Button>
         </div>
       </form>

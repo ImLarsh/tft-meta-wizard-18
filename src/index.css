@@ -1,230 +1,357 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 330 100% 95%;
-    --foreground: 320 80% 20%;
-    --card: 330 100% 96%;
-    --card-foreground: 320 80% 20%;
-    --popover: 330 100% 95%;
-    --popover-foreground: 320 80% 20%;
-    --primary: 320 100% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 330 60% 85%;
-    --secondary-foreground: 320 80% 20%;
-    --muted: 330 50% 90%;
-    --muted-foreground: 320 30% 40%;
-    --accent: 320 100% 75%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 330 60% 85%;
-    --input: 330 60% 85%;
-    --ring: 320 100% 65%;
+    --background: 210 40% 98%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262 83.3% 57.8%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 270 70% 4%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 265 27% 16%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 262 83.3% 57.8%;
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 270 50% 3%;
-    --foreground: 275 100% 95%;
-    --card: 270 50% 4%;
-    --card-foreground: 275 100% 95%;
-    --popover: 270 50% 3%;
-    --popover-foreground: 275 100% 95%;
-    --primary: 275 100% 55%;
-    --primary-foreground: 275 100% 98%;
-    --secondary: 270 30% 10%;
-    --secondary-foreground: 275 100% 95%;
-    --muted: 270 30% 10%;
-    --muted-foreground: 270 20% 70%;
-    --accent: 275 100% 30%;
-    --accent-foreground: 275 100% 98%;
-    --destructive: 0 100% 30%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 263 70% 50%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 275 27% 16%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 270 30% 10%;
-    --input: 270 30% 10%;
-    --ring: 275 100% 50%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 262 100% 76%;
   }
 }
 
-/* Universal styles */
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Exo 2', sans-serif;
-    /* Prevent iOS text size adjust after orientation change */
-    -webkit-text-size-adjust: 100%;
   }
-  
-  /* Custom styling for the board UI */
-  .board-wrapper {
-    @apply flex flex-col items-center gap-4 p-2;
-  }
+}
 
-  .board-wrapper.compact {
-    @apply p-0;
-  }
-  
-  .board-container {
-    @apply relative;
-  }
-  
-  .board-grid {
-    @apply inline-block relative;
-  }
-  
-  .board-row {
-    @apply flex justify-center;
-  }
-  
-  .board-row:nth-child(odd) {
-    @apply ml-4;
-  }
-  
-  .hexagon-cell {
-    @apply w-12 h-12 m-[2px] relative cursor-pointer;
-  }
-  
-  .compact .hexagon-cell {
-    @apply w-8 h-8 m-[1px];
-  }
-  
-  .hexagon {
-    @apply w-full h-full flex items-center justify-center;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  }
-  
-  .hexagon.empty {
-    @apply bg-secondary/60 hover:bg-secondary/80;
-  }
-  
-  .hexagon.occupied {
-    @apply bg-primary/20;
-  }
-  
-  .hexagon.selected {
-    @apply bg-primary/40;
-  }
-  
-  .champion-content {
-    @apply w-10 h-10 flex items-center justify-center;
-  }
-  
-  .compact .champion-content {
-    @apply w-6 h-6;
-  }
-  
-  .champions-title {
-    @apply text-lg font-medium mt-4 mb-2;
-  }
-  
-  .champions-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full max-w-2xl;
-  }
-  
-  .champion-card {
-    @apply bg-secondary/30 p-2 rounded-md cursor-pointer border border-transparent hover:border-primary/40 transition-all;
-  }
-  
-  .champion-card.selected {
-    @apply bg-primary/20 border-primary;
-  }
-  
-  .champion-card.positioned {
-    @apply opacity-80;
-  }
-  
-  .champion-info {
-    @apply flex flex-col items-center gap-1;
-  }
-  
-  .champion-name {
-    @apply text-xs font-medium;
-  }
-  
-  .position-indicator {
-    @apply text-[10px] flex items-center text-muted-foreground;
-  }
-  
-  .board-instructions {
-    @apply flex items-center text-sm text-muted-foreground bg-background/60 p-2 rounded-md mb-2 text-center md:text-left;
-  }
-  
-  .board-tip {
-    @apply mt-4 text-xs text-muted-foreground;
-  }
-  
-  /* Champion border colors based on cost */
-  .champion-border-1 {
-    @apply border-2 border-cost-1;
-  }
-  
-  .champion-border-2 {
-    @apply border-2 border-cost-2;
-  }
-  
-  .champion-border-3 {
-    @apply border-2 border-cost-3;
-  }
-  
-  .champion-border-4 {
-    @apply border-2 border-cost-4;
-  }
-  
-  .champion-border-5 {
-    @apply border-2 border-cost-5;
-  }
+/* BoardPositioning Styles */
+.board-wrapper {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
 
-  /* Custom card styling for TFT comps */
-  .tft-card {
-    @apply bg-card border border-border/60 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-md w-full;
-  }
+.board-wrapper.compact {
+  max-width: 500px;
+}
 
-  /* Gaming-style button with glow */
-  .gaming-button {
-    @apply bg-primary text-primary-foreground relative overflow-hidden shadow-[0_0_10px_rgba(123,31,162,0.5)];
-  }
+.board-instructions {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  font-size: 0.9rem;
+}
 
-  .gaming-button::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-primary/0 via-white/20 to-primary/0 -translate-x-full;
-    animation: shine 3s infinite;
-  }
+.board-container {
+  margin-bottom: 1.5rem;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(130, 80, 223, 0.05), rgba(130, 80, 223, 0.15));
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  box-shadow: 0 4px 16px rgba(var(--secondary-rgb), 0.1);
+}
 
-  @keyframes shine {
-    100% {
-      transform: translateX(100%);
-    }
+.board-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.board-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.hexagon-cell {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  cursor: pointer;
+}
+
+.compact .hexagon-cell {
+  width: 40px;
+  height: 40px;
+}
+
+.hexagon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(var(--muted-rgb), 0.5);
+  border: 2px solid rgba(var(--muted-foreground-rgb), 0.2);
+  border-radius: 8px;
+  position: relative;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.hexagon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(var(--primary-rgb), 0.15), transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.hexagon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.15);
+  border-color: rgba(var(--primary-rgb), 0.5);
+}
+
+.hexagon.occupied {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-color: rgba(var(--primary-rgb), 0.4);
+}
+
+.hexagon.selected {
+  border-color: rgba(var(--primary-rgb), 1);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.5);
+}
+
+.champion-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.champions-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.champions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.champion-card {
+  background-color: rgba(var(--card-rgb), 0.7);
+  border: 1px solid rgba(var(--border-rgb), 0.8);
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.champion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.15);
+  border-color: rgba(var(--primary-rgb), 0.4);
+}
+
+.champion-card.selected {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-color: rgba(var(--primary-rgb), 0.7);
+}
+
+.champion-card.positioned {
+  background-color: rgba(var(--secondary-rgb), 0.1);
+}
+
+.champion-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.champion-name {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.position-indicator {
+  font-size: 0.65rem;
+  color: rgba(var(--muted-foreground-rgb), 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+.board-tip {
+  padding: 0.75rem;
+  background-color: rgba(var(--secondary-rgb), 0.05);
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(var(--muted-foreground-rgb), 1);
+  border: 1px dashed rgba(var(--muted-foreground-rgb), 0.2);
+  text-align: center;
+}
+
+/* Gaming Button */
+.gaming-button {
+  background: linear-gradient(135deg, #9b87f5, #7E69AB);
+  box-shadow: 0 4px 10px rgba(112, 84, 168, 0.4);
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.gaming-button:hover {
+  background: linear-gradient(135deg, #8B5CF6, #6E59A5);
+  box-shadow: 0 6px 15px rgba(112, 84, 168, 0.6);
+}
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+}
+
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(45deg);
+  animation: shine-once 3s forwards;
+  opacity: 0;
+}
+
+.shine-effect:hover::after {
+  animation: shine 1.5s infinite;
+}
+
+@keyframes shine-once {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%) rotate(45deg);
   }
-  
-  /* Mobile optimizations */
-  @media (max-width: 640px) {
-    #root {
-      padding: 1rem !important;
-    }
-    
-    .container {
-      @apply px-2;
-    }
-    
-    .board-wrapper {
-      @apply scale-90 origin-top;
-    }
-    
-    .board-row:nth-child(odd) {
-      @apply ml-2;
-    }
-    
-    .champions-grid {
-      @apply grid-cols-2 gap-1;
-    }
-    
-    .champion-card {
-      @apply p-1;
-    }
+  30% {
+    opacity: 0.5;
   }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+@keyframes shine {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%) rotate(45deg);
+  }
+  30% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) rotate(45deg);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Glass effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* CSS for the Champion Preview overlay */
+.champion-preview {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  background-color: rgba(var(--background-rgb), 0.95);
+  border: 1px solid rgba(var(--primary-rgb), 0.3);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+.champion-content:hover .champion-preview {
+  opacity: 1;
 }

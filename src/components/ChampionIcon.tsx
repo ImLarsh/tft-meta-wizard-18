@@ -110,13 +110,13 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     5: 'bg-cost-5'
   };
   
-  // Cost-specific border classes
+  // Cost-specific border classes with proper colors
   const costBorderClasses = {
-    1: 'border-2 border-cost-1', // white
-    2: 'border-2 border-cost-2', // green
-    3: 'border-2 border-cost-3', // blue
-    4: 'border-2 border-cost-4', // pink
-    5: 'border-2 border-cost-5'  // yellow
+    1: 'border-2 border-cost-1', // white/gray for 1-cost
+    2: 'border-2 border-cost-2', // green for 2-cost
+    3: 'border-2 border-cost-3', // blue for 3-cost
+    4: 'border-2 border-cost-4', // pink/purple for 4-cost
+    5: 'border-2 border-cost-5'  // yellow/gold for 5-cost
   };
   
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
@@ -145,9 +145,9 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       {isCarry && (
         <div className="absolute -top-2 left-0 w-full flex justify-center z-10">
           <div className="flex">
-            <Star size={8} fill="#FFD700" color="#FFD700" />
-            <Star size={8} fill="#FFD700" color="#FFD700" />
-            <Star size={8} fill="#FFD700" color="#FFD700" />
+            <Star size={10} fill="#FFD700" color="#FFD700" />
+            <Star size={10} fill="#FFD700" color="#FFD700" />
+            <Star size={10} fill="#FFD700" color="#FFD700" />
           </div>
         </div>
       )}

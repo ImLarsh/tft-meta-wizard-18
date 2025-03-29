@@ -112,7 +112,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   const renderBoard = () => {
     const rows = 4;
     const cols = 7;
-    const board = [];
+    const boardPositions = [];
     
     for (let row = rows - 1; row >= 0; row--) {
       const rowCells = [];
@@ -129,6 +129,13 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
           >
+            {championAtPosition?.isCarry && (
+              <div className="carry-stars">
+                <Star size={10} fill="#FFD700" color="#FFD700" />
+                <Star size={10} fill="#FFD700" color="#FFD700" />
+                <Star size={10} fill="#FFD700" color="#FFD700" />
+              </div>
+            )}
             <div className={`hexagon ${championAtPosition ? 'occupied' : 'empty'} ${selectedChampion === championAtPosition ? 'selected' : ''}`}>
               {championAtPosition && (
                 <div 
@@ -136,14 +143,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   draggable={!readonly}
                   onDragStart={(e) => handleDragStart(e, championAtPosition)}
                 >
-                  {championAtPosition.isCarry && (
-                    <div className="carry-stars">
-                      <Star size={10} fill="#FFD700" color="#FFD700" />
-                      <Star size={10} fill="#FFD700" color="#FFD700" />
-                      <Star size={10} fill="#FFD700" color="#FFD700" />
-                    </div>
-                  )}
-                  
                   <div className="champion-icon-wrapper">
                     <TooltipProvider>
                       <Tooltip>
@@ -165,28 +164,27 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  
-                  {championAtPosition.items && championAtPosition.items.length > 0 && (
-                    <div className="items-container">
-                      {championAtPosition.items.map((item, idx) => (
-                        <ItemIcon key={idx} name={item} size="xs" />
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+            {championAtPosition?.items && championAtPosition.items.length > 0 && (
+              <div className="items-container">
+                {championAtPosition.items.map((item, idx) => (
+                  <ItemIcon key={idx} name={item} size="xs" />
+                ))}
+              </div>
+            )}
           </div>
         );
       }
-      board.push(
+      boardPositions.push(
         <div key={row} className="board-row">
           {rowCells}
         </div>
       );
     }
     
-    return board;
+    return boardPositions;
   };
 
   return (

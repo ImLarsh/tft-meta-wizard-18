@@ -19,6 +19,8 @@
   position: relative;
   cursor: pointer;
   transition: transform 0.2s;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 
 @media (max-width: 640px) {
@@ -96,7 +98,7 @@
 
 .items-container {
   position: absolute;
-  bottom: -8px;
+  bottom: -14px;
   left: 0;
   width: 100%;
   display: flex;

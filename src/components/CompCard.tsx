@@ -6,9 +6,11 @@ import ItemIcon from './ItemIcon';
 import BoardPositioning from './BoardPositioning';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronDown, ChevronRight, Star, Trophy, BarChart, Brain, MapPin, Triangle, Square, Circle } from 'lucide-react';
+import { ChevronDown, ChevronRight, Star, Trophy, BarChart, Brain, MapPin, Triangle, Square, Circle, Edit, Trash2 } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import CompVoteSystem from './CompVoteSystem';
+import { Link } from 'react-router-dom';
+import { toast } from '@/components/ui/use-toast';
 
 interface CompCardProps {
   comp: TFTComp;
@@ -16,7 +18,7 @@ interface CompCardProps {
 
 const CompCard: React.FC<CompCardProps> = ({ comp }) => {
   const [expanded, setExpanded] = useState(false);
-  const { traitMappings } = useComps();
+  const { traitMappings, removeComp } = useComps();
   
   const getTierIcon = (tier: string) => {
     switch (tier) {
@@ -42,6 +44,16 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
     if (!comp.tftVersion) return null;
     return traitMappings[comp.tftVersion]?.name || comp.tftVersion;
   };
+
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete the "${comp.name}" composition?`)) {
+      removeComp(comp.id);
+      toast({
+        title: "Composition Deleted",
+        description: `"${comp.name}" has been successfully deleted.`
+      });
+    }
+  };
   
   const hasPositioningData = comp.boardPositions || comp.finalComp.some(champ => champ.position);
   
@@ -60,6 +72,18 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
               {getSetName()}
             </span>
           )}
+          <div className="flex items-center gap-1">
+            <Link to={`/edit/${comp.id}`}>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Edit className="h-4 w-4" />
+                <span className="sr-only">Edit</span>
+              </Button>
+            </Link>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={handleDelete}>
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Delete</span>
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -98,8 +122,12 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
             <div key={champion.name} className={`relative ${champion.isCarry ? 'animate-pulse-subtle' : ''}`}>
               <ChampionIcon name={champion.name} cost={champion.cost} />
               {champion.isCarry && (
-                <div className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5">
-                  <Star className="h-3 w-3 text-black" />
+                <div className="absolute -top-2 left-0 w-full flex justify-center z-10">
+                  <div className="flex">
+                    <Star size={8} fill="#FFD700" color="#FFD700" />
+                    <Star size={8} fill="#FFD700" color="#FFD700" />
+                    <Star size={8} fill="#FFD700" color="#FFD700" />
+                  </div>
                 </div>
               )}
             </div>
@@ -167,7 +195,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                       <div className={`relative ${champion.isCarry ? 'animate-pulse-subtle' : ''}`}>
                         <ChampionIcon name={champion.name} cost={champion.cost} />
                         {champion.isCarry && (
-                          <div className="absolute -top-2 right-0 w-full flex justify-center">
+                          <div className="absolute -top-2 left-0 w-full flex justify-center z-10">
                             <div className="flex">
                               <Star size={8} fill="#FFD700" color="#FFD700" />
                               <Star size={8} fill="#FFD700" color="#FFD700" />

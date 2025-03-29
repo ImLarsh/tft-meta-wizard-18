@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -13,7 +12,7 @@ const CompEditExisting: React.FC = () => {
   const navigate = useNavigate();
   const { compId } = useParams<{ compId: string }>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { comps, addComp } = useComps();
+  const { comps, updateComp } = useComps();
   const [currentComp, setCurrentComp] = useState<TFTComp | null>(null);
 
   // Find the comp to edit
@@ -37,11 +36,14 @@ const CompEditExisting: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Save the comp to our context/localStorage
-      addComp(compData);
+      // Make sure we keep the original ID
+      const updatedComp = { ...compData, id: compId! };
+      
+      // Save the updated comp to our context/localStorage
+      updateComp(updatedComp);
       
       // Log the data that would be saved
-      console.log('Updating comp data:', compData);
+      console.log('Updating comp data:', updatedComp);
       
       // Show success message
       toast({

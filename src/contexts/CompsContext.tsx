@@ -212,7 +212,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           if (mappingsData.mappings && typeof mappingsData.mappings === 'object') {
             loadedMappings = {
               ...defaultTraitMappings,
-              ...mappingsData.mappings
+              ...mappingsData.mappings as Record<string, TraitMapping>
             };
           }
         } else {
@@ -270,7 +270,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_comps')
-            .update({ comps: comps })
+            .update({ comps: comps as any })
             .eq('id', existingComps[0].id);
             
           if (updateError) {
@@ -280,7 +280,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_comps')
-            .insert([{ comps: comps }]);
+            .insert([{ comps: comps as any }]);
             
           if (insertError) {
             console.error('Error inserting comps:', insertError);
@@ -296,7 +296,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_trait_mappings')
-            .update({ mappings: traitMappings })
+            .update({ mappings: traitMappings as any })
             .eq('id', existingMappings[0].id);
             
           if (updateError) {
@@ -306,7 +306,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_trait_mappings')
-            .insert([{ mappings: traitMappings }]);
+            .insert([{ mappings: traitMappings as any }]);
             
           if (insertError) {
             console.error('Error inserting trait mappings:', insertError);

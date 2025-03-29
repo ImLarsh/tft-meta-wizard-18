@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
+import { List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 
 const Header: React.FC = () => {
@@ -95,16 +95,7 @@ const Header: React.FC = () => {
               </Button>
             </Link>
             
-            <Link to="/create">
-              <Button 
-                size="sm" 
-                className={`gaming-button animate-glow bg-primary hover:bg-primary/90 transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-                style={{ transitionDelay: '400ms' }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Comp
-              </Button>
-            </Link>
+            {/* Create Comp button removed */}
           </nav>
         </div>
       </div>

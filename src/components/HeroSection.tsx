@@ -53,13 +53,7 @@ const HeroSection: React.FC = () => {
             Your magical companion for Teamfight Tactics success. Discover the best team compositions and climb the ranks with our mystical meta insights.
           </p>
           
-          {/* Animated button */}
-          <div className="mt-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <button className="gaming-button py-3 px-6 rounded-lg text-lg font-medium animate-glow">
-              <Sparkles className="h-5 w-5 inline-block mr-2" />
-              Explore Compositions
-            </button>
-          </div>
+          {/* Button removed */}
         </div>
       </div>
       

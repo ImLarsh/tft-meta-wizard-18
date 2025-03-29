@@ -121,7 +121,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
     return currentTraitMap[championName] || [];
   };
 
-  const handleAddChampion = () => {
+  const handleAddChampion = (champType: "early" | "final") => {
     if (!newChampName) return;
     
     const newChampion: Champion = {
@@ -132,9 +132,9 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
       position: null,
     };
     
-    if (newChampType === "early") {
+    if (champType === "early") {
       setEarlyGame([...earlyGame, newChampion]);
-    } else if (newChampType === "final") {
+    } else if (champType === "final") {
       setFinalComp([...finalComp, newChampion]);
     }
     
@@ -561,10 +561,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   
                   <Button 
                     type="button" 
-                    onClick={() => {
-                      setNewChampType("early");
-                      handleAddChampion();
-                    }}
+                    onClick={() => handleAddChampion("early")}
                     disabled={!newChampName || filteredChampions.length === 0}
                     className="flex-1"
                   >
@@ -776,10 +773,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 
                 <Button 
                   type="button" 
-                  onClick={() => {
-                    setNewChampType("final");
-                    handleAddChampion();
-                  }}
+                  onClick={() => handleAddChampion("final")}
                   disabled={!newChampName || filteredChampions.length === 0}
                   className="w-full"
                 >

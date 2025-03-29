@@ -53,12 +53,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // TFT cost colors
-        'cost-1': "hsl(var(--cost-1))",
-        'cost-2': "hsl(var(--cost-2))",
-        'cost-3': "hsl(var(--cost-3))",
-        'cost-4': "hsl(var(--cost-4))",
-        'cost-5': "hsl(var(--cost-5))",
+        // TFT cost colors - make sure to use distinct colors
+        'cost-1': "#949494", // Gray/white for 1-cost
+        'cost-2': "#11B288", // Green for 2-cost
+        'cost-3': "#207AC7", // Blue for 3-cost
+        'cost-4': "#C440DA", // Pink/purple for 4-cost
+        'cost-5': "#FFB93B", // Yellow/gold for 5-cost
         // TFT board colors
         'tft-gold': "#FFDD1B",
         'tft-cyan': "#00CFBE",

@@ -283,9 +283,10 @@ const ParticlesBackground: React.FC = () => {
     <>
       <div 
         ref={containerRef} 
-        className="particles-container fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0" 
+        className="particles-container fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-1]" 
+        aria-hidden="true"
       />
-      <div className="abstract-background fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-1]">
+      <div className="abstract-background fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-2]">
         <div className="blur-circle circle-1 absolute rounded-full bg-primary/10 w-[70vw] h-[70vw] blur-[120px] top-[-20vw] left-[-20vw]"></div>
         <div className="blur-circle circle-2 absolute rounded-full bg-primary/10 w-[50vw] h-[50vw] blur-[100px] bottom-[-10vw] right-[-10vw]"></div>
         <div className="blur-circle circle-3 absolute rounded-full bg-primary/5 w-[40vw] h-[40vw] blur-[80px] top-[30vh] right-[10vw]"></div>

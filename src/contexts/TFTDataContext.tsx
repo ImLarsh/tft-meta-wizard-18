@@ -14,6 +14,26 @@ interface TFTDataContextType {
 
 const TFTDataContext = createContext<TFTDataContextType | undefined>(undefined);
 
+// Preload common images
+const preloadChampionImages = (champions: TFTChampion[], version: string) => {
+  if (!champions.length) return;
+  
+  // Preload only the first few champions initially to speed up initial rendering
+  const champsToPreload = champions.slice(0, 10);
+  
+  champsToPreload.forEach(champion => {
+    if (champion.icon) {
+      const img = new Image();
+      img.src = champion.icon;
+    }
+    
+    // Also try to preload from direct Data Dragon
+    const normalizedName = champion.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const img = new Image();
+    img.src = `https://ddragon.leagueoflegends.com/cdn/${version}/img/tft-champion/${normalizedName}.png`;
+  });
+};
+
 export const TFTDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [champions, setChampions] = useState<TFTChampion[]>([]);
   const [items, setItems] = useState<TFTItem[]>([]);
@@ -32,6 +52,9 @@ export const TFTDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setChampions(champions);
       setItems(items);
       setCurrentPatchVersion(version);
+      
+      // Preload champion images for smoother UI
+      preloadChampionImages(champions, version);
       
       console.log(`Loaded ${champions.length} champions and ${items.length} items from patch ${version}`);
       

@@ -27,7 +27,13 @@ export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, a
       return {};
     }
     
-    return data?.mappings || {};
+    // Add a type check to ensure we're returning an object
+    const mappings = data?.mappings;
+    if (mappings && typeof mappings === 'object' && !Array.isArray(mappings)) {
+      return mappings as Record<string, any>;
+    }
+    
+    return {};
   } catch (error) {
     console.error('Error in fetchTraitMappingsFromSupabase:', error);
     return {};
@@ -48,10 +54,13 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
       .limit(1);
     
     if (existingRecord && existingRecord.length > 0) {
-      // Update existing record
+      // Update existing record - convert Date to ISO string
       const { error } = await supabase
         .from('tft_trait_mappings')
-        .update({ mappings, updated_at: new Date() })
+        .update({ 
+          mappings, 
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', existingRecord[0].id);
       
       if (error) {

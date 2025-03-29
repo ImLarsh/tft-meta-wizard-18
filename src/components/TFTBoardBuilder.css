@@ -1,196 +1,213 @@
 
+/* TFT Board Builder Styles */
 .board-wrapper {
   width: 100%;
   margin: 0 auto;
-  overflow: hidden;
+  padding: 0 15px;
 }
 
 .board-wrapper.compact {
-  max-width: 600px;
+  max-width: 90%;
 }
 
+/* Board Container */
 .board-container {
   width: 100%;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  padding: 20px 0;
-}
-
-.tft-board-grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px;
-  background: linear-gradient(135deg, rgba(33, 27, 75, 0.7) 0%, rgba(26, 31, 44, 0.8) 100%);
+  padding: 30px 0;
+  background: linear-gradient(135deg, rgba(33, 27, 75, 0.9) 0%, rgba(26, 31, 44, 0.95) 100%);
   border-radius: 12px;
   border: 2px solid #7E69AB;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 20px rgba(155, 135, 245, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 30px rgba(155, 135, 245, 0.2);
   position: relative;
   overflow: hidden;
 }
 
-.tft-board-grid::before {
+.board-container::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(155, 135, 245, 0.15), transparent 60%);
+  background: radial-gradient(circle at center, rgba(155, 135, 245, 0.2), transparent 70%);
   pointer-events: none;
 }
 
-.board-row {
-  display: flex;
-  justify-content: center;
-  margin: -8px 0;
-}
-
-/* Each alternate row is offset to create proper hexagon alignment */
-.board-row:nth-child(even) {
-  margin-left: 38px;
-}
-
-/* Hexagon cell styling */
-.hexagon-cell {
+/* Hexagon Grid Structure */
+.hex-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 8px;
-  position: relative;
+  gap: 5px;
+  padding: 20px 0;
+  width: 100%;
 }
 
-.hexagon {
-  width: 70px;
-  height: 80px;
+.hex-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.hex-row.offset {
+  margin-left: 45px; /* Offset for honeycomb effect */
+}
+
+/* Hexagon Cell */
+.hex-cell {
   position: relative;
-  margin: 0 auto;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background-color: rgba(33, 27, 75, 0.6);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 5px;
   cursor: pointer;
+}
+
+.hex {
+  width: 100%;
+  height: 115%; /* Height is 115% of width to create proper hexagon */
+  position: relative;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background-color: rgba(33, 27, 75, 0.8);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   border: 2px solid rgba(155, 135, 245, 0.3);
-  box-shadow: inset 0 0 15px rgba(155, 135, 245, 0.15);
+  box-shadow: 
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 0 20px rgba(155, 135, 245, 0.2);
 }
 
-.hexagon.empty {
+.hex.empty {
   background-color: rgba(33, 27, 75, 0.4);
-  border: 1px dashed rgba(155, 135, 245, 0.3);
+  border: 2px dashed rgba(155, 135, 245, 0.3);
   box-shadow: none;
 }
 
-.hexagon.occupied {
-  background-color: rgba(33, 27, 75, 0.6);
+.hex.occupied {
+  background-color: rgba(33, 27, 75, 0.7);
   border: 2px solid rgba(155, 135, 245, 0.5);
-  box-shadow: 0 0 15px rgba(155, 135, 245, 0.2), inset 0 0 20px rgba(155, 135, 245, 0.15);
+  box-shadow: 
+    0 0 20px rgba(155, 135, 245, 0.3), 
+    inset 0 0 20px rgba(155, 135, 245, 0.2);
 }
 
-.hexagon.selected {
-  background-color: rgba(156, 39, 176, 0.4);
-  border: 2px solid rgba(155, 135, 245, 0.8);
-  box-shadow: 0 0 15px rgba(155, 135, 245, 0.5);
+.hex.selected {
+  background-color: rgba(156, 39, 176, 0.5);
+  border: 3px solid rgba(156, 39, 176, 0.8);
+  box-shadow: 
+    0 0 30px rgba(156, 39, 176, 0.4),
+    inset 0 0 20px rgba(156, 39, 176, 0.3);
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.hex:hover {
   transform: scale(1.05);
+  border-color: rgba(155, 135, 245, 0.8);
+  box-shadow: 
+    0 0 25px rgba(155, 135, 245, 0.4), 
+    inset 0 0 20px rgba(155, 135, 245, 0.3);
+  z-index: 5;
 }
 
-.hexagon:hover {
-  transform: scale(1.05);
-  border-color: rgba(155, 135, 245, 0.7);
-  box-shadow: 0 0 20px rgba(155, 135, 245, 0.3), inset 0 0 20px rgba(155, 135, 245, 0.2);
-}
-
-/* Champion styling within hexagon */
+/* Champion Content */
 .champion-content {
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden;
 }
 
 .champion-icon-wrapper {
   width: 100%;
   height: 100%;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: scale(1.2);
+  overflow: hidden;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
 .champion-icon-wrapper img {
-  width: 110%;
-  height: 110%;
+  width: 140%;
+  height: 140%;
   object-fit: cover;
-  transform: scale(1.2);
 }
 
-.carry-stars {
+.carry-indicator {
   position: absolute;
-  top: -20px;
-  display: flex;
-  gap: 2px;
-  z-index: 10;
-  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.7));
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
 }
 
 .items-container {
+  position: absolute;
+  bottom: -15px;
   display: flex;
   justify-content: center;
   gap: 4px;
-  margin-top: 5px;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 3px 5px;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  padding: 3px 6px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Champions grid below the board */
+/* Champions Grid */
 .champions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 15px;
   width: 100%;
-  margin-top: 20px;
-  padding: 15px;
-  background: rgba(33, 27, 75, 0.3);
-  border-radius: 8px;
-  border: 1px solid rgba(155, 135, 245, 0.2);
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(33, 27, 75, 0.5);
+  border-radius: 10px;
+  border: 1px solid rgba(155, 135, 245, 0.3);
+  box-shadow: inset 0 0 20px rgba(155, 135, 245, 0.1);
 }
 
 .champion-card {
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
-  background-color: rgba(33, 27, 75, 0.5);
+  background-color: rgba(33, 27, 75, 0.7);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
-  border: 1px solid rgba(155, 135, 245, 0.3);
+  border: 1px solid rgba(155, 135, 245, 0.4);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .champion-card:hover {
-  background-color: rgba(33, 27, 75, 0.7);
-  border-color: rgba(155, 135, 245, 0.6);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background-color: rgba(33, 27, 75, 0.9);
+  border-color: rgba(155, 135, 245, 0.8);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .champion-card.selected {
-  background-color: rgba(156, 39, 176, 0.4);
-  border: 1px solid rgba(156, 39, 176, 0.8);
-  box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+  background-color: rgba(156, 39, 176, 0.5);
+  border: 2px solid rgba(156, 39, 176, 0.8);
+  box-shadow: 0 0 20px rgba(156, 39, 176, 0.4);
 }
 
 .champion-card.positioned {
-  border: 1px solid rgba(0, 255, 0, 0.3);
-  background-color: rgba(0, 128, 0, 0.1);
+  border: 2px solid rgba(0, 255, 0, 0.5);
+  background-color: rgba(0, 128, 0, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
 }
 
 .champion-info {
@@ -200,80 +217,107 @@
 }
 
 .champion-name {
-  font-size: 12px;
-  margin-top: 6px;
+  font-size: 13px;
+  margin-top: 8px;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
-  font-weight: 500;
+  font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .position-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  margin-top: 4px;
-  color: rgba(255, 255, 255, 0.8);
-  background: rgba(33, 27, 75, 0.6);
-  padding: 2px 5px;
-  border-radius: 10px;
-  border: 1px solid rgba(155, 135, 245, 0.3);
+  font-size: 11px;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(33, 27, 75, 0.8);
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(155, 135, 245, 0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+/* Instructions and Tips */
 .board-instructions {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 12px 15px;
-  background: linear-gradient(135deg, rgba(33, 27, 75, 0.6), rgba(26, 31, 44, 0.7));
-  border-radius: 8px;
-  font-size: 14px;
-  border: 1px solid rgba(155, 135, 245, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 25px;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(33, 27, 75, 0.8), rgba(26, 31, 44, 0.9));
+  border-radius: 10px;
+  font-size: 15px;
+  border: 1px solid rgba(155, 135, 245, 0.4);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .champions-title {
-  margin-top: 30px;
-  margin-bottom: 10px;
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border-left: 4px solid #9b87f5;
-  padding-left: 10px;
+  margin-top: 35px;
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  border-left: 5px solid #9b87f5;
+  padding-left: 12px;
+  letter-spacing: 0.5px;
 }
 
 .board-tip {
-  margin-top: 15px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  margin-top: 20px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
   text-align: center;
-  padding: 10px;
-  background: rgba(33, 27, 75, 0.3);
-  border-radius: 6px;
-  border: 1px dashed rgba(155, 135, 245, 0.3);
+  padding: 12px;
+  background: rgba(33, 27, 75, 0.4);
+  border-radius: 8px;
+  border: 1px dashed rgba(155, 135, 245, 0.4);
+  box-shadow: inset 0 0 20px rgba(155, 135, 245, 0.1);
 }
 
+/* Responsive Adjustments */
 @media (max-width: 768px) {
-  .hexagon {
-    width: 50px;
-    height: 58px;
+  .hex-cell {
+    width: 55px;
+    height: 55px;
   }
   
-  .board-row:nth-child(even) {
-    margin-left: 25px;
-  }
-  
-  .hexagon-cell {
-    margin: 4px;
+  .hex-row.offset {
+    margin-left: 30px;
   }
   
   .champions-grid {
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
   }
+}
+
+/* Compact Mode Adjustments */
+.compact .hex-cell {
+  width: 50px;
+  height: 50px;
+}
+
+.compact .hex-row.offset {
+  margin-left: 25px;
+}
+
+/* Animation Effects */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.03);
+  }
+}
+
+.hex.empty {
+  animation: pulse 4s infinite ease-in-out;
 }

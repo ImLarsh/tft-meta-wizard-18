@@ -110,6 +110,15 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     5: 'text-cost-5'  // yellow/gold for 5-cost
   };
   
+  // Cost-specific border colors
+  const costBorderColors = {
+    1: 'border-cost-1', // white/gray for 1-cost
+    2: 'border-cost-2', // green for 2-cost
+    3: 'border-cost-3', // blue for 3-cost
+    4: 'border-cost-4', // pink/purple for 4-cost
+    5: 'border-cost-5'  // yellow/gold for 5-cost
+  };
+  
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   
   const handleImageError = () => {
@@ -125,9 +134,9 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   
   return (
     <div className="relative">
-      {/* Stars for carry champion - positioned OUTSIDE the main container to prevent clipping */}
+      {/* Stars for carry champion - positioned above the container with enough space */}
       {isCarry && (
-        <div className="absolute w-full flex justify-center" style={{ top: '-14px' }}>
+        <div className="absolute top-[-16px] w-full flex justify-center">
           <div className="flex space-x-0.5">
             <Star size={10} fill="#FFD700" color="#FFD700" />
             <Star size={10} fill="#FFD700" color="#FFD700" />
@@ -138,8 +147,10 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       
       <div 
         className={cn(
-          size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
+          size !== 'md' ? sizeClasses[size] : 'w-11 h-11', 
           'rounded-md overflow-hidden relative',
+          'border-2', // Add border
+          costBorderColors[cost], // Add cost-specific border color
           className
         )}
         onClick={onClick}

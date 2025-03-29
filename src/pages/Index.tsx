@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import CompTierList from '@/components/CompTierList';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Grid3X3 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import AppLogo from '@/components/AppLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -39,18 +38,6 @@ const Index: React.FC = () => {
                 Create Comp
               </Button>
             </Link>
-            
-            <Link to="/builder">
-              <Button 
-                className="gap-2 hover-lift gaming-button bg-primary/90 hover:bg-primary w-full sm:w-auto"
-                size={isMobile ? "default" : "lg"}
-                disabled={!hasTraitMappings}
-                variant="outline"
-              >
-                <Grid3X3 className="h-5 w-5" />
-                Board Builder
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
@@ -80,11 +67,6 @@ const Index: React.FC = () => {
               <Link to="/create">
                 <Button variant="default" size={isMobile ? "default" : "lg"} className="w-full sm:w-auto">
                   Create Your First Comp
-                </Button>
-              </Link>
-              <Link to="/builder">
-                <Button variant="outline" size={isMobile ? "default" : "lg"} className="w-full sm:w-auto">
-                  Try the Board Builder
                 </Button>
               </Link>
             </div>

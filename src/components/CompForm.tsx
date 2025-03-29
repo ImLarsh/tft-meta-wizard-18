@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -911,3 +912,104 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               </h3>
               
               <div className="bg-card/50 border border-border rounded-lg p-6">
+                <BoardPositioning 
+                  champions={finalComp} 
+                  onUpdatePositions={handleUpdatePositions}
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="strategy" className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Strengths</h3>
+              
+              <div className="flex flex-wrap gap-2">
+                {strengths.map((strength, index) => (
+                  <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                    <span className="text-sm">{strength}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 w-5 p-0"
+                      onClick={() => removeStrength(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex gap-2">
+                <Input 
+                  value={newStrength} 
+                  onChange={(e) => setNewStrength(e.target.value)}
+                  placeholder="Add a strength"
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleAddStrength}
+                  disabled={!newStrength || strengths.includes(newStrength)}
+                >
+                  Add Strength
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Weaknesses</h3>
+              
+              <div className="flex flex-wrap gap-2">
+                {weaknesses.map((weakness, index) => (
+                  <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                    <span className="text-sm">{weakness}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 w-5 p-0"
+                      onClick={() => removeWeakness(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex gap-2">
+                <Input 
+                  value={newWeakness} 
+                  onChange={(e) => setNewWeakness(e.target.value)}
+                  placeholder="Add a weakness"
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  onClick={handleAddWeakness}
+                  disabled={!newWeakness || weaknesses.includes(newWeakness)}
+                >
+                  Add Weakness
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-end pt-6 border-t border-border">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className="w-full md:w-auto"
+          >
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save Comp
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
+
+export default CompForm;

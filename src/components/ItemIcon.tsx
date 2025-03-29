@@ -70,7 +70,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       "Redemption": "3107",
       "Hand of Justice": "3158",
       "Guardian Angel": "3026",
-      "Jeweled Gauntlet": "3177",
+      "Jeweled Gauntlet": "3137", // Fixed correct ID for Jeweled Gauntlet
       "Rabadon's Deathcap": "3089",
       "Zeke's Herald": "3050",
       "Ionic Spark": "3100",
@@ -91,13 +91,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       "Frozen Heart": "3110",
       "Trap Claw": "3110",
       "Edge of Night": "3147",
-      "Titan's Resolve": "3053",
-      "Runaan's Hurricane": "3085",
       "Volatile Spellblade": "3151",
-      "Jeweled Gauntlet": "3177",
-      "Bloodthirster": "3072",
-      "Chalice of Power": "3222",
-      "Redemption": "3107",
     };
 
     return itemIdMap[itemName] || "";
@@ -111,6 +105,16 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       .toLowerCase();
   };
   
+  // Special case handling for specific items that need custom paths
+  const getSpecialCaseUrl = (itemName: string): string | null => {
+    // Special handling for Jeweled Gauntlet which seems to be problematic
+    if (itemName === "Jeweled Gauntlet") {
+      return "https://rerollcdn.com/items/JeweledGauntlet.png";
+    }
+    
+    return null;
+  };
+  
   // Get TFT-specific CDNs for the various sites
   const getTFTSpecificUrl = (itemName: string): string => {
     const cleanName = getCleanItemName(itemName);
@@ -120,6 +124,12 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   
   // Get item sources in priority order of reliability
   const getItemSources = (itemName: string): string[] => {
+    // Check for special cases first
+    const specialCaseUrl = getSpecialCaseUrl(itemName);
+    if (specialCaseUrl) {
+      return [specialCaseUrl];
+    }
+    
     const cleanName = getCleanItemName(itemName);
     const itemId = formatItemId(itemName);
     const tftSpecificUrl = getTFTSpecificUrl(itemName);

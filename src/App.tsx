@@ -1,33 +1,28 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import CompEditor from "./pages/CompEditor";
-import NotFound from "./pages/NotFound";
-import { CompsProvider } from "./contexts/CompsContext";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import CompEditor from './pages/CompEditor';
+import CompEditExisting from './pages/CompEditExisting';
+import SetManager from './pages/SetManager';
+import NotFound from './pages/NotFound';
+import { CompsProvider } from './contexts/CompsContext';
+import './App.css';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <CompsProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/editor" element={<CompEditor />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </CompsProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <CompsProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/create" element={<CompEditor />} />
+          <Route path="/edit/:compId" element={<CompEditExisting />} />
+          <Route path="/sets" element={<SetManager />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </CompsProvider>
+  );
+}
 
 export default App;

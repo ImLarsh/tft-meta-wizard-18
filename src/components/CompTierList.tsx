@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CompCard from './CompCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SearchX, Trash2, Filter, Sparkles } from 'lucide-react';
+import { SearchX, Trash2, Filter, Sparkles, Edit } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import { 
   AlertDialog,
@@ -28,8 +28,8 @@ const CompTierList: React.FC = () => {
   const [compToDelete, setCompToDelete] = useState<string | null>(null);
   const [groupedComps, setGroupedComps] = useState<Record<string, TFTComp[]>>({});
   const [activeTab, setActiveTab] = useState('S');
-  
-  // Group comps by tier
+  const navigate = useNavigate();
+
   useEffect(() => {
     const tierOrder = ['S', 'A', 'B', 'C'];
     const grouped: Record<string, TFTComp[]> = {};
@@ -40,23 +40,19 @@ const CompTierList: React.FC = () => {
     
     setGroupedComps(grouped);
   }, [comps]);
-  
-  // Filter comps based on search and filters
+
   const filteredComps = comps.filter((comp) => {
-    // Search filter
     const matchesSearch = searchTerm === '' || 
       comp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comp.traits.some(trait => trait.name.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    // Tier filter
     const matchesTier = filters.tier === 'all' || comp.tier === filters.tier;
     
-    // Playstyle filter
     const matchesPlaystyle = filters.playstyle === 'all' || comp.playstyle === filters.playstyle;
     
     return matchesSearch && matchesTier && matchesPlaystyle;
   });
-  
+
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({
       ...prev,
@@ -72,10 +68,13 @@ const CompTierList: React.FC = () => {
       description: "The composition has been removed successfully",
     });
   };
-  
-  // Determine what to display based on filters
+
+  const handleEditComp = (compId: string) => {
+    navigate(`/edit/${compId}`);
+  };
+
   const shouldShowFilteredView = !(filters.tier === 'all' && filters.playstyle === 'all' && searchTerm === '');
-  
+
   return (
     <section className="py-12">
       <div className="container">
@@ -159,23 +158,30 @@ const CompTierList: React.FC = () => {
           </div>
         </div>
         
-        {/* Show comps */}
         {shouldShowFilteredView ? (
-          // Filtered view
           <>
             {filteredComps.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredComps.map(comp => (
                   <div key={comp.id} className="relative group">
                     <CompCard comp={comp} />
-                    <Button 
-                      variant="destructive" 
-                      size="icon" 
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => setCompToDelete(comp.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        variant="secondary" 
+                        size="icon" 
+                        className="bg-primary/20 hover:bg-primary/40"
+                        onClick={() => handleEditComp(comp.id)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="icon" 
+                        onClick={() => setCompToDelete(comp.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -197,7 +203,6 @@ const CompTierList: React.FC = () => {
             )}
           </>
         ) : (
-          // Organized by tier
           <Tabs defaultValue="S" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-6">
               {['S', 'A', 'B', 'C'].map(tier => (
@@ -214,14 +219,23 @@ const CompTierList: React.FC = () => {
                     {groupedComps[tier]?.map(comp => (
                       <div key={comp.id} className="relative group">
                         <CompCard comp={comp} />
-                        <Button 
-                          variant="destructive" 
-                          size="icon" 
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => setCompToDelete(comp.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button 
+                            variant="secondary" 
+                            size="icon" 
+                            className="bg-primary/20 hover:bg-primary/40"
+                            onClick={() => handleEditComp(comp.id)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="icon" 
+                            onClick={() => setCompToDelete(comp.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -236,7 +250,6 @@ const CompTierList: React.FC = () => {
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!compToDelete} onOpenChange={() => setCompToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

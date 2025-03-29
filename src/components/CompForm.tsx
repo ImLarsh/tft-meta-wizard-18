@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash, X, Loader2, MapPin } from 'lucide-react';
 import ChampionIcon from './ChampionIcon';
 import BoardPositioning from './BoardPositioning';
+import { useComps } from '@/contexts/CompsContext';
+import { ChampionTraitMap } from '@/types/champion';
 
 const formSchema = z.object({
   id: z.string().min(3, { message: "ID must be at least 3 characters" }),
@@ -42,141 +44,6 @@ const commonChampions = [
   "Twitch", "Urgot", "Vex", "Vi", "Viego", "Yasuo", "Yone", "Yorick", "Zac", "Ziggs"
 ];
 
-const traitsByVersion: Record<string, string[]> = {
-  "Set 9": [
-    "8-Bit", "Disco", "Superfan", "Guardian", "Bruiser", "Crowd Diver", 
-    "Big Shot", "Edgelord", "Renegade", "Bastion", "Strategist", "Multicaster"
-  ],
-  "Set 10": [
-    "K/DA", "True Damage", "Heartsteel", "Hyperpop", "Pentakill", "Country", 
-    "EDM", "Punk", "Jazz", "Emo", "Illbeats", "Maestro", "Guardian", "Bruiser", 
-    "Crowd Diver", "Big Shot", "Superfan", "Edgelord"
-  ],
-  "Set 11": [
-    "Darkin", "Slayer", "Empress", "Void", "Deadeye", "Juggernaut", 
-    "Duskwalker", "Quickdraw", "Tactician", "Gunner", "Armored", "Mythic"
-  ]
-};
-
-const commonItems = [
-  "Blue Buff", "Infinity Edge", "Jeweled Gauntlet", "Giant Slayer", 
-  "Bloodthirster", "Titan's Resolve", "Last Whisper", "Runaan's Hurricane", 
-  "Spear of Shojin", "Warmog's Armor", "Dragon's Claw", "Gargoyle Stoneplate", 
-  "Quicksilver", "Archangel's Staff", "Hextech Gunblade", "Guinsoo's Rageblade", 
-  "Sunfire Cape", "Bramble Vest", "Ionic Spark", "Redemption", "Chalice of Power"
-];
-
-const championTraits: ChampionTraitMap = {
-  "Ahri": ["K/DA", "Spellweaver"],
-  "Akali": ["K/DA", "Assassin"],
-  "Amumu": ["Pentakill", "Guardian"],
-  "Annie": ["Hyperpop", "Spellweaver"],
-  "Aphelios": ["Heartsteel", "Deadeye"],
-  "Bard": ["Jazz", "Support"],
-  "Caitlyn": ["True Damage", "Deadeye"],
-  "Corki": ["8-Bit", "Big Shot"],
-  "Ekko": ["True Damage", "Superfan"],
-  "Evelynn": ["K/DA", "Crowd Diver"],
-  "Garen": ["Pentakill", "Juggernaut"],
-  "Gragas": ["Disco", "Bruiser"],
-  "Illaoi": ["Pentakill", "Bruiser"],
-  "Jax": ["EDM", "Mosher"],
-  "Jhin": ["Maestro", "Big Shot"],
-  "Jinx": ["Punk", "Rapidfire"],
-  "Kayle": ["Pentakill", "Slayer"],
-  "Kayn": ["Heartsteel", "Edgelord"],
-  "Kennen": ["True Damage", "Superfan"],
-  "Karthus": ["Pentakill", "Executioner"],
-  "Lillia": ["K/DA", "Guardian"],
-  "Lucian": ["Jazz", "Deadeye"],
-  "Lulu": ["Hyperpop", "Support"],
-  "Lux": ["EDM", "Spellweaver"],
-  "Miss Fortune": ["Jazz", "Big Shot"],
-  "Mordekaiser": ["Pentakill", "Sentinel"],
-  "Neeko": ["K/DA", "Guardian"],
-  "Olaf": ["Pentakill", "Bruiser"],
-  "Pantheon": ["Punk", "Guardian"],
-  "Poppy": ["Emo", "Guardian"],
-  "Qiyana": ["True Damage", "Crowd Diver"],
-  "Samira": ["Country", "Challenger"],
-  "Senna": ["True Damage", "Rapidfire"],
-  "Seraphine": ["K/DA", "Spellweaver"],
-  "Sett": ["Heartsteel", "Bruiser"],
-  "Sona": ["Mixer", "Spellweaver"],
-  "Tahm Kench": ["Country", "Bruiser"],
-  "Taric": ["Disco", "Guardian"],
-  "Thresh": ["Country", "Guardian"],
-  "Twisted Fate": ["Disco", "Spellweaver"],
-  "Twitch": ["Punk", "Executioner"],
-  "Urgot": ["Country", "Mosher"],
-  "Vex": ["Emo", "Executioner"],
-  "Vi": ["Punk", "Mosher"],
-  "Viego": ["Pentakill", "Edgelord"],
-  "Yasuo": ["True Damage", "Edgelord"],
-  "Yone": ["Heartsteel", "Challenger"],
-  "Yorick": ["Pentakill", "Guardian"],
-  "Zac": ["EDM", "Bruiser"],
-  "Ziggs": ["Hyperpop", "Spellweaver"]
-};
-
-const set11ChampionTraits: ChampionTraitMap = {
-  "Ahri": ["Mythic", "Spellweaver"],
-  "Akali": ["Empress", "Assassin"],
-  "Amumu": ["Darkin", "Guardian"],
-  "Annie": ["Void", "Sorcerer"],
-  "Aphelios": ["Darkin", "Deadeye"],
-  "Caitlyn": ["Quickdraw", "Deadeye"],
-  "Ekko": ["Slayer", "Tactician"],
-  "Garen": ["Juggernaut", "Slayer"],
-  "Illaoi": ["Void", "Juggernaut"],
-  "Jax": ["Darkin", "Slayer"],
-  "Jhin": ["Mythic", "Deadeye"],
-  "Jinx": ["Gunner", "Duskwalker"],
-  "Kayle": ["Empress", "Slayer"],
-  "Kayn": ["Slayer", "Assassin"],
-  "Karthus": ["Void", "Sorcerer"],
-  "Lux": ["Mythic", "Sorcerer"],
-  "Mordekaiser": ["Darkin", "Juggernaut"],
-  "Olaf": ["Juggernaut", "Berserker"],
-  "Pantheon": ["Mythic", "Guardian"],
-  "Samira": ["Empress", "Gunner"],
-  "Sett": ["Juggernaut", "Brawler"],
-  "Vi": ["Armored", "Brawler"],
-  "Viego": ["Slayer", "Assassin"],
-  "Yasuo": ["Empress", "Duskwalker"],
-  "Zac": ["Void", "Guardian"]
-};
-
-const set9ChampionTraits: ChampionTraitMap = {
-  "Ahri": ["Ionia", "Sorcerer"],
-  "Akali": ["Ionia", "Assassin"],
-  "Amumu": ["Guardian", "Empath"],
-  "Annie": ["Fiddle", "Sorcerer"],
-  "Aphelios": ["Deadeye", "Targon"],
-  "Bard": ["Wanderer", "Support"],
-  "Caitlyn": ["Deadeye", "Piltover"],
-  "Corki": ["Big Shot", "Yordle"],
-  "Ekko": ["Piltover", "Rogue"],
-  "Garen": ["Demacia", "Juggernaut"],
-  "Gragas": ["Freljord", "Bruiser"],
-  "Illaoi": ["Illaoi", "Bruiser"],
-  "Jax": ["Wanderer", "Juggernaut"],
-  "Jinx": ["Zaun", "Gunner"],
-  "Kayle": ["Demacia", "Slayer"],
-  "Kennen": ["Ionia", "Ninja"],
-  "Lux": ["Demacia", "Sorcerer"],
-  "Mordekaiser": ["Shadow Isles", "Juggernaut"],
-  "Olaf": ["Freljord", "Berserker"],
-  "Pantheon": ["Shurima", "Guardian"],
-  "Sett": ["Ionia", "Juggernaut"]
-};
-
-const traitMapsByVersion: Record<string, ChampionTraitMap> = {
-  "Set 9": set9ChampionTraits,
-  "Set 10": championTraits,
-  "Set 11": set11ChampionTraits
-};
-
 const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting = false }) => {
   const [earlyGame, setEarlyGame] = useState<Champion[]>(initialData?.earlyGame || []);
   const [finalComp, setFinalComp] = useState<Champion[]>(initialData?.finalComp || []);
@@ -199,6 +66,8 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   const [newTraitVersion, setNewTraitVersion] = useState<string>(initialData?.tftVersion || "Set 10");
 
   const [activeTab, setActiveTab] = useState("general");
+
+  const { traitMappings } = useComps();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -225,9 +94,11 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
 
   const currentTftVersion = form.watch("tftVersion") || "Set 10";
   
-  const availableTraits = traitsByVersion[currentTftVersion] || traitsByVersion["Set 10"];
+  // Get traits for the current version
+  const availableTraits = traitMappings[currentTftVersion]?.traits || [];
   
-  const currentTraitMap = traitMapsByVersion[currentTftVersion] || traitMapsByVersion["Set 10"];
+  // Get champion trait mapping for the current version
+  const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
 
   const handleUpdatePositions = (updatedChampions: Champion[]) => {
     setFinalComp(updatedChampions);
@@ -1053,68 +924,3 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   <Button 
                     type="button" 
                     onClick={handleAddStrength}
-                    disabled={!newStrength}
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Weaknesses</h3>
-                
-                <div className="flex flex-wrap gap-2">
-                  {weaknesses.map((weakness, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
-                      <span className="text-sm">{weakness}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-5 w-5 p-0"
-                        onClick={() => removeWeakness(index)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="flex gap-2">
-                  <Input 
-                    value={newWeakness} 
-                    onChange={(e) => setNewWeakness(e.target.value)}
-                    placeholder="Weakness"
-                    className="flex-1"
-                  />
-                  <Button 
-                    type="button" 
-                    onClick={handleAddWeakness}
-                    disabled={!newWeakness}
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        <div className="pt-6 space-x-2 flex justify-end">
-          <Button type="submit" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              'Save Composition'
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};
-
-export default CompForm;

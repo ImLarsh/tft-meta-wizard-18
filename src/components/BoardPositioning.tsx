@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
@@ -113,7 +112,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     const cols = 7;
     const board = [];
     
-    // Flipped board: we render from rows-1 down to 0 instead of 0 up to rows-1
     for (let row = rows - 1; row >= 0; row--) {
       const rowCells = [];
       for (let col = 0; col < cols; col++) {
@@ -139,18 +137,18 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDrop={(e) => handleDrop(e, row, col)}
             style={{
               transform: isEvenRow ? `translateX(${compact ? 10 : 16}px)` : '',
-              margin: `0 ${hexSpacing}px` // Add consistent horizontal spacing
+              margin: `0 ${hexSpacing}px`
             }}
           >
             <div className={`hexagon ${
               championAtPosition ? 'tft-board-hex-occupied' : 'tft-board-hex-empty'
             } ${
-              !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
+              !readonly && selectedChampion === championAtPosition ? 'ring-1 ring-primary' : ''
             } w-full h-full`}>
               {championAtPosition ? (
                 <div 
                   className={`absolute inset-0 flex items-center justify-center ${
-                    !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
+                    !readonly && selectedChampion === championAtPosition ? 'ring-1 ring-primary' : ''
                   }`}
                   draggable={!readonly}
                   onDragStart={(e) => handleDragStart(e, championAtPosition)}

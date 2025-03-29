@@ -80,8 +80,8 @@ export default {
           to: { height: "0" },
         },
         "pulse-subtle": {
-          "0%, 100%": { opacity: 1 },
-          "50%": { opacity: 0.8 },
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.8" },
         },
         "spin-slow": {
           from: { transform: "rotate(0deg)" },

@@ -106,55 +106,68 @@
   }
 }
 
-/* Clean Hexagon Grid Styling */
+/* Hexagon Grid for TFT Board */
 .board-wrapper {
-  @apply flex flex-col items-center space-y-4;
+  @apply flex flex-col items-center space-y-4 max-w-3xl mx-auto;
 }
 
 .board-wrapper.compact {
-  @apply scale-75 origin-top-left;
+  @apply scale-[0.8] origin-top-left;
 }
 
 .board-instructions {
-  @apply flex items-center mb-4 text-sm text-muted-foreground;
+  @apply flex items-center justify-center text-sm text-muted-foreground mt-2 mb-4;
 }
 
 .board-container {
-  @apply bg-[#0A0720] p-4 rounded-md border border-white/5;
+  @apply rounded-lg bg-[#0A071D] p-4 border border-purple-900/30 shadow-lg;
+  background-image: radial-gradient(circle at center, rgba(139, 92, 246, 0.05) 0%, rgba(10, 7, 29, 1) 70%);
 }
 
 .board-grid {
-  @apply p-2 bg-[#0F0A26] rounded-md border border-white/5;
+  @apply flex flex-col items-center gap-[-6px] p-4;
 }
 
 .board-row {
-  @apply flex justify-center my-1;
+  @apply flex gap-1 my-[-6px];
 }
 
 /* Staggered hexagon grid */
 .board-row:nth-child(even) {
-  @apply ml-[18px];
+  @apply ml-[14px];
 }
 
-.hexagon-container {
-  @apply relative w-10 h-10 mx-1;
+.hexagon-cell {
+  position: relative;
+  width: 44px;
+  height: 50px;
+  margin: 0 2px;
 }
 
 .hexagon {
-  @apply w-full h-full flex items-center justify-center transition-all duration-200;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition: all 0.2s ease-out;
 }
 
 .hexagon.empty {
-  @apply bg-transparent border border-white/10;
+  @apply bg-transparent border border-purple-500/20;
+  background: rgba(91, 33, 182, 0.03);
 }
 
 .hexagon.occupied {
-  @apply bg-black/30 border border-white/15;
+  @apply bg-purple-900/20 border border-purple-500/40;
+  box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.1);
 }
 
 .hexagon.selected {
-  @apply ring-1 ring-primary;
+  @apply border-purple-500/70 bg-purple-900/40;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
 }
 
 .champion-content {
@@ -163,19 +176,20 @@
 
 /* Champions grid styling */
 .champions-title {
-  @apply text-sm font-medium mt-4;
+  @apply text-sm font-medium mt-6 mb-2 text-center;
 }
 
 .champions-grid {
-  @apply grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2;
+  @apply grid grid-cols-4 sm:grid-cols-5 gap-2;
 }
 
 .champion-card {
-  @apply relative border border-border rounded p-2 bg-card/50 hover:bg-card/80 transition-all duration-200 cursor-pointer;
+  @apply relative border border-border/40 rounded-md p-2 bg-card/20 hover:bg-card/40 transition-all duration-200 cursor-pointer;
+  backdrop-filter: blur(8px);
 }
 
 .champion-card.selected {
-  @apply bg-primary/20 ring-1 ring-primary;
+  @apply bg-primary/10 border-primary/50 shadow-md;
 }
 
 .champion-card.positioned {
@@ -183,7 +197,7 @@
 }
 
 .champion-info {
-  @apply flex flex-col items-center;
+  @apply flex flex-col items-center gap-1;
 }
 
 .champion-name {
@@ -195,7 +209,7 @@
 }
 
 .board-tip {
-  @apply text-xs text-muted-foreground mt-2;
+  @apply text-xs text-muted-foreground mt-4 text-center;
 }
 
 /* Cost-specific colors */
@@ -210,3 +224,32 @@
 .border-cost-3 { @apply border-[hsl(var(--cost-3))]; }
 .border-cost-4 { @apply border-[hsl(var(--cost-4))]; }
 .border-cost-5 { @apply border-[hsl(var(--cost-5))]; }
+
+/* Particle effects for background */
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.abstract-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -2;
+}
+
+.blur-circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+}

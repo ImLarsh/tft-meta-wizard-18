@@ -120,12 +120,10 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           champ => champ.position && champ.position.row === row && champ.position.col === col
         );
         
-        const isEvenRow = row % 2 === 0;
-        
         rowCells.push(
           <div 
             key={`${row}-${col}`}
-            className={`hexagon-container ${isEvenRow ? 'even-row' : ''}`}
+            className="hexagon-cell"
             onClick={() => handleCellClick(row, col)}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}

@@ -1,8 +1,15 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { TFTComp, Champion, Trait } from '@/data/comps';
-import { ChampionTraitMap, ChampionSet } from '@/types/champion';
+import { ChampionTraitMap } from '@/types/champion';
 import { useSupabase } from '@/hooks/use-supabase';
+
+// Define the ChampionSet interface that was missing
+interface ChampionSet {
+  name: string;
+  traits: string[];
+  championTraits: Record<string, string[]>;
+}
 
 // Define the context type
 interface CompsContextType {
@@ -13,6 +20,10 @@ interface CompsContextType {
   traitMappings: Record<string, ChampionSet>;
   addTraitMappings: (setName: string, mapping: ChampionSet) => void;
   removeTraitMappings: (setName: string) => void;
+  addTraitMapping: (setKey: string, setName: string, traits: string[], championTraits: Record<string, string[]>) => void;
+  updateTraitMapping: (setKey: string, setName: string, traits: string[], championTraits: Record<string, string[]>) => void;
+  removeTraitMapping: (setKey: string) => void;
+  loading: boolean;
 }
 
 // Create the context
@@ -26,6 +37,7 @@ interface CompsProviderProps {
 export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
   const [comps, setComps] = useState<TFTComp[]>([]);
   const [traitMappings, setTraitMappings] = useState<Record<string, ChampionSet>>({});
+  const [loading, setLoading] = useState<boolean>(false);
   const { supabase } = useSupabase();
 
   // Load comps and trait mappings from localStorage on component mount
@@ -103,6 +115,37 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
     });
   };
 
+  // Add the missing methods
+  const addTraitMapping = (setKey: string, setName: string, traits: string[], championTraits: Record<string, string[]>) => {
+    setTraitMappings(prev => ({
+      ...prev,
+      [setKey]: {
+        name: setName,
+        traits: traits,
+        championTraits: championTraits
+      }
+    }));
+  };
+
+  const updateTraitMapping = (setKey: string, setName: string, traits: string[], championTraits: Record<string, string[]>) => {
+    setTraitMappings(prev => ({
+      ...prev,
+      [setKey]: {
+        name: setName,
+        traits: traits,
+        championTraits: championTraits
+      }
+    }));
+  };
+
+  const removeTraitMapping = (setKey: string) => {
+    setTraitMappings(prev => {
+      const newMappings = {...prev};
+      delete newMappings[setKey];
+      return newMappings;
+    });
+  };
+
   return (
     <CompsContext.Provider
       value={{
@@ -113,6 +156,10 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
         traitMappings,
         addTraitMappings,
         removeTraitMappings,
+        addTraitMapping,
+        updateTraitMapping,
+        removeTraitMapping,
+        loading,
       }}
     >
       {children}

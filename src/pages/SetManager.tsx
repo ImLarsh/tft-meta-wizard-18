@@ -7,10 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Save, Trash, ChevronDown, ChevronUp, Settings, RefreshCw } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChampionTraitMap } from '@/types/champion';
 
 const SetManager: React.FC = () => {
-  const { traitMappings, setTraitMappings, addTraitMapping, updateTraitMapping, removeTraitMapping } = useComps();
+  const { 
+    traitMappings, 
+    addTraitMapping, 
+    updateTraitMapping, 
+    removeTraitMapping 
+  } = useComps();
   
   const [activeTab, setActiveTab] = useState<string>("manage");
   const [activeSetTab, setActiveSetTab] = useState<string | null>(null);
@@ -24,27 +28,22 @@ const SetManager: React.FC = () => {
   const [newChampName, setNewChampName] = useState("");
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
 
-  // Initialize with existing set as active
   useEffect(() => {
     if (!activeSetTab && Object.keys(traitMappings).length > 0) {
       setActiveSetTab(Object.keys(traitMappings)[0]);
     }
   }, [traitMappings, activeSetTab]);
   
-  // When the active set tab changes, update the traits and champion mappings
   useEffect(() => {
     if (activeSetTab && traitMappings[activeSetTab]) {
-      // Safely access traits with a fallback to empty array if it doesn't exist
       const traits = traitMappings[activeSetTab].traits || [];
       setNewSetTraits([...traits]);
       
-      // Safely access championTraits with a fallback to empty object if it doesn't exist
       const champTraits = traitMappings[activeSetTab].championTraits || {};
       setChampionTraitMapping({ ...champTraits });
     }
   }, [activeSetTab, traitMappings]);
   
-  // Function to add a new TFT set
   const handleAddSet = () => {
     if (!newSetVersion || !newSetName) {
       toast({
@@ -71,7 +70,6 @@ const SetManager: React.FC = () => {
       description: `Set ${newSetName} has been created successfully`,
     });
     
-    // Reset form
     setNewSetVersion("");
     setNewSetName("");
     setNewSetTraits([]);
@@ -79,7 +77,6 @@ const SetManager: React.FC = () => {
     setActiveTab("manage");
   };
   
-  // Function to add a new trait to the list
   const handleAddTrait = () => {
     if (!newTraitInput) return;
     if (!newSetTraits.includes(newTraitInput)) {
@@ -88,12 +85,10 @@ const SetManager: React.FC = () => {
     }
   };
   
-  // Function to remove a trait from the list
   const handleRemoveTrait = (index: number) => {
     setNewSetTraits(newSetTraits.filter((_, i) => i !== index));
   };
   
-  // Function to update an existing set's traits
   const handleUpdateSet = (setKey: string) => {
     if (!traitMappings[setKey]) return;
     
@@ -106,7 +101,6 @@ const SetManager: React.FC = () => {
     });
   };
   
-  // Function to delete a set
   const handleDeleteSet = (setKey: string) => {
     if (!traitMappings[setKey]) return;
     
@@ -118,21 +112,17 @@ const SetManager: React.FC = () => {
     }
   };
   
-  // Load trait mappings for a specific set
   const handleSelectSet = (setKey: string) => {
     setActiveSetTab(setKey);
     if (traitMappings[setKey]) {
-      // Safely access traits with a fallback to empty array
       const traits = traitMappings[setKey].traits || [];
       setNewSetTraits([...traits]);
       
-      // Safely access championTraits with a fallback to empty object
       const champTraits = traitMappings[setKey].championTraits || {};
       setChampionTraitMapping({ ...champTraits });
     }
   };
   
-  // Add champion to trait mapping
   const handleAddChampion = () => {
     if (!newChampName || selectedTraits.length === 0) return;
     
@@ -145,7 +135,6 @@ const SetManager: React.FC = () => {
     setSelectedTraits([]);
   };
   
-  // Remove champion from trait mapping
   const handleRemoveChampion = (champName: string) => {
     setChampionTraitMapping(prev => {
       const updated = { ...prev };
@@ -154,7 +143,6 @@ const SetManager: React.FC = () => {
     });
   };
   
-  // Toggle trait selection
   const handleToggleTrait = (trait: string) => {
     if (selectedTraits.includes(trait)) {
       setSelectedTraits(selectedTraits.filter(t => t !== trait));

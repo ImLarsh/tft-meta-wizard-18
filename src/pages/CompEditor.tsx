@@ -27,6 +27,11 @@ const CompEditor = () => {
         comp.id = nanoid(8);
       }
       
+      // Set default patch if not provided
+      if (!comp.patch) {
+        comp.patch = "14.1";
+      }
+      
       // Add comp to context
       await addComp(comp);
       

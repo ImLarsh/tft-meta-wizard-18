@@ -168,26 +168,20 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
           </TabsList>
 
           <TabsContent value="general" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField control={form.control} name="name" render={({
-              field
-            }) => <FormItem className="px-[11px] mx-[9px] my-0 py-[6px]">
-                    <FormLabel>Comp Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="8-Bit Disco" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>} />
-              
-              <FormField control={form.control} name="id" render={({
-              field
-            }) => <FormItem>
-                    
-                    <FormControl>
-                      
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>} />
+            <div className="flex justify-center mb-6">
+              <div className="w-full max-w-md">
+                <FormField 
+                  control={form.control} 
+                  name="name" 
+                  render={({ field }) => <FormItem>
+                      <FormLabel>Comp Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="8-Bit Disco" {...field} className="text-center" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>} 
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -434,4 +428,5 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
       </form>
     </Form>;
 };
+
 export default SimpleCompForm;

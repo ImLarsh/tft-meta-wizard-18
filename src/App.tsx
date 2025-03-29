@@ -8,25 +8,26 @@ import SetManager from './pages/SetManager';
 import NotFound from './pages/NotFound';
 import { CompsProvider } from './contexts/CompsContext';
 import { Toaster } from './components/ui/toaster';
+import { ThemeProvider } from './providers/ThemeProvider';
 import './App.css';
-
-// Add some additional styles for better UI spacing
 import './index.css';
 
 function App() {
   return (
-    <CompsProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/create" element={<CompEditor />} />
-          <Route path="/edit/:compId" element={<CompEditExisting />} />
-          <Route path="/sets" element={<SetManager />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-      <Toaster />
-    </CompsProvider>
+    <ThemeProvider>
+      <CompsProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/create" element={<CompEditor />} />
+            <Route path="/edit/:compId" element={<CompEditExisting />} />
+            <Route path="/sets" element={<SetManager />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+        <Toaster />
+      </CompsProvider>
+    </ThemeProvider>
   );
 }
 

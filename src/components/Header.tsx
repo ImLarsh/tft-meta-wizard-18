@@ -2,9 +2,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, List, Sparkles, Settings } from 'lucide-react';
+import { Plus, List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/providers/ThemeProvider';
 
 const Header: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
+  
   return (
     <header className="bg-card/90 backdrop-blur sticky top-0 z-10 border-b border-primary/10">
       <div className="container py-4">
@@ -18,6 +21,20 @@ const Header: React.FC = () => {
           </Link>
           
           <nav className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={toggleTheme} 
+              className="mr-2 hover:bg-primary/10"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+            
             <Link to="/sets">
               <Button variant="ghost" size="sm" className="hover:bg-primary/10">
                 <Settings className="h-4 w-4 mr-2" />

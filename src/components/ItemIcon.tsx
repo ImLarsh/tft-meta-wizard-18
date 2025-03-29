@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
@@ -143,19 +142,12 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   // Use the special case mapping if available
   const specialCaseName = specialCaseMap[name] || normalizedName;
   
-  // Updated sources with enhanced LoL Fandom wiki URLs
+  // Prioritize LoL Fandom wiki sources
   const sources = [
-    // Primary LoL Fandom wiki sources with different URL patterns
+    // LoL Fandom wiki (primary source now)
     `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/e/e6/${wikiName}_TFT_item.png/64px-${wikiName}_TFT_item.png`,
     `https://static.wikia.nocookie.net/leagueoflegends/images/e/e6/${wikiName}_TFT_item.png`,
-    
-    // Alternative formats from the wiki
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/e/e6/${wikiName}.png/64px-${wikiName}.png`,
-    `https://static.wikia.nocookie.net/leagueoflegends/images/e/e6/${wikiName}.png`,
-    
-    // Try with different hash values
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/1/1b/${wikiName}_TFT_item.png/64px-${wikiName}_TFT_item.png`,
-    `https://static.wikia.nocookie.net/leagueoflegends/images/1/1b/${wikiName}_TFT_item.png`,
+    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/e/e6/${wikiName}/64px-${wikiName}.png`,
     
     // TFT Set 10 specific sources as fallbacks
     `https://raw.communitydragon.org/latest/game/assets/items/icons/${specialCaseName.toLowerCase()}.png`,
@@ -167,7 +159,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     `https://lolchess.gg/images/tft/items/${specialCaseName}.png`,
   ];
   
-  // Use Deathblade as fallback that's likely to exist
+  // Use a common item as fallback that's likely to exist
   const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/thumb/e/e6/Deathblade_TFT_item.png/64px-Deathblade_TFT_item.png';
   
   const sizeClasses = {
@@ -177,12 +169,10 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   };
   
   const handleImageError = () => {
-    console.log(`Image error for item: ${name}, trying next source (${currentSourceIndex + 1}/${sources.length})`);
     const nextIndex = currentSourceIndex + 1;
     if (nextIndex < sources.length) {
       setCurrentSourceIndex(nextIndex);
     } else {
-      console.log(`All sources failed for item: ${name}, using fallback display`);
       setImgError(true);
     }
   };
@@ -204,13 +194,12 @@ const ItemIcon: React.FC<ItemIconProps> = ({
         </div>
       ) : (
         <img
-          src={sources[currentSourceIndex] || fallbackUrl}
+          src={sources[currentSourceIndex]}
           alt={name}
           className="w-full h-full object-cover"
           onError={handleImageError}
           loading="lazy"
           title={name}
-          crossOrigin="anonymous"
         />
       )}
     </div>

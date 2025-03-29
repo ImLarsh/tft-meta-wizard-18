@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,6 +53,23 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				tft: {
+					blue: '#0A1428',
+					gold: '#C8AA6E',
+					purple: '#5B3B85',
+					cyan: '#0AC8B9',
+					red: '#E84057',
+					dark: '#091428',
+					light: '#F0F0F0'
+				},
+				// Champion costs colors
+				cost: {
+					1: '#B5B5B5', // Gray
+					2: '#11B288', // Green
+					3: '#207AC7', // Blue
+					4: '#C440DA', // Purple
+					5: '#FF8311', // Orange
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -84,11 +102,16 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-subtle': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.8' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
 			}
 		}
 	},

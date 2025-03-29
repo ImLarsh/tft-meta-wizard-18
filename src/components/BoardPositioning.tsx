@@ -105,7 +105,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       const rowCells = [];
       for (let col = 0; col < cols; col++) {
         const championAtPosition = positionedChampions.find(champ => champ.position && champ.position.row === row && champ.position.col === col);
-        rowCells.push(<div key={`${row}-${col}`} onClick={() => handleCellClick(row, col)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, row, col)} className="hexagon-cell px-0 mx-0 py-0 my-[10px] bg-indigo-950">
+        rowCells.push(<div key={`${row}-${col}`} onClick={() => handleCellClick(row, col)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, row, col)} className="hexagon-cell px-0 mx-0 py-0 bg-indigo-950 my-[8px]">
             {championAtPosition?.isCarry && <div className="carry-stars my-[7px]">
                 <Star size={14} fill="#FFD700" color="#FFD700" />
                 <Star size={14} fill="#FFD700" color="#FFD700" />

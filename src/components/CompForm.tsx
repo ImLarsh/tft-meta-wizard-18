@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -233,7 +232,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   };
 
   const handleAddChampionItem = () => {
-    if (!selectedItem || newChampItems.includes(selectedItem) || newChampItems.length >= 3) return;
+    if (!selectedItem || newChampItems.length >= 3) return;
     setNewChampItems([...newChampItems, selectedItem]);
     setSelectedItem("");
   };
@@ -1083,4 +1082,3 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
 };
 
 export default CompForm;
-

@@ -1,302 +1,187 @@
-/* TFT Board Builder Styles */
-.board-wrapper {
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 15px;
-}
 
-.board-wrapper.compact {
-  max-width: 90%;
-}
-
-/* Board Container */
-.board-container {
-  width: 100%;
-  margin: 0 auto;
-  padding: 30px 0;
-  background: rgba(26, 31, 44, 1);
-  border-radius: 12px;
-  border: 2px solid #7E69AB;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Hexagon Grid Structure */
 .hex-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
-  padding: 20px;
-  width: 100%;
+  margin: 0 auto;
+  max-width: 640px;
 }
 
 .hex-row {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin: 0;
+  margin-bottom: -10px;
 }
 
 .hex-row.offset {
-  margin-left: 55px; /* Offset for honeycomb effect */
+  margin-left: 26px;
 }
 
-/* Hexagon Cell */
 .hex-cell {
-  position: relative;
-  width: 90px;
-  height: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0 4px;
   cursor: pointer;
 }
 
 .hex {
-  width: 100%;
-  height: 115%; /* Height is 115% of width to create proper hexagon */
   position: relative;
+  width: 50px;
+  height: 58px;
+  background-color: rgba(128, 128, 128, 0.2);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background-color: rgba(125, 95, 200, 0.3);
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  border: 2px solid #9b87f5;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
 }
 
 .hex.empty {
-  background-color: rgba(125, 95, 200, 0.2);
-  border: 2px dashed #9b87f5;
-  box-shadow: none;
+  background-color: rgba(128, 128, 128, 0.2);
+}
+
+.hex.empty:hover {
+  background-color: rgba(128, 128, 128, 0.4);
 }
 
 .hex.occupied {
-  background-color: rgba(125, 95, 200, 0.5);
-  border: 2px solid #9b87f5;
-  box-shadow: 0 0 20px rgba(155, 135, 245, 0.3);
+  background-color: rgba(79, 70, 229, 0.1);
+  border: 2px solid rgba(79, 70, 229, 0.3);
 }
 
 .hex.selected {
-  background-color: rgba(156, 39, 176, 0.5);
-  border: 3px solid rgba(156, 39, 176, 0.8);
-  box-shadow: 0 0 30px rgba(156, 39, 176, 0.4);
-  transform: scale(1.1);
-  z-index: 10;
+  background-color: rgba(79, 70, 229, 0.3);
+  border: 2px solid rgba(79, 70, 229, 0.6);
 }
 
-.hex:hover {
-  transform: scale(1.05);
-  border-color: #9b87f5;
-  box-shadow: 0 0 25px rgba(155, 135, 245, 0.4);
-  z-index: 5;
-}
-
-/* Champion Content */
 .champion-content {
-  width: 100%;
-  height: 100%;
+  position: relative;
+  width: 85%;
+  height: 85%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  position: relative;
+  justify-content: center;
 }
 
 .champion-icon-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 4px;
   overflow: hidden;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-}
-
-.champion-icon-wrapper img {
-  width: 140%;
-  height: 140%;
-  object-fit: cover;
 }
 
 .carry-indicator {
   position: absolute;
-  top: -10px;
+  top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
-  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+  z-index: 10;
 }
 
 .items-container {
   position: absolute;
-  bottom: -15px;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  justify-content: center;
-  gap: 4px;
-  padding: 3px 6px;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 10px;
-  z-index: 3;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  gap: 2px;
+  z-index: 5;
 }
 
-/* Champions Grid */
+.board-container {
+  padding: 1.5rem;
+  margin: 0 auto;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.board-wrapper {
+  width: 100%;
+}
+
+.board-wrapper.compact .board-container {
+  padding: 1rem;
+  max-width: 480px;
+}
+
+.board-instructions {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  color: #4b5563;
+}
+
+.champions-title {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
 .champions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 15px;
-  width: 100%;
-  margin-top: 30px;
-  padding: 20px;
-  background: rgba(33, 27, 75, 0.5);
-  border-radius: 10px;
-  border: 1px solid rgba(155, 135, 245, 0.3);
-  box-shadow: inset 0 0 20px rgba(155, 135, 245, 0.1);
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .champion-card {
-  padding: 12px;
-  border-radius: 8px;
-  background-color: rgba(33, 27, 75, 0.7);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  border: 1px solid rgba(155, 135, 245, 0.4);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+  border: 1px solid transparent;
 }
 
 .champion-card:hover {
-  background-color: rgba(33, 27, 75, 0.9);
-  border-color: rgba(155, 135, 245, 0.8);
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .champion-card.selected {
-  background-color: rgba(156, 39, 176, 0.5);
-  border: 2px solid rgba(156, 39, 176, 0.8);
-  box-shadow: 0 0 20px rgba(156, 39, 176, 0.4);
+  background-color: rgba(79, 70, 229, 0.1);
+  border-color: rgba(79, 70, 229, 0.5);
 }
 
 .champion-card.positioned {
-  border: 2px solid rgba(0, 255, 0, 0.5);
-  background-color: rgba(0, 128, 0, 0.2);
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+  background-color: rgba(5, 150, 105, 0.1);
+  border-color: rgba(5, 150, 105, 0.3);
+}
+
+.champion-card.selected.positioned {
+  background-color: rgba(79, 70, 229, 0.1);
+  border-color: rgba(79, 70, 229, 0.5);
 }
 
 .champion-info {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.25rem;
 }
 
 .champion-name {
-  font-size: 13px;
-  margin-top: 8px;
+  font-size: 0.75rem;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  max-width: 100%;
 }
 
 .position-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(33, 27, 75, 0.8);
-  padding: 3px 8px;
-  border-radius: 12px;
-  border: 1px solid rgba(155, 135, 245, 0.5);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-/* Instructions and Tips */
-.board-instructions {
-  display: flex;
-  align-items: center;
-  margin-bottom: 25px;
-  padding: 15px;
-  background: linear-gradient(135deg, rgba(33, 27, 75, 0.8), rgba(26, 31, 44, 0.9));
-  border-radius: 10px;
-  font-size: 15px;
-  border: 1px solid rgba(155, 135, 245, 0.4);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.champions-title {
-  margin-top: 35px;
-  margin-bottom: 15px;
-  font-size: 20px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
-  border-left: 5px solid #9b87f5;
-  padding-left: 12px;
-  letter-spacing: 0.5px;
+  font-size: 0.65rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
 }
 
 .board-tip {
-  margin-top: 20px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  color: #6b7280;
   text-align: center;
-  padding: 12px;
-  background: rgba(33, 27, 75, 0.4);
-  border-radius: 8px;
-  border: 1px dashed rgba(155, 135, 245, 0.4);
-  box-shadow: inset 0 0 20px rgba(155, 135, 245, 0.1);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .hex-cell {
-    width: 55px;
-    height: 55px;
-  }
-  
-  .hex-row.offset {
-    margin-left: 30px;
-  }
-  
-  .champions-grid {
-    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-  }
-}
-
-/* Compact Mode Adjustments */
-.compact .hex-cell {
-  width: 50px;
-  height: 50px;
-}
-
-.compact .hex-row.offset {
-  margin-left: 25px;
-}
-
-/* Animation Effects */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.03);
-  }
-}
-
-.hex.empty {
-  animation: pulse 4s infinite ease-in-out;
+  margin-top: 1rem;
 }

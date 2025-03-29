@@ -115,7 +115,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   // Size classes - adjusted for better filling of hexagons
   const sizeClasses = {
     sm: 'w-8 h-8',
-    md: 'w-full h-full', // Changed to fill parent container
+    md: 'w-11 h-11', 
     lg: 'w-16 h-16'
   };
   
@@ -145,7 +145,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     <div className="relative">
       {/* Stars for carry champion - positioned above the container with enough space */}
       {isCarry && (
-        <div className="absolute top-[-16px] w-full flex justify-center">
+        <div className="absolute -top-4 w-full flex justify-center">
           <div className="flex space-x-0.5">
             <Star size={10} fill="#FFD700" color="#FFD700" />
             <Star size={10} fill="#FFD700" color="#FFD700" />
@@ -156,7 +156,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       
       <div 
         className={cn(
-          size !== 'md' ? sizeClasses[size] : 'w-11 h-11', 
+          sizeClasses[size], 
           'rounded-md overflow-hidden relative',
           className
         )}
@@ -165,7 +165,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
         {imgError ? (
           <div className={cn(
             "w-full h-full flex items-center justify-center text-[10px] font-medium text-white bg-secondary/60 p-0.5 text-center",
-            sizeClasses[size]
           )}>
             {displayName}
           </div>
@@ -174,7 +173,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
             <img
               src={sources[currentSourceIndex]}
               alt={name || 'Unknown Champion'}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               onError={handleImageError}
               loading="lazy"
             />

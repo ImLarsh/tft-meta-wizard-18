@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
@@ -147,12 +148,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   draggable={!readonly} 
                   onDragStart={e => handleDragStart(e, championAtPosition)}
                 >
-                  {championAtPosition.isCarry && (
-                    <div className="carry-indicator">
-                      <Star size={16} fill="#FFD700" color="#FFD700" />
-                    </div>
-                  )}
-                  
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -160,8 +155,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                           <ChampionIcon 
                             name={championAtPosition.name} 
                             cost={championAtPosition.cost} 
-                            size="lg" 
-                            isCarry={false} 
+                            size="sm" 
+                            isCarry={championAtPosition.isCarry} 
                             onClick={() => !readonly && handleChampionClick(championAtPosition)}
                           />
                         </div>
@@ -232,12 +227,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                 onDragStart={e => handleDragStart(e, champion)}
               >
                 <div className="champion-info">
-                  {champion.isCarry && (
-                    <div className="flex mb-1 justify-center">
-                      <Star size={12} fill="#FFD700" color="#FFD700" />
-                    </div>
-                  )}
-                  <ChampionIcon name={champion.name} cost={champion.cost} size="md" isCarry={false} />
+                  <ChampionIcon name={champion.name} cost={champion.cost} size="md" isCarry={champion.isCarry} />
                   <div className="champion-name">
                     {champion.name}
                   </div>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
@@ -24,7 +23,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   
-  // This ensures we properly handle champions with or without positions
   useEffect(() => {
     setPositionedChampions(champions || []);
   }, [champions]);
@@ -33,7 +31,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     if (readonly) return;
 
     if (selectedChampion) {
-      // Update the champion's position
       const updatedChampions = positionedChampions.map(champ => {
         if (champ === selectedChampion) {
           return { ...champ, position: { row, col } };
@@ -44,17 +41,14 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       setPositionedChampions(updatedChampions);
       setSelectedChampion(null);
       
-      // Notify parent of change
       if (onChange) {
         onChange(updatedChampions);
       }
       
-      // Support for the onUpdatePositions prop used in CompForm
       if (onUpdatePositions) {
         onUpdatePositions(updatedChampions);
       }
     } else {
-      // Check if there's a champion at this position and select it
       const championAtPosition = positionedChampions.find(
         champ => champ.position && champ.position.row === row && champ.position.col === col
       );
@@ -90,7 +84,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     e.preventDefault();
     const championIndex = parseInt(e.dataTransfer.getData('championIndex'));
     
-    // Make sure we have a valid champion index
     if (isNaN(championIndex) || championIndex < 0 || championIndex >= positionedChampions.length) {
       return;
     }
@@ -105,19 +98,16 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     setIsDragging(false);
     setSelectedChampion(null);
     
-    // Notify parent of change
     if (onChange) {
       onChange(updatedChampions);
     }
     
-    // Support for the onUpdatePositions prop
     if (onUpdatePositions) {
       onUpdatePositions(updatedChampions);
     }
   };
 
   const renderBoard = () => {
-    // TFT board dimensions: 7 columns x 4 rows (hexagonal grid)
     const rows = 4;
     const cols = 7;
     const board = [];
@@ -129,8 +119,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           champ => champ.position && champ.position.row === row && champ.position.col === col
         );
         
-        // Adjust offset for even and odd rows to create proper hexagon grid
-        // Even rows are offset to create the honeycomb pattern
         const isEvenRow = row % 2 === 0;
         
         const cellSize = compact ? 10 : 14;
@@ -147,7 +135,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
             style={{
-              transform: isEvenRow ? 'translateX(8px)' : '' // Offset even rows for proper honeycomb
+              transform: isEvenRow ? 'translateX(8px)' : ''
             }}
           >
             <div className={`hexagon ${
@@ -170,7 +158,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                           <ChampionIcon
                             name={championAtPosition.name}
                             cost={championAtPosition.cost}
-                            size={compact ? "xs" : "md"}
+                            size={compact ? "sm" : "md"}
                             isCarry={championAtPosition.isCarry}
                             onClick={() => !readonly && handleChampionClick(championAtPosition)}
                             className="hexagon-icon"

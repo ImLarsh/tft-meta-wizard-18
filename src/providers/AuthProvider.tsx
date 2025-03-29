@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  username: string | null; // Add username property
+  username: string | null;
   signOut: () => Promise<void>;
 }
 
@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   loading: true,
-  username: null, // Initialize as null
+  username: null,
   signOut: async () => {}
 });
 
@@ -35,8 +35,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Check for an existing session on initial load
-    const checkSession = async () => {
+    // Set up auth state change listener FIRST (to prevent missing auth events)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        console.info('Auth state changed:', event, currentSession ? 'Session exists' : 'No session');
+        
+        if (currentSession) {
+          setSession(currentSession);
+          setUser(currentSession.user);
+          setUsername(extractUsername(currentSession.user));
+          
+          if (event === 'SIGNED_IN') {
+            toast({
+              title: "Successfully signed in",
+              description: `Welcome ${extractUsername(currentSession.user) || currentSession.user.email || 'to TFT Genie'}!`,
+            });
+          } else if (event === 'TOKEN_REFRESHED') {
+            console.info('Session token refreshed successfully');
+          }
+        } else {
+          // Only clear states on explicit sign out, not on token errors
+          if (event === 'SIGNED_OUT') {
+            setSession(null);
+            setUser(null);
+            setUsername(null);
+            
+            toast({
+              title: "Signed out",
+              description: "You have been signed out of your account",
+            });
+          }
+        }
+      }
+    );
+
+    // THEN check for existing session
+    const getInitialSession = async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
         console.info('Initial session check:', data);
@@ -58,40 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    checkSession();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        console.info('Auth state changed:', event, currentSession ? 'Session exists' : 'No session');
-        
-        if (currentSession) {
-          setSession(currentSession);
-          setUser(currentSession.user);
-          setUsername(extractUsername(currentSession.user));
-          
-          if (event === 'SIGNED_IN') {
-            toast({
-              title: "Successfully signed in",
-              description: `Welcome ${extractUsername(currentSession.user) || currentSession.user.email || 'to TFT Genie'}!`,
-            });
-          }
-        } else {
-          setSession(null);
-          setUser(null);
-          setUsername(null);
-          
-          if (event === 'SIGNED_OUT') {
-            toast({
-              title: "Signed out",
-              description: "You have been signed out of your account",
-            });
-          }
-        }
-        
-        setLoading(false);
-      }
-    );
+    getInitialSession();
 
     // Cleanup subscription on unmount
     return () => {

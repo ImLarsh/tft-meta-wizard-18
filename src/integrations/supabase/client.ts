@@ -19,4 +19,15 @@ export const isUsingDefaultCredentials = (): boolean => {
   return false;
 };
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Create Supabase client with explicit auth configuration
+export const supabase = createClient<Database>(
+  SUPABASE_URL, 
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      storage: localStorage
+    }
+  }
+);

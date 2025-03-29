@@ -59,6 +59,12 @@ const AuthCallback = () => {
               title: "Email verified successfully",
               description: "You are now logged in.",
             });
+
+            // Ensure session is persisted
+            await supabase.auth.setSession({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+            });
           }
         }
       } catch (err) {

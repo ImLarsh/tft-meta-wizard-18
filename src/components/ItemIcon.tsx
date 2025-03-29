@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
@@ -10,7 +9,7 @@ import {
 
 interface ItemIconProps {
   name: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
   showTooltip?: boolean;
 }
@@ -30,8 +29,9 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     setCurrentSourceIndex(0);
   }, [name]);
   
-  // Size classes for the icon container
+  // Size classes for the icon container - added 'xs' size
   const sizeClasses = {
+    xs: 'w-4 h-4',
     sm: 'w-6 h-6',
     md: 'w-8 h-8',
     lg: 'w-10 h-10'

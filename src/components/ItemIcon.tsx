@@ -31,68 +31,59 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   };
   
   // Format the item name for URL usage
-  const getWikiName = (itemName: string) => {
-    // Replace spaces with underscores and preserve apostrophes for wiki URLs
+  const formatNameForUrl = (itemName: string) => {
     return itemName
-      .replace(/\s+/g, '_');
+      .replace(/\s+/g, '_')
+      .replace(/'/g, '%27');
   };
   
-  // Special mappings for commonly confused item names 
-  // Maps from display name to the actual file name on the wiki
-  const specialMappings: Record<string, string> = {
-    "Bloodthirster": "Bloodthirster_(Teamfight_Tactics)",
-    "Blue Buff": "Blue_Buff_(Teamfight_Tactics)",
-    "Bramble Vest": "Bramble_Vest_(Teamfight_Tactics)",
-    "Deathblade": "Deathblade_(Teamfight_Tactics)",
-    "Dragon's Claw": "Dragon%27s_Claw_(Teamfight_Tactics)",
-    "Edge of Night": "Edge_of_Night_(Teamfight_Tactics)",
-    "Giant Slayer": "Giant_Slayer_(Teamfight_Tactics)",
-    "Guinsoo's Rageblade": "Guinsoo%27s_Rageblade_(Teamfight_Tactics)",
-    "Hand of Justice": "Hand_of_Justice_(Teamfight_Tactics)",
-    "Infinity Edge": "Infinity_Edge_(Teamfight_Tactics)",
-    "Ionic Spark": "Ionic_Spark_(Teamfight_Tactics)",
-    "Jeweled Gauntlet": "Jeweled_Gauntlet_(Teamfight_Tactics)",
-    "Last Whisper": "Last_Whisper_(Teamfight_Tactics)",
-    "Locket of the Iron Solari": "Locket_of_the_Iron_Solari_(Teamfight_Tactics)",
-    "Morellonomicon": "Morellonomicon_(Teamfight_Tactics)",
-    "Quicksilver": "Quicksilver_(Teamfight_Tactics)",
-    "Rabadon's Deathcap": "Rabadon%27s_Deathcap_(Teamfight_Tactics)",
-    "Rapid Firecannon": "Rapid_Firecannon_(Teamfight_Tactics)",
-    "Redemption": "Redemption_(Teamfight_Tactics)",
-    "Runaan's Hurricane": "Runaan%27s_Hurricane_(Teamfight_Tactics)",
-    "Spear of Shojin": "Spear_of_Shojin_(Teamfight_Tactics)",
-    "Statikk Shiv": "Statikk_Shiv_(Teamfight_Tactics)",
-    "Sunfire Cape": "Sunfire_Cape_(Teamfight_Tactics)",
-    "Thief's Gloves": "Thief%27s_Gloves_(Teamfight_Tactics)",
-    "Titan's Resolve": "Titan%27s_Resolve_(Teamfight_Tactics)",
-    "Warmog's Armor": "Warmog%27s_Armor_(Teamfight_Tactics)",
-    "Zeke's Herald": "Zeke%27s_Herald_(Teamfight_Tactics)",
-    "Zephyr": "Zephyr_(Teamfight_Tactics)",
-    "Zz'Rot Portal": "Zz%27Rot_Portal_(Teamfight_Tactics)",
+  // Using the correct URL pattern for TFT items
+  const baseImageUrl = `https://static.wikia.nocookie.net/leagueoflegends/images`;
+  
+  // Direct mappings of item names to their exact image URLs
+  const directImageMappings: Record<string, string> = {
+    "Bloodthirster": "https://static.wikia.nocookie.net/leagueoflegends/images/d/d3/Bloodthirster_TFT_item.png/revision/latest?cb=20210904180025",
+    "Blue Buff": "https://static.wikia.nocookie.net/leagueoflegends/images/b/b3/Blue_Buff_TFT_item.png/revision/latest?cb=20210904180026",
+    "Bramble Vest": "https://static.wikia.nocookie.net/leagueoflegends/images/6/69/Bramble_Vest_TFT_item.png/revision/latest?cb=20210904180027",
+    "Deathblade": "https://static.wikia.nocookie.net/leagueoflegends/images/9/94/Deathblade_TFT_item.png/revision/latest?cb=20210904180028",
+    "Dragon's Claw": "https://static.wikia.nocookie.net/leagueoflegends/images/6/60/Dragon%27s_Claw_TFT_item.png/revision/latest?cb=20210904180029",
+    "Edge of Night": "https://static.wikia.nocookie.net/leagueoflegends/images/8/81/Edge_of_Night_TFT_item.png/revision/latest?cb=20210904180032",
+    "Giant Slayer": "https://static.wikia.nocookie.net/leagueoflegends/images/5/58/Giant_Slayer_TFT_item.png/revision/latest?cb=20210904180033",
+    "Guinsoo's Rageblade": "https://static.wikia.nocookie.net/leagueoflegends/images/d/da/Guinsoo%27s_Rageblade_TFT_item.png/revision/latest?cb=20210904180035",
+    "Hand of Justice": "https://static.wikia.nocookie.net/leagueoflegends/images/f/f1/Hand_of_Justice_TFT_item.png/revision/latest?cb=20210904180037",
+    "Infinity Edge": "https://static.wikia.nocookie.net/leagueoflegends/images/c/c6/Infinity_Edge_TFT_item.png/revision/latest?cb=20210904180040",
+    "Ionic Spark": "https://static.wikia.nocookie.net/leagueoflegends/images/9/93/Ionic_Spark_TFT_item.png/revision/latest?cb=20210904180042",
+    "Jeweled Gauntlet": "https://static.wikia.nocookie.net/leagueoflegends/images/8/87/Jeweled_Gauntlet_TFT_item.png/revision/latest?cb=20210904180045",
+    "Last Whisper": "https://static.wikia.nocookie.net/leagueoflegends/images/9/91/Last_Whisper_TFT_item.png/revision/latest?cb=20210904180048",
+    "Locket of the Iron Solari": "https://static.wikia.nocookie.net/leagueoflegends/images/a/ac/Locket_of_the_Iron_Solari_TFT_item.png/revision/latest?cb=20210904180049",
+    "Morellonomicon": "https://static.wikia.nocookie.net/leagueoflegends/images/e/ec/Morellonomicon_TFT_item.png/revision/latest?cb=20210904180051",
+    "Quicksilver": "https://static.wikia.nocookie.net/leagueoflegends/images/9/95/Quicksilver_TFT_item.png/revision/latest?cb=20210904180053",
+    "Rabadon's Deathcap": "https://static.wikia.nocookie.net/leagueoflegends/images/a/a1/Rabadon%27s_Deathcap_TFT_item.png/revision/latest?cb=20210904180055",
+    "Rapid Firecannon": "https://static.wikia.nocookie.net/leagueoflegends/images/f/f2/Rapid_Firecannon_TFT_item.png/revision/latest?cb=20210904180056",
+    "Redemption": "https://static.wikia.nocookie.net/leagueoflegends/images/7/75/Redemption_TFT_item.png/revision/latest?cb=20210904180058",
+    "Runaan's Hurricane": "https://static.wikia.nocookie.net/leagueoflegends/images/e/e9/Runaan%27s_Hurricane_TFT_item.png/revision/latest?cb=20210904180101",
+    "Spear of Shojin": "https://static.wikia.nocookie.net/leagueoflegends/images/d/dd/Spear_of_Shojin_TFT_item.png/revision/latest?cb=20210904180103",
+    "Statikk Shiv": "https://static.wikia.nocookie.net/leagueoflegends/images/2/28/Statikk_Shiv_TFT_item.png/revision/latest?cb=20210904180104",
+    "Sunfire Cape": "https://static.wikia.nocookie.net/leagueoflegends/images/2/27/Sunfire_Cape_TFT_item.png/revision/latest?cb=20210904180105",
+    "Thief's Gloves": "https://static.wikia.nocookie.net/leagueoflegends/images/1/14/Thief%27s_Gloves_TFT_item.png/revision/latest?cb=20210904180107",
+    "Titan's Resolve": "https://static.wikia.nocookie.net/leagueoflegends/images/e/e0/Titan%27s_Resolve_TFT_item.png/revision/latest?cb=20210904180108",
+    "Warmog's Armor": "https://static.wikia.nocookie.net/leagueoflegends/images/c/cf/Warmog%27s_Armor_TFT_item.png/revision/latest?cb=20210904180110",
+    "Zeke's Herald": "https://static.wikia.nocookie.net/leagueoflegends/images/a/af/Zeke%27s_Herald_TFT_item.png/revision/latest?cb=20210904180112",
+    "Zephyr": "https://static.wikia.nocookie.net/leagueoflegends/images/8/8d/Zephyr_TFT_item.png/revision/latest?cb=20210904180113",
+    "Zz'Rot Portal": "https://static.wikia.nocookie.net/leagueoflegends/images/d/df/Zz%27Rot_Portal_TFT_item.png/revision/latest?cb=20210904180114",
   };
   
-  // Get the appropriate wiki page name
-  const wikiPageName = specialMappings[name] || `${getWikiName(name)}_(Teamfight_Tactics)`;
-  
-  // Main image URL using the League of Legends wiki
-  const imageUrl = `https://static.wikia.nocookie.net/leagueoflegends/images/${wikiPageName}.png/revision/latest`;
-  
-  // Alternative direct URLs for popular items
-  const directImageUrls: Record<string, string> = {
-    "Bloodthirster": "https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Bloodthirster_%28Teamfight_Tactics%29.png/revision/latest",
-    "Blue Buff": "https://static.wikia.nocookie.net/leagueoflegends/images/e/e7/Blue_Buff_%28Teamfight_Tactics%29.png/revision/latest",
-    "Infinity Edge": "https://static.wikia.nocookie.net/leagueoflegends/images/5/5a/Infinity_Edge_%28Teamfight_Tactics%29.png/revision/latest",
-    "Jeweled Gauntlet": "https://static.wikia.nocookie.net/leagueoflegends/images/9/9c/Jeweled_Gauntlet_%28Teamfight_Tactics%29.png/revision/latest",
-    "Rabadon's Deathcap": "https://static.wikia.nocookie.net/leagueoflegends/images/4/46/Rabadon%27s_Deathcap_%28Teamfight_Tactics%29.png/revision/latest",
-    "Runaan's Hurricane": "https://static.wikia.nocookie.net/leagueoflegends/images/e/eb/Runaan%27s_Hurricane_%28Teamfight_Tactics%29.png/revision/latest",
-    "Spear of Shojin": "https://static.wikia.nocookie.net/leagueoflegends/images/1/1e/Spear_of_Shojin_%28Teamfight_Tactics%29.png/revision/latest",
+  // Generic URL pattern for items not in the direct mappings
+  const getGenericItemUrl = (itemName: string) => {
+    const formattedName = formatNameForUrl(itemName);
+    return `${baseImageUrl}/${formattedName}_TFT_item.png/revision/latest?cb=20210904180040`;
   };
   
-  // Final URL to use for the image
-  const finalImageUrl = directImageUrls[name] || imageUrl;
+  // Determine which URL to use
+  const imageUrl = directImageMappings[name] || getGenericItemUrl(name);
   
-  // Guaranteed fallback image in case all else fails (using Bloodthirster as fallback)
-  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Bloodthirster_%28Teamfight_Tactics%29.png/revision/latest';
+  // Guaranteed fallback image in case all else fails (using a known working image)
+  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/c/c6/Infinity_Edge_TFT_item.png/revision/latest?cb=20210904180040';
   
   // Display name for fallback text, used if images fail to load
   const displayName = name.length > 12 ? name.substring(0, 10) + '...' : name;
@@ -119,7 +110,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
         </div>
       ) : (
         <img
-          src={finalImageUrl}
+          src={imageUrl}
           alt={name}
           className="w-full h-full object-cover"
           onError={handleImageError}

@@ -53,8 +53,8 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // TFT cost colors
-        'cost-1': '#ffffff', // white for 1-cost
+        // TFT cost colors with more distinctive, vibrant colors
+        'cost-1': '#dadada', // white/silver for 1-cost (slightly darker to be visible)
         'cost-2': '#62c46c', // green for 2-cost
         'cost-3': '#37a6ff', // blue for 3-cost
         'cost-4': '#e664f0', // pink/purple for 4-cost

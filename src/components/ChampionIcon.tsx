@@ -101,22 +101,22 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     lg: 'w-16 h-16'
   };
   
-  // Cost-specific text colors for the number indicator
-  const costTextColors = {
-    1: 'text-cost-1', // white/gray for 1-cost
-    2: 'text-cost-2', // green for 2-cost
-    3: 'text-cost-3', // blue for 3-cost
-    4: 'text-cost-4', // pink/purple for 4-cost
-    5: 'text-cost-5'  // yellow/gold for 5-cost
-  };
-  
-  // Cost-specific border colors
+  // Border colors based on champion cost
   const costBorderColors = {
-    1: 'border-cost-1', // white/gray for 1-cost
+    1: 'border-cost-1', // white for 1-cost
     2: 'border-cost-2', // green for 2-cost
     3: 'border-cost-3', // blue for 3-cost
-    4: 'border-cost-4', // pink/purple for 4-cost
-    5: 'border-cost-5'  // yellow/gold for 5-cost
+    4: 'border-cost-4', // purple for 4-cost
+    5: 'border-cost-5'  // gold for 5-cost
+  };
+  
+  // Cost-specific text colors for the number indicator
+  const costTextColors = {
+    1: 'text-cost-1', // white for 1-cost
+    2: 'text-cost-2', // green for 2-cost
+    3: 'text-cost-3', // blue for 3-cost
+    4: 'text-cost-4', // purple for 4-cost
+    5: 'text-cost-5'  // gold for 5-cost
   };
   
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
@@ -149,8 +149,8 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
         className={cn(
           size !== 'md' ? sizeClasses[size] : 'w-11 h-11', 
           'rounded-md overflow-hidden relative',
-          'border-2', // Add border
-          costBorderColors[cost], // Add cost-specific border color
+          'border-2', // Add a consistent border width
+          costBorderColors[cost], // Apply cost-specific border color
           className
         )}
         onClick={onClick}

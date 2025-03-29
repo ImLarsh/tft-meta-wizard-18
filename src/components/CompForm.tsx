@@ -69,6 +69,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
 
   const [activeTab, setActiveTab] = useState("general");
   const [filteredChampions, setFilteredChampions] = useState<string[]>([]);
+  const [selectedItem, setSelectedItem] = useState<string>("");
 
   const { traitMappings } = useComps();
   const availableSets = Object.keys(traitMappings);
@@ -232,9 +233,9 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   };
 
   const handleAddChampionItem = () => {
-    if (!newItemName || newChampItems.includes(newItemName)) return;
-    setNewChampItems([...newChampItems, newItemName]);
-    setNewItemName("");
+    if (!selectedItem || newChampItems.includes(selectedItem) || newChampItems.length >= 3) return;
+    setNewChampItems([...newChampItems, selectedItem]);
+    setSelectedItem("");
   };
 
   const removeChampionItem = (index: number) => {
@@ -550,6 +551,69 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   </Popover>
                 </div>
                 
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="carry-checkbox"
+                      checked={newChampIsCarry}
+                      onChange={(e) => setNewChampIsCarry(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <Label htmlFor="carry-checkbox" className="cursor-pointer">
+                      Is Carry?
+                    </Label>
+                  </div>
+                  
+                  <Select
+                    value={selectedItem}
+                    onValueChange={setSelectedItem}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select Item" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {commonItems.map((item) => (
+                        <SelectItem key={item} value={item}>
+                          {item}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Button 
+                    type="button" 
+                    size="sm"
+                    onClick={handleAddChampionItem}
+                    disabled={!selectedItem || newChampItems.includes(selectedItem) || newChampItems.length >= 3}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Item
+                  </Button>
+                </div>
+                
+                {newChampItems.length > 0 && (
+                  <div className="col-span-full">
+                    <Label className="mb-2 block">Selected Items</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {newChampItems.map((item, index) => (
+                        <div key={index} className="flex items-center gap-1 bg-secondary/30 rounded-md px-2 py-1">
+                          <span className="text-xs">{item}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 ml-1"
+                            onClick={() => removeChampionItem(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <Button 
                   type="button" 
                   onClick={() => handleAddChampion("early")}
@@ -669,19 +733,45 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                     </Popover>
                   </div>
                   
-                  <div className="flex items-end mb-1">
+                  <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        id="carry-checkbox"
+                        id="carry-checkbox-final"
                         checked={newChampIsCarry}
                         onChange={(e) => setNewChampIsCarry(e.target.checked)}
                         className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                       />
-                      <Label htmlFor="carry-checkbox" className="cursor-pointer">
+                      <Label htmlFor="carry-checkbox-final" className="cursor-pointer">
                         Is Carry?
                       </Label>
                     </div>
+                    
+                    <Select
+                      value={selectedItem}
+                      onValueChange={setSelectedItem}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select Item" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {commonItems.map((item) => (
+                          <SelectItem key={item} value={item}>
+                            {item}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Button 
+                      type="button" 
+                      size="sm"
+                      onClick={handleAddChampionItem}
+                      disabled={!selectedItem || newChampItems.includes(selectedItem) || newChampItems.length >= 3}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Item
+                    </Button>
                   </div>
                 </div>
                 
@@ -702,44 +792,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                         </Button>
                       </div>
                     ))}
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Input 
-                          value={newItemName} 
-                          onChange={(e) => setNewItemName(e.target.value)}
-                          placeholder="Search for an item..."
-                          className="flex-1"
-                        />
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0" align="start">
-                        <div className="max-h-[200px] overflow-y-auto">
-                          {commonItems
-                            .filter(name => name.toLowerCase().includes(newItemName.toLowerCase()))
-                            .map((name, index) => (
-                              <Button
-                                key={index}
-                                variant="ghost"
-                                className="w-full justify-start rounded-none text-left font-normal"
-                                onClick={() => setNewItemName(name)}
-                              >
-                                {name}
-                              </Button>
-                            ))
-                          }
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    <Button 
-                      type="button" 
-                      onClick={handleAddChampionItem}
-                      disabled={!newItemName || newChampItems.includes(newItemName)}
-                      size="sm"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
                 
@@ -1031,3 +1083,4 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
 };
 
 export default CompForm;
+

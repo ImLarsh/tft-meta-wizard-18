@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
+import { MapPin } from 'lucide-react';
 
 interface BoardPositioningProps {
   champions: Champion[];
@@ -110,7 +111,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   };
 
   const renderBoard = () => {
-    // Correct TFT board dimensions: 7 columns x 3 rows (hexagonal grid)
+    // TFT board dimensions: 7 columns x 3 rows (hexagonal grid)
     const rows = 3;
     const cols = 7;
     const board = [];
@@ -131,12 +132,12 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
               !readonly && (!championAtPosition && selectedChampion) 
                 ? 'cursor-pointer hover:bg-primary/20' 
                 : ''
-            }`}
+            } flex items-center justify-center`}
             onClick={() => handleCellClick(row, col)}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
           >
-            {championAtPosition && (
+            {championAtPosition ? (
               <div 
                 className={`absolute inset-0 flex items-center justify-center ${
                   !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
@@ -151,6 +152,11 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   isCarry={championAtPosition.isCarry}
                   onClick={() => !readonly && handleChampionClick(championAtPosition)}
                 />
+              </div>
+            ) : (
+              // Show empty cell indicator 
+              <div className="text-muted-foreground/20 text-xs">
+                {row},{col}
               </div>
             )}
           </div>
@@ -168,48 +174,68 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col items-center">
-        {isDragging && !readonly && (
-          <div className="text-sm text-primary mb-2">
-            Drag champion to a position on the board
+      <div className="flex flex-col items-center bg-card/30 p-4 rounded-md border border-border/30">
+        {!readonly && (
+          <div className="flex items-center mb-4 text-sm text-muted-foreground">
+            <MapPin className="h-4 w-4 mr-1" />
+            {selectedChampion ? (
+              <span>
+                Place <strong>{selectedChampion.name}</strong> on the board or click another champion
+              </span>
+            ) : isDragging ? (
+              <span>Drag champion to a position on the board</span>
+            ) : (
+              <span>Select a champion to position or drag directly onto the board</span>
+            )}
           </div>
         )}
-        <div className="flex justify-center">
-          {renderBoard()}
+        
+        <div className="board-container p-2 bg-card/50 rounded-md">
+          <div className="board-wrapper">
+            {renderBoard()}
+          </div>
         </div>
       </div>
       
       {!readonly && (
-        <div className="grid grid-cols-5 gap-2 mt-4">
-          {positionedChampions.map((champion, index) => (
-            <div
-              key={index}
-              className={`relative border border-border rounded p-1 ${
-                selectedChampion === champion ? 'bg-primary/20 ring-1 ring-primary' : ''
-              }`}
-              onClick={() => handleChampionClick(champion)}
-              draggable
-              onDragStart={(e) => handleDragStart(e, champion)}
-            >
-              <div className="flex flex-col items-center">
-                <ChampionIcon
-                  name={champion.name}
-                  cost={champion.cost}
-                  size="sm"
-                  isCarry={champion.isCarry}
-                />
-                <div className="text-xs mt-1 text-center truncate w-full">
-                  {champion.name}
-                </div>
-                {champion.position && (
-                  <div className="text-xs text-muted-foreground">
-                    ({champion.position.row}, {champion.position.col})
+        <>
+          <h3 className="text-sm font-medium mt-4">Available Champions</h3>
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">
+            {positionedChampions.map((champion, index) => (
+              <div
+                key={index}
+                className={`relative border border-border rounded p-2 ${
+                  selectedChampion === champion ? 'bg-primary/20 ring-1 ring-primary' : 'bg-card/50'
+                } ${champion.position ? 'border-primary/30' : ''}`}
+                onClick={() => handleChampionClick(champion)}
+                draggable
+                onDragStart={(e) => handleDragStart(e, champion)}
+              >
+                <div className="flex flex-col items-center">
+                  <ChampionIcon
+                    name={champion.name}
+                    cost={champion.cost}
+                    size="sm"
+                    isCarry={champion.isCarry}
+                  />
+                  <div className="text-xs mt-1 text-center truncate w-full">
+                    {champion.name}
                   </div>
-                )}
+                  {champion.position && (
+                    <div className="text-xs text-primary flex items-center mt-1">
+                      <MapPin className="h-3 w-3 mr-0.5" />
+                      {champion.position.row},{champion.position.col}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          
+          <div className="text-xs text-muted-foreground mt-2">
+            <p>Tip: Click a champion then click on a board position, or drag and drop directly.</p>
+          </div>
+        </>
       )}
     </div>
   );

@@ -1,228 +1,164 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+ 
 @layer base {
   :root {
-    --background: 240 24% 6%;
-    --foreground: 210 20% 98%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
 
-    --card: 224 71% 8%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 224 71% 8%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 286 70% 67%;
-    --primary-foreground: 240 24% 4%;
-
-    --secondary: 240 21% 15%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 240 21% 12%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 256 54% 56%;
-    --accent-foreground: 210 20% 98%;
-
-    --destructive: 0 62% 57%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 240 21% 18%;
-    --input: 240 21% 18%;
-    --ring: 286 70% 67%;
-
-    --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --radius: 0.5rem;
+    
+    /* TFT-specific colors */
+    --cost-1: 180 100% 40%;    /* Blue for 1-cost */
+    --cost-2: 120 65% 40%;     /* Green for 2-cost */
+    --cost-3: 270 75% 60%;     /* Purple for 3-cost */
+    --cost-4: 330 90% 65%;     /* Pink for 4-cost */
+    --cost-5: 45 100% 60%;     /* Gold for 5-cost */
+    
+    --tft-gold: 45 100% 60%;
+    --tft-silver: 0 0% 75%;
+    --tft-bronze: 30 60% 45%;
+    --tft-cyan: 180 100% 50%;
+    --tft-purple: 270 75% 60%;
+    --tft-red: 0 100% 50%;
   }
-
+}
+ 
+@layer base {
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
-    font-family: 'Exo 2', sans-serif;
-    background-image: 
-      radial-gradient(circle at 25% 25%, rgba(76, 29, 149, 0.15) 0%, transparent 45%),
-      radial-gradient(circle at 75% 75%, rgba(192, 132, 252, 0.1) 0%, transparent 45%);
-    background-attachment: fixed;
-  }
-  
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    @apply bg-muted/30 rounded-full;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    @apply bg-primary/40 rounded-full;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/60;
   }
 }
 
-@layer components {
-  .tft-gradient {
-    background: linear-gradient(to bottom, rgba(10, 20, 40, 0.8), rgba(9, 20, 40, 0.95));
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
+/* Champion border colors based on cost */
+.champion-border-1 {
+  border-color: hsl(var(--cost-1));
+  box-shadow: 0 0 4px hsl(var(--cost-1) / 0.5);
+}
+
+.champion-border-2 {
+  border-color: hsl(var(--cost-2));
+  box-shadow: 0 0 4px hsl(var(--cost-2) / 0.5);
+}
+
+.champion-border-3 {
+  border-color: hsl(var(--cost-3));
+  box-shadow: 0 0 4px hsl(var(--cost-3) / 0.5);
+}
+
+.champion-border-4 {
+  border-color: hsl(var(--cost-4));
+  box-shadow: 0 0 4px hsl(var(--cost-4) / 0.5);
+}
+
+.champion-border-5 {
+  border-color: hsl(var(--cost-5));
+  box-shadow: 0 0 4px hsl(var(--cost-5) / 0.5);
+}
+
+/* Gaming specific styles */
+.gaming-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.gaming-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: all 0.6s;
+  z-index: -1;
+}
+
+.gaming-button:hover::before {
+  left: 100%;
+}
+
+/* Glow text for TFT branding */
+.glow-text {
+  text-shadow: 0 0 10px rgba(var(--primary-rgb), 0.7);
+}
+
+/* TFT Card styles */
+.tft-card {
+  @apply bg-card rounded-lg shadow-lg border border-border/30 overflow-hidden transition-all duration-300;
+}
+
+.tft-card:hover {
+  @apply border-primary/30 shadow-xl;
+}
+
+/* Subtle pulse animation for carry champions */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
   }
-  
-  .tft-card {
-    @apply bg-card/90 border border-border/50 rounded-lg shadow-lg backdrop-blur-sm transition-all duration-300;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), 
-                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  50% {
+    opacity: 0.8;
   }
-  
-  .tft-card:hover {
-    @apply border-primary/50 shadow-xl;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 
-                0 0 0 1px rgba(255, 255, 255, 0.05),
-                0 0 15px rgba(192, 132, 252, 0.2);
-    transform: translateY(-2px);
-  }
-  
-  .tft-card-actions {
-    @apply absolute top-3 right-3 flex gap-2 z-10 opacity-0 transition-opacity duration-200;
-  }
-  
-  .tft-card:hover .tft-card-actions {
-    @apply opacity-100;
-  }
-  
-  .grid-comp-list {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-  }
-  
-  .champion-border-1 {
-    @apply border-2 border-cost-1;
-  }
-  
-  .champion-border-2 {
-    @apply border-2 border-cost-2;
-  }
-  
-  .champion-border-3 {
-    @apply border-2 border-cost-3;
-  }
-  
-  .champion-border-4 {
-    @apply border-2 border-cost-4;
-  }
-  
-  .champion-border-5 {
-    @apply border-2 border-cost-5;
-  }
-  
-  .tft-board-container {
-    @apply flex justify-center items-center;
-  }
-  
-  .tft-board {
-    @apply w-full max-w-lg mx-auto rounded-lg overflow-hidden;
-    position: relative;
-    perspective: 1000px;
-    background-image: url('/lovable-uploads/db943740-3751-4b05-a8c4-db9822ac6793.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.1);
-    aspect-ratio: 7/4;
-  }
-  
-  .tft-board::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 0.5rem;
-    z-index: -1;
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-  }
-  
-  .tft-board-overlay {
-    @apply absolute inset-0 bg-black/10 backdrop-blur-[1px];
-  }
-  
-  .tft-board-cell {
-    @apply w-12 h-12 rounded-md flex items-center justify-center relative z-10 transition-all duration-200;
-  }
-  
-  .tft-board-cell-empty {
-    @apply bg-transparent border border-dashed border-white/30;
-  }
-  
-  .tft-board-cell-occupied {
-    @apply bg-secondary/10 border border-primary/40;
-    box-shadow: 0 0 8px rgba(192, 132, 252, 0.3);
-  }
-  
-  .tft-board-cell-editable {
-    @apply hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer 
-           hover:bg-secondary/20;
-  }
-  
-  .animate-pulse-subtle {
-    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  @keyframes pulse-subtle {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.8;
-    }
-  }
-  
-  .gaming-button {
-    @apply relative overflow-hidden bg-gradient-to-r from-primary/80 to-accent/80 
-           hover:from-primary hover:to-accent
-           text-white font-medium rounded-lg shadow-lg 
-           transition-all duration-300 ease-in-out;
-  }
-  
-  .gaming-button::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 
-           transition-opacity duration-300 ease-in-out;
-  }
-  
-  .gaming-button:hover::before {
-    @apply opacity-100;
-    animation: shine 1.5s infinite;
-  }
-  
-  @keyframes shine {
-    from {
-      transform: translateX(-100%);
-    }
-    to {
-      transform: translateX(100%);
-    }
-  }
-  
-  .glow-text {
-    text-shadow: 0 0 10px rgba(192, 132, 252, 0.5), 
-                 0 0 20px rgba(192, 132, 252, 0.3);
-  }
-  
-  .glow-border {
-    box-shadow: 0 0 5px rgba(192, 132, 252, 0.5), 
-                0 0 10px rgba(192, 132, 252, 0.3);
-  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* TFT gradient background */
+.tft-gradient {
+  background: linear-gradient(135deg, hsl(222.2 84% 4.9%), hsl(230, 70%, 10%));
+}
+
+/* Board styling */
+.board-container {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.board-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  border: 2px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  overflow: hidden;
 }

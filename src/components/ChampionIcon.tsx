@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Star } from 'lucide-react';
 
 interface ChampionIconProps {
   name: string;
@@ -140,6 +142,15 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       )}
       onClick={onClick}
     >
+      {isCarry && (
+        <div className="absolute -top-3 left-0 w-full flex justify-center z-10">
+          <div className="flex">
+            <Star size={10} fill="#FFD700" color="#FFD700" />
+            <Star size={10} fill="#FFD700" color="#FFD700" />
+            <Star size={10} fill="#FFD700" color="#FFD700" />
+          </div>
+        </div>
+      )}
       {imgError ? (
         <div className={cn(
           "w-full h-full flex items-center justify-center text-[10px] font-medium text-white bg-secondary p-0.5 text-center",
@@ -162,11 +173,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       )}>
         {cost}
       </div>
-      {isCarry && (
-        <div className="absolute top-0 right-0 w-3 h-3 bg-primary rounded-bl-md flex items-center justify-center">
-          <span className="text-[8px] font-bold text-white">★</span>
-        </div>
-      )}
     </div>
   );
 };

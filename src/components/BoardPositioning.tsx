@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
-import { MapPin, FlipHorizontal } from 'lucide-react';
+import { MapPin, FlipHorizontal, Star } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface BoardPositioningProps {
@@ -127,6 +127,15 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
           >
+            {championAtPosition && championAtPosition.isCarry && (
+              <div className="absolute -top-3 z-10 w-full flex justify-center">
+                <div className="flex">
+                  <Star size={10} fill="#FFD700" color="#FFD700" />
+                  <Star size={10} fill="#FFD700" color="#FFD700" />
+                  <Star size={10} fill="#FFD700" color="#FFD700" />
+                </div>
+              </div>
+            )}
             <div className={`hexagon ${championAtPosition ? 'occupied' : 'empty'} ${selectedChampion === championAtPosition ? 'selected' : ''}`}>
               {championAtPosition && (
                 <div 
@@ -142,7 +151,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                             name={championAtPosition.name}
                             cost={championAtPosition.cost}
                             size={compact ? "sm" : "md"}
-                            isCarry={championAtPosition.isCarry}
+                            isCarry={false}
                             onClick={() => !readonly && handleChampionClick(championAtPosition)}
                           />
                         </div>
@@ -204,11 +213,18 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                 onDragStart={(e) => handleDragStart(e, champion)}
               >
                 <div className="champion-info">
+                  {champion.isCarry && (
+                    <div className="flex mb-1 justify-center">
+                      <Star size={12} fill="#FFD700" color="#FFD700" />
+                      <Star size={12} fill="#FFD700" color="#FFD700" />
+                      <Star size={12} fill="#FFD700" color="#FFD700" />
+                    </div>
+                  )}
                   <ChampionIcon
                     name={champion.name}
                     cost={champion.cost}
                     size="sm"
-                    isCarry={champion.isCarry}
+                    isCarry={false}
                   />
                   <div className="champion-name">
                     {champion.name}

@@ -19,44 +19,42 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '');
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
-  // Primary source from Mobalytics
-  const mobalyticsUrl = `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName}.png`;
+  // Primary source from TFT Tactics
+  const tftTacticsUrl = `https://cdn.tft.tools/items/${normalizedName}.png`;
   
   // More comprehensive list of image sources to try with different naming patterns
   const sources = [
+    // Primary TFT Tactics source
+    tftTacticsUrl,
+    
+    // Alternative TFT Tactics format
+    `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${normalizedName}.png`,
+    
     // Primary Mobalytics sources
-    mobalyticsUrl,
-    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName.toLowerCase()}.png`,
-    `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedName.toLowerCase()}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedName}.png`,
     
     // Alternative item naming schemes for Mobalytics
-    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/tft10_${normalizedName.toLowerCase()}.png`,
-    `https://cdn.mobalytics.gg/assets/tft/images/items/tft_${normalizedName.toLowerCase()}.png`,
-    
-    // TFT Set 10 specific from Community Dragon
-    `https://raw.communitydragon.org/pbe/game/assets/items/icons2d/tft_item_${normalizedName.toLowerCase()}.tft_set10.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/tft10_${normalizedName}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/tft_${normalizedName}.png`,
     
     // MetaTFT and Reroll
-    `https://cdn.metatft.com/file/metatft/items/${normalizedName.toLowerCase()}.png`,
-    `https://rerollcdn.com/items/${normalizedName.toLowerCase()}.png`,
+    `https://cdn.metatft.com/file/metatft/items/${normalizedName}.png`,
+    `https://rerollcdn.com/items/${normalizedName}.png`,
     
     // League sources
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/${normalizedName.toLowerCase()}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/${normalizedName.toLowerCase()}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/${normalizedName}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/${normalizedName}.png`,
     
     // Community Dragon with different naming patterns
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${normalizedName.toLowerCase()}.png`,
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/standard/${normalizedName.toLowerCase()}.png`,
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/set10/${normalizedName.toLowerCase()}.png`,
-    
-    // Alternative item naming schemes
-    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/tft10_${normalizedName.toLowerCase()}.png`,
-    `https://cdn.mobalytics.gg/assets/tft/images/items/tft_${normalizedName.toLowerCase()}.png`,
-    `https://lolg-cdn.porofessor.gg/img/tft/items/${normalizedName.toLowerCase()}.png`
+    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${normalizedName}.png`,
+    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/standard/${normalizedName}.png`,
+    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/set10/${normalizedName}.png`,
+    `https://raw.communitydragon.org/pbe/game/assets/items/icons2d/tft_item_${normalizedName}.tft_set10.png`,
   ];
   
-  // Fallback image - generic item icon from Mobalytics
-  const fallbackUrl = 'https://cdn.mobalytics.gg/assets/tft/images/items/set10/archangelsstaff.png';
+  // Fallback image - generic item icon from TFT Tactics
+  const fallbackUrl = 'https://cdn.tft.tools/items/deathblade.png';
   
   // Size classes
   const sizeClasses = {

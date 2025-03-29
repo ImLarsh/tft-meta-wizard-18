@@ -101,7 +101,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     lg: 'w-16 h-16'
   };
   
-  // Cost-specific classes
+  // Cost-specific background classes (for the small cost indicator)
   const costBgClasses = {
     1: 'bg-cost-1',
     2: 'bg-cost-2',
@@ -167,12 +167,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
           loading="lazy"
         />
       )}
-      <div className={cn(
-        "absolute bottom-0 right-0 w-3 h-3 rounded-tl-md flex items-center justify-center text-[8px] font-bold text-white",
-        costBgClasses[cost]
-      )}>
-        {cost}
-      </div>
+      {/* Remove the cost indicator as requested */}
     </div>
   );
 };

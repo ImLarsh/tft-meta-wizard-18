@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
+import ItemIcon from './ItemIcon';
 import { Champion } from '@/data/comps';
 import { MapPin, FlipHorizontal, Star } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -128,15 +129,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
           >
-            {championAtPosition && championAtPosition.isCarry && (
-              <div className="absolute -top-2 z-10 w-full flex justify-center">
-                <div className="flex">
-                  <Star size={8} fill="#FFD700" color="#FFD700" />
-                  <Star size={8} fill="#FFD700" color="#FFD700" />
-                  <Star size={8} fill="#FFD700" color="#FFD700" />
-                </div>
-              </div>
-            )}
             <div className={`hexagon ${championAtPosition ? 'occupied' : 'empty'} ${selectedChampion === championAtPosition ? 'selected' : ''}`}>
               {championAtPosition && (
                 <div 
@@ -144,24 +136,45 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   draggable={!readonly}
                   onDragStart={(e) => handleDragStart(e, championAtPosition)}
                 >
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div>
-                          <ChampionIcon
-                            name={championAtPosition.name}
-                            cost={championAtPosition.cost}
-                            size={compact ? "sm" : "md"}
-                            isCarry={false}
-                            onClick={() => !readonly && handleChampionClick(championAtPosition)}
-                          />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{championAtPosition.name}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {championAtPosition.isCarry && (
+                    <div className="absolute -top-2 z-10 w-full flex justify-center">
+                      <div className="flex">
+                        <Star size={8} fill="#FFD700" color="#FFD700" />
+                        <Star size={8} fill="#FFD700" color="#FFD700" />
+                        <Star size={8} fill="#FFD700" color="#FFD700" />
+                      </div>
+                    </div>
+                  )}
+                  <div className="champion-icon-wrapper">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-full h-full">
+                            <ChampionIcon
+                              name={championAtPosition.name}
+                              cost={championAtPosition.cost}
+                              size="md"
+                              isCarry={false}
+                              className="w-full h-full rounded-md overflow-hidden"
+                              onClick={() => !readonly && handleChampionClick(championAtPosition)}
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{championAtPosition.name}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  
+                  {/* Items display under champion */}
+                  {championAtPosition.items && championAtPosition.items.length > 0 && (
+                    <div className="items-container">
+                      {championAtPosition.items.map((item, idx) => (
+                        <ItemIcon key={idx} name={item} size="xs" />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -196,7 +209,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       )}
       
       <div className="board-container">
-        <div className="board-grid">
+        <div className="tft-board-grid">
           {renderBoard()}
         </div>
       </div>

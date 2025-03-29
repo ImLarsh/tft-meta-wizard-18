@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -90,16 +89,10 @@
   box-shadow: 0 4px 16px rgba(var(--secondary-rgb), 0.1);
 }
 
-.board-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
 .board-row {
   display: flex;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
 }
 
 .hexagon-cell {
@@ -354,4 +347,9 @@
 
 .champion-content:hover .champion-preview {
   opacity: 1;
+}
+
+/* TFT specific styles */
+.board-row:nth-child(odd) {
+  margin-left: 10px; /* Offset odd rows for more realistic hexagon grid */
 }

@@ -3,8 +3,7 @@ import React from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import CompTierList from '@/components/CompTierList';
-import { Button } from '@/components/ui/button';
-import { Sparkles, ExternalLink } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -26,13 +25,6 @@ const Index = () => {
                   TFT Genie helps you stay competitive with the latest team compositions, item builds, and strategies. 
                   Our data is updated with each patch to ensure you're always playing the strongest comps.
                 </p>
-                <div className="flex flex-wrap gap-3">
-                  <Button className="gaming-button">View All Comps</Button>
-                  <Button variant="outline" className="border-primary/40 hover:bg-primary/10">
-                    Latest Patch Notes
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
               </div>
               
               <div className="rounded-lg overflow-hidden shadow-xl border border-border/40">

@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
@@ -18,15 +17,6 @@ const HeroSection: React.FC = () => {
           <p className="text-lg md:text-xl mb-8 text-foreground/90">
             Your magical companion for Teamfight Tactics success. Discover the best team compositions and climb the ranks with our mystical meta insights.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-base gaming-button">
-              View Top Comps
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="text-base border-primary/40 hover:bg-primary/10">
-              Latest Updates
-            </Button>
-          </div>
         </div>
       </div>
       

@@ -101,13 +101,13 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     lg: 'w-16 h-16'
   };
   
-  // Cost-specific border colors
+  // Cost-specific border colors with increased width for visibility
   const costBorderClasses = {
-    1: 'border-2 border-cost-1', // white/gray for 1-cost
-    2: 'border-2 border-cost-2', // green for 2-cost
-    3: 'border-2 border-cost-3', // blue for 3-cost
-    4: 'border-2 border-cost-4', // pink/purple for 4-cost
-    5: 'border-2 border-cost-5'  // yellow/gold for 5-cost
+    1: 'border-[3px] border-cost-1', // white/gray for 1-cost
+    2: 'border-[3px] border-cost-2', // green for 2-cost  
+    3: 'border-[3px] border-cost-3', // blue for 3-cost
+    4: 'border-[3px] border-cost-4', // pink/purple for 4-cost
+    5: 'border-[3px] border-cost-5'  // yellow/gold for 5-cost
   };
   
   // Cost-specific text colors for the number indicator
@@ -159,13 +159,15 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
           {displayName}
         </div>
       ) : (
-        <img
-          src={sources[currentSourceIndex]}
-          alt={name || 'Unknown Champion'}
-          className="w-full h-full object-cover"
-          onError={handleImageError}
-          loading="lazy"
-        />
+        <div className="w-full h-full">
+          <img
+            src={sources[currentSourceIndex]}
+            alt={name || 'Unknown Champion'}
+            className="w-full h-full object-cover"
+            onError={handleImageError}
+            loading="lazy"
+          />
+        </div>
       )}
       
       {/* Cost indicator number */}

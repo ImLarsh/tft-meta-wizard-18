@@ -1,33 +1,169 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { TFTComp } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
+import { toast } from '@/components/ui/use-toast';
 
-// Define the structure for trait mappings
-interface TraitMapping {
-  name: string;
-  traits: string[];
-  championTraits: ChampionTraitMap;
+// TraitMappings interface to define the structure of traits data
+interface TraitMappings {
+  [setKey: string]: {
+    name: string;
+    traits: string[];
+    championTraits: ChampionTraitMap;
+  };
 }
 
-interface TraitMappingsState {
-  [key: string]: TraitMapping;
-}
-
+// CompsContext interface
 interface CompsContextType {
   comps: TFTComp[];
+  traitMappings: TraitMappings;
   addComp: (comp: TFTComp) => void;
-  updateComp: (compId: string, updatedComp: TFTComp) => void;
-  removeComp: (compId: string) => void;
-  getCompById: (compId: string) => TFTComp | undefined;
-  traitMappings: TraitMappingsState;
-  updateTraitMappings: (tftVersion: string, mapping: TraitMapping) => void;
-  removeSet: (tftVersion: string) => void;
-  setTraitMappings: (mappings: TraitMappingsState) => void;
-  addTraitMapping: (tftVersion: string, mapping: TraitMapping) => void;
+  updateComp: (comp: TFTComp) => void;
+  removeComp: (id: string) => void;
+  getComp: (id: string) => TFTComp | undefined;
+  addTraitMapping: (setKey: string, setName: string, traits: string[], championTraits: ChampionTraitMap) => void;
+  updateTraitMapping: (setKey: string, setName: string, traits: string[], championTraits: ChampionTraitMap) => void;
+  removeTraitMapping: (setKey: string) => void;
 }
 
 const CompsContext = createContext<CompsContextType | undefined>(undefined);
+
+export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // State for comps and trait mappings, starting with empty arrays/objects
+  const [comps, setComps] = useState<TFTComp[]>([]);
+  const [traitMappings, setTraitMappings] = useState<TraitMappings>({});
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const savedComps = localStorage.getItem('tftComps');
+    const savedTraitMappings = localStorage.getItem('tftTraitMappings');
+    
+    if (savedComps) {
+      try {
+        setComps(JSON.parse(savedComps));
+      } catch (error) {
+        console.error('Error parsing saved comps:', error);
+        setComps([]);
+      }
+    }
+    
+    if (savedTraitMappings) {
+      try {
+        setTraitMappings(JSON.parse(savedTraitMappings));
+      } catch (error) {
+        console.error('Error parsing saved trait mappings:', error);
+        setTraitMappings({});
+      }
+    }
+  }, []);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('tftComps', JSON.stringify(comps));
+  }, [comps]);
+  
+  useEffect(() => {
+    localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
+  }, [traitMappings]);
+
+  // Add a new comp
+  const addComp = (comp: TFTComp) => {
+    setComps(prevComps => [...prevComps, comp]);
+  };
+
+  // Update an existing comp
+  const updateComp = (updatedComp: TFTComp) => {
+    setComps(prevComps => 
+      prevComps.map(comp => 
+        comp.id === updatedComp.id ? updatedComp : comp
+      )
+    );
+  };
+
+  // Remove a comp
+  const removeComp = (id: string) => {
+    setComps(prevComps => prevComps.filter(comp => comp.id !== id));
+  };
+
+  // Get a specific comp by ID
+  const getComp = (id: string) => {
+    return comps.find(comp => comp.id === id);
+  };
+
+  // Add a new trait mapping
+  const addTraitMapping = (setKey: string, setName: string, traits: string[], championTraits: ChampionTraitMap) => {
+    setTraitMappings(prev => ({
+      ...prev,
+      [setKey]: {
+        name: setName,
+        traits,
+        championTraits
+      }
+    }));
+    
+    toast({
+      title: "Set Added",
+      description: `${setName} has been added successfully.`,
+    });
+  };
+
+  // Update an existing trait mapping
+  const updateTraitMapping = (setKey: string, setName: string, traits: string[], championTraits: ChampionTraitMap) => {
+    setTraitMappings(prev => ({
+      ...prev,
+      [setKey]: {
+        name: setName,
+        traits,
+        championTraits
+      }
+    }));
+    
+    toast({
+      title: "Set Updated",
+      description: `${setName} has been updated successfully.`,
+    });
+  };
+
+  // Remove a trait mapping
+  const removeTraitMapping = (setKey: string) => {
+    // Create a new object without the specified key
+    const { [setKey]: removed, ...rest } = traitMappings;
+    setTraitMappings(rest);
+    
+    // Check if any comps use this set and update them
+    const compsUsingSet = comps.filter(comp => comp.tftVersion === setKey);
+    if (compsUsingSet.length > 0) {
+      toast({
+        title: "Warning",
+        description: `Removed a set that was used by ${compsUsingSet.length} compositions.`,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Set Removed",
+        description: "The set has been removed successfully.",
+      });
+    }
+  };
+
+  return (
+    <CompsContext.Provider
+      value={{
+        comps,
+        traitMappings,
+        addComp,
+        updateComp,
+        removeComp,
+        getComp,
+        addTraitMapping,
+        updateTraitMapping,
+        removeTraitMapping
+      }}
+    >
+      {children}
+    </CompsContext.Provider>
+  );
+};
 
 export const useComps = () => {
   const context = useContext(CompsContext);
@@ -35,161 +171,4 @@ export const useComps = () => {
     throw new Error('useComps must be used within a CompsProvider');
   }
   return context;
-};
-
-export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [comps, setComps] = useState<TFTComp[]>([]);
-  const [traitMappings, setTraitMappings] = useState<TraitMappingsState>({
-    "Set 10": {
-      name: "Remix Rumble",
-      traits: ["8-bit", "Big Shot", "Breakout", "Country", "Disco", "EDM", "Emo", "Funk", "Heartsteel", "Hyperpop", "Illbeats", "Jazz", "K/DA", "Metal", "Mixmaster", "Pentakill", "Pop", "Punk", "True Damage", "Wildcard"],
-      championTraits: {
-        "Ahri": ["K/DA", "Wildcard"],
-        "Akali": ["K/DA", "True Damage"],
-        "Amumu": ["Emo", "Punk"],
-        "Annie": ["Emo", "Hyperpop"],
-        "Bard": ["Jazz"],
-        "Blitzcrank": ["Disco", "Punk"],
-        "Caitlyn": ["Heartsteel", "True Damage"],
-        "Corki": ["Big Shot", "8-bit"],
-        "Evelynn": ["K/DA", "Funk"],
-        "Ekko": ["True Damage"],
-        "Garen": ["Pentakill", "8-bit"],
-        "Gnar": ["EDM", "Wildcard"],
-        "Gragas": ["Disco", "Country"],
-        "Illaoi": ["Illbeats", "Country"],
-        "Jax": ["EDM", "Punk"],
-        "Jhin": ["Maestro", "Country"],
-        "Jinx": ["Punk", "Pentakill"],
-        "Kai'Sa": ["K/DA", "Big Shot"],
-        "Karthus": ["Pentakill", "Disco"],
-        "Katarina": ["Country", "K/DA"],
-        "Kayle": ["Pentakill", "Big Shot"],
-        "Kayn": ["Heartsteel", "Wildcard"],
-        "Kennen": ["Disco", "True Damage"],
-        "Lillia": ["K/DA", "EDM"],
-        "Lucian": ["Jazz", "Big Shot"],
-        "Lulu": ["Hyperpop", "EDM"],
-        "Lux": ["Pop", "EDM"],
-        "Miss Fortune": ["Jazz", "Big Shot"],
-        "Mordekaiser": ["Pentakill"],
-        "Nami": ["Jazz", "Disco"],
-        "Neeko": ["Hyperpop", "K/DA"],
-        "Olaf": ["Pentakill", "Punk"],
-        "Pantheon": ["Punk", "Pentakill"],
-        "Poppy": ["Emo", "Heartsteel"],
-        "Qiyana": ["True Damage"],
-        "Riven": ["8-bit", "Heartsteel"],
-        "Samira": ["Country", "Jazz"],
-        "Senna": ["True Damage", "Heartsteel"],
-        "Seraphine": ["K/DA", "Heartsteel"],
-        "Sett": ["Heartsteel", "Mosher"],
-        "Sona": ["Mixmaster", "Jazz"],
-        "Tahm Kench": ["Country", "Jazz"],
-        "Taric": ["Disco", "Pop"],
-        "Thresh": ["Pentakill", "Country"],
-        "Twitch": ["Punk", "Jazz"],
-        "Twisted Fate": ["Disco", "Heartsteel"],
-        "Urgot": ["Country", "Metal"],
-        "Vex": ["Emo", "Pentakill"],
-        "Vi": ["Punk", "Funk"],
-        "Viego": ["Pentakill", "EDM"],
-        "Yasuo": ["True Damage", "Heartsteel"],
-        "Yone": ["Heartsteel", "EDM"],
-        "Yorick": ["Pentakill", "Disco"],
-        "Zac": ["EDM", "Pop"],
-        "Zed": ["EDM", "Heartsteel"],
-        "Ziggs": ["Hyperpop", "8-bit"],
-        "Zilean": ["Funk", "Disco"]
-      }
-    }
-  });
-
-  // Load previously saved comps from localStorage on component mount
-  useEffect(() => {
-    const savedComps = localStorage.getItem('tftComps');
-    if (savedComps) {
-      setComps(JSON.parse(savedComps));
-    }
-
-    const savedTraitMappings = localStorage.getItem('tftTraitMappings');
-    if (savedTraitMappings) {
-      setTraitMappings(JSON.parse(savedTraitMappings));
-    }
-  }, []);
-
-  // Save comps to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('tftComps', JSON.stringify(comps));
-  }, [comps]);
-
-  // Save trait mappings to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
-    console.info('Successfully saved trait mappings');
-  }, [traitMappings]);
-
-  const addComp = (comp: TFTComp) => {
-    setComps((prevComps) => [...prevComps, comp]);
-  };
-
-  const updateComp = (compId: string, updatedComp: TFTComp) => {
-    setComps((prevComps) => 
-      prevComps.map((comp) => 
-        comp.id === compId ? updatedComp : comp
-      )
-    );
-  };
-
-  const removeComp = (compId: string) => {
-    setComps((prevComps) => prevComps.filter((comp) => comp.id !== compId));
-  };
-
-  const getCompById = (compId: string) => {
-    return comps.find((comp) => comp.id === compId);
-  };
-
-  const updateTraitMappings = (tftVersion: string, mapping: TraitMapping) => {
-    setTraitMappings((prev) => ({
-      ...prev,
-      [tftVersion]: mapping
-    }));
-  };
-
-  const addTraitMapping = (tftVersion: string, mapping: TraitMapping) => {
-    setTraitMappings((prev) => ({
-      ...prev,
-      [tftVersion]: mapping
-    }));
-  };
-
-  const removeSet = (tftVersion: string) => {
-    setTraitMappings((prev) => {
-      const updated = { ...prev };
-      delete updated[tftVersion];
-      return updated;
-    });
-
-    // Also remove comps associated with the deleted set
-    setComps((prevComps) => prevComps.filter((comp) => comp.tftVersion !== tftVersion));
-  };
-
-  return (
-    <CompsContext.Provider 
-      value={{ 
-        comps, 
-        addComp, 
-        updateComp, 
-        removeComp, 
-        getCompById,
-        traitMappings,
-        updateTraitMappings,
-        removeSet,
-        setTraitMappings,
-        addTraitMapping
-      }}
-    >
-      {children}
-    </CompsContext.Provider>
-  );
 };

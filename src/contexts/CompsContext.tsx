@@ -4,6 +4,7 @@ import { TFTComp } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 // TraitMappings interface to define the structure of traits data
 interface TraitMappings {
@@ -61,21 +62,27 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
         if (compsData) {
           // Parse the JSON data from Supabase
-          const parsedComps = Array.isArray(compsData.comps) ? compsData.comps : [];
-          setComps(parsedComps);
+          const jsonComps = compsData.comps as Json;
+          if (Array.isArray(jsonComps)) {
+            // Type assertion to convert Json[] to TFTComp[]
+            const parsedComps = jsonComps as unknown as TFTComp[];
+            setComps(parsedComps);
+          } else {
+            setComps([]);
+          }
         } else {
           // If no data in Supabase, try to load from localStorage as fallback
           const savedComps = localStorage.getItem('tftComps');
           
           if (savedComps) {
             try {
-              const parsedComps = JSON.parse(savedComps);
+              const parsedComps = JSON.parse(savedComps) as TFTComp[];
               setComps(parsedComps);
               
               // Save the localStorage comps to Supabase
               await supabase
                 .from('tft_comps')
-                .insert({ comps: parsedComps })
+                .insert({ comps: parsedComps as unknown as Json })
                 .select();
               
               // Clear localStorage now that data is in Supabase
@@ -88,7 +95,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             // Initialize with empty array if no data available
             await supabase
               .from('tft_comps')
-              .insert({ comps: [] })
+              .insert({ comps: [] as unknown as Json })
               .select();
           }
         }
@@ -106,21 +113,27 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
         if (mappingsData) {
           // Parse the JSON data from Supabase
-          const parsedMappings = typeof mappingsData.mappings === 'object' ? mappingsData.mappings : {};
-          setTraitMappings(parsedMappings);
+          const jsonMappings = mappingsData.mappings as Json;
+          if (typeof jsonMappings === 'object' && jsonMappings !== null && !Array.isArray(jsonMappings)) {
+            // Type assertion to convert Json to TraitMappings
+            const parsedMappings = jsonMappings as unknown as TraitMappings;
+            setTraitMappings(parsedMappings);
+          } else {
+            setTraitMappings({});
+          }
         } else {
           // If no data in Supabase, try to load from localStorage as fallback
           const savedTraitMappings = localStorage.getItem('tftTraitMappings');
           
           if (savedTraitMappings) {
             try {
-              const parsedMappings = JSON.parse(savedTraitMappings);
+              const parsedMappings = JSON.parse(savedTraitMappings) as TraitMappings;
               setTraitMappings(parsedMappings);
               
               // Save the localStorage mappings to Supabase
               await supabase
                 .from('tft_trait_mappings')
-                .insert({ mappings: parsedMappings })
+                .insert({ mappings: parsedMappings as unknown as Json })
                 .select();
               
               // Clear localStorage now that data is in Supabase
@@ -133,7 +146,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             // Initialize with empty object if no data available
             await supabase
               .from('tft_trait_mappings')
-              .insert({ mappings: {} })
+              .insert({ mappings: {} as unknown as Json })
               .select();
           }
         }
@@ -159,7 +172,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       if (savedComps) {
         try {
-          setComps(JSON.parse(savedComps));
+          setComps(JSON.parse(savedComps) as TFTComp[]);
         } catch (error) {
           console.error('Error parsing saved comps:', error);
           setComps([]);
@@ -168,7 +181,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       if (savedTraitMappings) {
         try {
-          setTraitMappings(JSON.parse(savedTraitMappings));
+          setTraitMappings(JSON.parse(savedTraitMappings) as TraitMappings);
         } catch (error) {
           console.error('Error parsing saved trait mappings:', error);
           setTraitMappings({});
@@ -200,7 +213,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_comps')
-            .update({ comps })
+            .update({ comps: comps as unknown as Json })
             .eq('id', existingData.id);
           
           if (updateError) {
@@ -212,7 +225,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_comps')
-            .insert({ comps })
+            .insert({ comps: comps as unknown as Json })
             .select();
           
           if (insertError) {
@@ -252,7 +265,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_trait_mappings')
-            .update({ mappings: traitMappings })
+            .update({ mappings: traitMappings as unknown as Json })
             .eq('id', existingData.id);
           
           if (updateError) {
@@ -264,7 +277,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_trait_mappings')
-            .insert({ mappings: traitMappings })
+            .insert({ mappings: traitMappings as unknown as Json })
             .select();
           
           if (insertError) {

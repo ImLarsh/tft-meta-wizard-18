@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import CompCard from './CompCard';
 import { Button } from '@/components/ui/button';
@@ -91,6 +92,12 @@ const CompTierList: React.FC = () => {
       default: return null;
     }
   };
+  
+  // Calculate if we should show filtered view based on if any filters or search are active
+  const shouldShowFilteredView = searchTerm !== '' || 
+                               filters.tier !== 'all' || 
+                               filters.playstyle !== 'all' || 
+                               filters.tftVersion !== 'all';
 
   return (
     <section className="py-12">

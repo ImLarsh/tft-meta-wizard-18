@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Champion } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
@@ -134,18 +133,9 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   return (
     <div className="space-y-4">
       <div className="tft-board-container mb-6">
-        <div 
-          className="tft-board grid grid-cols-7 gap-1 p-2 rounded-lg border border-primary/20 relative overflow-hidden"
-          style={{
-            backgroundImage: `url('/lovable-uploads/db943740-3751-4b05-a8c4-db9822ac6793.png')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            boxShadow: '0 0 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.1)'
-          }}
-        >
+        <div className="tft-board grid grid-cols-7 gap-1 p-2 rounded-lg border border-primary/20 relative overflow-hidden">
           {/* Semi-transparent overlay to ensure cell visibility */}
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
+          <div className="tft-board-overlay"></div>
           
           {board.map((row, rowIndex) => (
             <React.Fragment key={`row-${rowIndex}`}>
@@ -153,19 +143,14 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                 <div 
                   key={`cell-${rowIndex}-${colIndex}`}
                   className={`
-                    w-12 h-12 rounded-md flex items-center justify-center relative z-10
-                    ${editable ? 'hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer' : ''}
-                    ${cell ? 'bg-secondary/20' : 'bg-transparent'}
-                    transition-all duration-200 hover:bg-secondary/20
+                    tft-board-cell
+                    ${cell ? 'tft-board-cell-occupied' : 'tft-board-cell-empty'}
+                    ${editable ? 'tft-board-cell-editable' : ''}
                     ${rowIndex === 0 ? 'mt-1' : ''}
                     ${rowIndex === rows - 1 ? 'mb-1' : ''}
                     ${colIndex === 0 ? 'ml-1' : ''}
                     ${colIndex === cols - 1 ? 'mr-1' : ''}
                   `}
-                  style={{
-                    boxShadow: cell ? '0 0 8px rgba(192, 132, 252, 0.3)' : 'none',
-                    border: cell ? '1px solid rgba(192, 132, 252, 0.4)' : '1px dashed rgba(255, 255, 255, 0.3)'
-                  }}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, rowIndex, colIndex)}
                 >

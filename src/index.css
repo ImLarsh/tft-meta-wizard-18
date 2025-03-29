@@ -43,9 +43,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -59,7 +57,6 @@
     background-attachment: fixed;
   }
   
-  /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -128,6 +125,11 @@
     @apply w-full max-w-lg mx-auto;
     position: relative;
     perspective: 1000px;
+    background-image: url('/lovable-uploads/db943740-3751-4b05-a8c4-db9822ac6793.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.1);
   }
   
   .tft-board::before {
@@ -138,6 +140,28 @@
     z-index: -1;
     background-origin: border-box;
     background-clip: padding-box, border-box;
+  }
+  
+  .tft-board-overlay {
+    @apply absolute inset-0 bg-black/10 backdrop-blur-[1px];
+  }
+  
+  .tft-board-cell {
+    @apply w-12 h-12 rounded-md flex items-center justify-center relative z-10 transition-all duration-200;
+  }
+  
+  .tft-board-cell-empty {
+    @apply bg-transparent border border-dashed border-white/30;
+  }
+  
+  .tft-board-cell-occupied {
+    @apply bg-secondary/20 border border-primary/40;
+    box-shadow: 0 0 8px rgba(192, 132, 252, 0.3);
+  }
+  
+  .tft-board-cell-editable {
+    @apply hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer 
+           hover:bg-secondary/20;
   }
   
   .animate-pulse-subtle {
@@ -153,7 +177,6 @@
     }
   }
   
-  /* Gaming style button */
   .gaming-button {
     @apply relative overflow-hidden bg-gradient-to-r from-primary/80 to-accent/80 
            hover:from-primary hover:to-accent
@@ -181,7 +204,6 @@
     }
   }
   
-  /* Glow effects */
   .glow-text {
     text-shadow: 0 0 10px rgba(192, 132, 252, 0.5), 
                  0 0 20px rgba(192, 132, 252, 0.3);

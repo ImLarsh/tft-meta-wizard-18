@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
 import { Champion } from '@/data/comps';
 import { MapPin, FlipHorizontal, Star } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import '../components/TFTBoardBuilder.css';
 
 interface BoardPositioningProps {
   champions: Champion[];

@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { TFTComp, Champion, Trait } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
 import { useSupabase } from '@/hooks/use-supabase';
+import { fetchTraitMappingsFromSupabase, saveTraitMappingsToSupabase } from '@/utils/supabaseUtils';
+import { toast } from '@/components/ui/use-toast';
 
 // Define the ChampionSet interface that was missing
 interface ChampionSet {
@@ -37,24 +39,61 @@ interface CompsProviderProps {
 export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
   const [comps, setComps] = useState<TFTComp[]>([]);
   const [traitMappings, setTraitMappings] = useState<Record<string, ChampionSet>>({});
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const { supabase } = useSupabase();
 
-  // Load comps and trait mappings from localStorage on component mount
+  // Fetch trait mappings from Supabase on component mount
   useEffect(() => {
-    try {
-      const savedComps = localStorage.getItem('tftComps');
-      if (savedComps) {
-        setComps(JSON.parse(savedComps));
+    const loadTraitMappings = async () => {
+      setLoading(true);
+      try {
+        // Try to load from Supabase first
+        const mappingsFromSupabase = await fetchTraitMappingsFromSupabase();
+        
+        if (Object.keys(mappingsFromSupabase).length > 0) {
+          setTraitMappings(mappingsFromSupabase);
+          console.log('Trait mappings loaded from Supabase:', mappingsFromSupabase);
+        } else {
+          // If nothing in Supabase, try localStorage as fallback
+          const savedMappings = localStorage.getItem('tftTraitMappings');
+          if (savedMappings) {
+            const parsedMappings = JSON.parse(savedMappings);
+            setTraitMappings(parsedMappings);
+            
+            // Save to Supabase in background
+            await saveTraitMappingsToSupabase(parsedMappings);
+            console.log('Trait mappings loaded from localStorage and saved to Supabase');
+          }
+        }
+        
+        // Load comps from localStorage
+        const savedComps = localStorage.getItem('tftComps');
+        if (savedComps) {
+          setComps(JSON.parse(savedComps));
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        
+        // Fallback to localStorage for both
+        try {
+          const savedMappings = localStorage.getItem('tftTraitMappings');
+          if (savedMappings) {
+            setTraitMappings(JSON.parse(savedMappings));
+          }
+          
+          const savedComps = localStorage.getItem('tftComps');
+          if (savedComps) {
+            setComps(JSON.parse(savedComps));
+          }
+        } catch (localError) {
+          console.error('Error loading from localStorage:', localError);
+        }
+      } finally {
+        setLoading(false);
       }
-      
-      const savedMappings = localStorage.getItem('tftTraitMappings');
-      if (savedMappings) {
-        setTraitMappings(JSON.parse(savedMappings));
-      }
-    } catch (error) {
-      console.error('Error loading data from localStorage:', error);
-    }
+    };
+
+    loadTraitMappings();
   }, []);
 
   // Save comps to localStorage whenever they change
@@ -66,14 +105,24 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
     }
   }, [comps]);
 
-  // Save trait mappings to localStorage whenever they change
+  // Save trait mappings to both localStorage and Supabase whenever they change
   useEffect(() => {
-    try {
-      localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
-    } catch (error) {
-      console.error('Error saving trait mappings to localStorage:', error);
+    if (Object.keys(traitMappings).length > 0 && !loading) {
+      try {
+        // Save to localStorage
+        localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
+        
+        // Save to Supabase asynchronously
+        saveTraitMappingsToSupabase(traitMappings).then(success => {
+          if (!success) {
+            console.warn('Failed to save trait mappings to Supabase, but saved to localStorage');
+          }
+        });
+      } catch (error) {
+        console.error('Error saving trait mappings:', error);
+      }
     }
-  }, [traitMappings]);
+  }, [traitMappings, loading]);
 
   const addComp = (comp: TFTComp) => {
     setComps(prevComps => {
@@ -117,14 +166,22 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
 
   // Add the missing methods
   const addTraitMapping = (setKey: string, setName: string, traits: string[], championTraits: Record<string, string[]>) => {
-    setTraitMappings(prev => ({
-      ...prev,
-      [setKey]: {
-        name: setName,
-        traits: traits,
-        championTraits: championTraits
-      }
-    }));
+    setTraitMappings(prev => {
+      const newMappings = {
+        ...prev,
+        [setKey]: {
+          name: setName,
+          traits: traits,
+          championTraits: championTraits
+        }
+      };
+      return newMappings;
+    });
+    
+    toast({
+      title: "Set Added",
+      description: `${setName} has been added successfully`,
+    });
   };
 
   const updateTraitMapping = (setKey: string, setName: string, traits: string[], championTraits: Record<string, string[]>) => {
@@ -136,12 +193,23 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
         championTraits: championTraits
       }
     }));
+    
+    toast({
+      title: "Set Updated",
+      description: `${setName} has been updated successfully`,
+    });
   };
 
   const removeTraitMapping = (setKey: string) => {
     setTraitMappings(prev => {
       const newMappings = {...prev};
       delete newMappings[setKey];
+      
+      toast({
+        title: "Set Removed",
+        description: `Set has been removed successfully`,
+      });
+      
       return newMappings;
     });
   };

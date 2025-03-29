@@ -1,19 +1,22 @@
+
 import React, { useState, useEffect } from 'react';
 import { useComps } from '@/contexts/CompsContext';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Save, Trash, ChevronDown, ChevronUp, Settings, RefreshCw } from 'lucide-react';
+import { Plus, Save, Trash, ChevronDown, ChevronUp, Settings, RefreshCw, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const SetManager: React.FC = () => {
   const { 
     traitMappings, 
     addTraitMapping, 
     updateTraitMapping, 
-    removeTraitMapping 
+    removeTraitMapping,
+    loading
   } = useComps();
   
   const [activeTab, setActiveTab] = useState<string>("manage");
@@ -65,11 +68,6 @@ const SetManager: React.FC = () => {
     
     addTraitMapping(newSetVersion, newSetName, newSetTraits, {});
     
-    toast({
-      title: "Set Created",
-      description: `Set ${newSetName} has been created successfully`,
-    });
-    
     setNewSetVersion("");
     setNewSetName("");
     setNewSetTraits([]);
@@ -94,11 +92,6 @@ const SetManager: React.FC = () => {
     
     const setName = traitMappings[setKey].name;
     updateTraitMapping(setKey, setName, newSetTraits, championTraitMapping);
-    
-    toast({
-      title: "Set Updated",
-      description: `${setName} has been updated successfully`,
-    });
   };
   
   const handleDeleteSet = (setKey: string) => {
@@ -150,6 +143,32 @@ const SetManager: React.FC = () => {
       setSelectedTraits([...selectedTraits, trait]);
     }
   };
+
+  // Render loading state if needed
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container py-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold flex items-center">
+                <Settings className="mr-2 h-6 w-6 text-primary" />
+                TFT Set Manager
+              </h1>
+              <p className="text-muted-foreground mt-1">Loading trait mappings from database...</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-center py-12">
+            <div className="flex flex-col items-center space-y-4">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              <p className="text-muted-foreground">Loading trait mappings from Supabase...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

@@ -9,12 +9,30 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+// Get the current URL for proper redirect handling
+const getRedirectURL = () => {
+  try {
+    // In browser environments
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      return `${url.protocol}//${url.host}/auth/callback`;
+    }
+  } catch (error) {
+    console.error('Error creating redirect URL:', error);
+  }
+  // Fallback to relative path if URL can't be determined
+  return '/auth/callback';
+};
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage, // Use localStorage for session persistence
-    persistSession: true, // Enable session persistence
-    autoRefreshToken: true, // Enable automatic token refresh
-    detectSessionInUrl: true, // Detect auth tokens in URL
+    storage: typeof localStorage !== 'undefined' ? localStorage : undefined,
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    debug: true,
+    redirectTo: getRedirectURL(),
   }
 });
 
@@ -24,3 +42,4 @@ export const isUsingDefaultCredentials = (): boolean => {
   // In a real application, you might want a more robust check
   return false; // Since we have actual credentials from your Supabase project, this is false
 };
+

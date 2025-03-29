@@ -41,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.info('Auth state changed:', event, currentSession ? 'Session exists' : 'No session');
         
         if (currentSession) {
+          // Update state synchronously
           setSession(currentSession);
           setUser(currentSession.user);
           setUsername(extractUsername(currentSession.user));
@@ -53,18 +54,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } else if (event === 'TOKEN_REFRESHED') {
             console.info('Session token refreshed successfully');
           }
-        } else {
-          // Only clear states on explicit sign out, not on token errors
-          if (event === 'SIGNED_OUT') {
-            setSession(null);
-            setUser(null);
-            setUsername(null);
-            
-            toast({
-              title: "Signed out",
-              description: "You have been signed out of your account",
-            });
-          }
+        } else if (event === 'SIGNED_OUT') {
+          // Only clear states on explicit sign out
+          setSession(null);
+          setUser(null);
+          setUsername(null);
+          
+          toast({
+            title: "Signed out",
+            description: "You have been signed out of your account",
+          });
         }
       }
     );
@@ -103,11 +102,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      setUsername(null);
+      // The onAuthStateChange listener will handle state updates
     } catch (error) {
       console.error('Error signing out:', error);
+      toast({
+        title: "Sign out error",
+        description: "There was a problem signing out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 

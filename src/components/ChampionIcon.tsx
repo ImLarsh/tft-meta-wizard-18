@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ChampionIconProps {
@@ -15,91 +16,84 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   className
 }) => {
   const [imgError, setImgError] = useState(false);
-  const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   
-  useEffect(() => {
-    setCurrentSourceIndex(0);
-    setImgError(false);
-  }, [name]);
+  // Normalize the champion name for different API formats
+  let normalizedName;
   
-  const championNameMap: Record<string, string> = {
-    "MissFortune": "missfortune",
-    "Miss Fortune": "missfortune",
-    "AurelionSol": "aurelionsol",
-    "Aurelion Sol": "aurelionsol",
-    "TahmKench": "tahmkench",
-    "Tahm Kench": "tahmkench",
-    "XinZhao": "xinzhao",
-    "Xin Zhao": "xinzhao",
-    "MasterYi": "masteryi",
-    "Master Yi": "masteryi",
-    "TwistedFate": "twistedfate",
-    "Twisted Fate": "twistedfate",
-    "KSante": "ksante",
-    "K'Sante": "ksante",
-    "JarvanIV": "jarvaniv",
-    "Jarvan IV": "jarvaniv",
-    "LeBlanc": "leblanc",
-    "Le Blanc": "leblanc",
-    "RekSai": "reksai",
-    "Rek'Sai": "reksai",
-    "KaiSa": "kaisa",
-    "Kai'Sa": "kaisa",
-    "KhaZix": "khazix",
-    "Kha'Zix": "khazix",
-    "ChoGath": "chogath",
-    "Cho'Gath": "chogath"
-  };
+  // Special case handling for champions with known naming issues
+  if (name === "MissFortune" || name === "Miss Fortune") {
+    normalizedName = "missfortune";
+  } else if (name === "AurelionSol" || name === "Aurelion Sol") {
+    normalizedName = "aurelionsol";
+  } else if (name === "TahmKench" || name === "Tahm Kench") {
+    normalizedName = "tahmkench";
+  } else if (name === "XinZhao" || name === "Xin Zhao") {
+    normalizedName = "xinzhao";
+  } else if (name === "MasterYi" || name === "Master Yi") {
+    normalizedName = "masteryi";
+  } else if (name === "TwistedFate" || name === "Twisted Fate") {
+    normalizedName = "twistedfate";
+  } else if (name === "KSante" || name === "K'Sante") {
+    normalizedName = "ksante";
+  } else if (name === "JarvanIV" || name === "Jarvan IV") {
+    normalizedName = "jarvaniv";
+  } else if (name === "LeBlanc" || name === "Le Blanc") {
+    normalizedName = "leblanc";
+  } else {
+    // Standard normalization for other champions
+    // Remove spaces and special characters, convert to lowercase
+    normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
   
-  const getNormalizedName = (championName: string) => {
-    if (championNameMap[championName]) {
-      return championNameMap[championName];
-    }
-    
-    return championName.toLowerCase().replace(/[^a-z0-9]/g, '');
-  };
+  // For display in fallback
+  const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
-  const normalizedName = getNormalizedName(name);
-  
-  const getWikiName = (championName: string) => {
-    return championName
-      .replace(/([A-Z])/g, ' $1')
-      .trim()
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join('_')
-      .replace(/'/g, '%27');
-  };
-  
-  const wikiName = getWikiName(name);
-  
-  const displayName = name.replace(/([A-Z])/g, ' $1').trim();
-  
+  // New and more reliable image sources
   const sources = [
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/3/35/${wikiName}/120px-${wikiName}.png`,
-    `https://static.wikia.nocookie.net/leagueoflegends/images/3/35/${wikiName}.png`,
-    
-    `https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/${name.replace(/\s+/g, '')}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${name.replace(/\s+/g, '')}_0.jpg`,
-    
+    // TFT set 10 specific sources
+    `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     
+    // Riot Data Dragon - First try with normalized name
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    
+    // Then try with original name (for Data Dragon which sometimes uses spaces)
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name.replace(/\s+/g, '')}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name.replace(/\s+/g, '')}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name.replace(/\s+/g, '')}_0.jpg`,
+    
+    // Community Dragon
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName}/${normalizedName}_0.jpg`,
     
+    // Mobalytics - try multiple format approaches
     `https://cdn.mobalytics.gg/assets/tft/images/champions/thumbnails/${normalizedName}.png`,
+    `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName}.png`,
+    
+    // MetaTFT & Reroll
     `https://cdn.metatft.com/file/metatft/champions/${normalizedName}.png`,
-    `https://rerollcdn.com/characters/${normalizedName}.png`
+    `https://rerollcdn.com/characters/${normalizedName}.png`,
+    
+    // League of Legends asset links
+    `https://static.wikia.nocookie.net/leagueoflegends/images/latest/scale-to-width-down/123?cb=20200412015006&path-prefix=${normalizedName}`,
+    `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName}.png`,
+    
+    // TFT Tactics
+    `https://cdn.tft.tools/champions/${normalizedName}.png`
   ];
   
-  const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/Ryze.png';
+  // Fallback image - use a more reliable placeholder
+  const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Ryze_0.jpg';
   
+  // Size classes
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
     lg: 'w-16 h-16'
   };
   
+  // Cost-specific classes
   const costClasses = {
     1: 'border-cost-1/70',
     2: 'border-cost-2/70',
@@ -115,6 +109,8 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     4: 'bg-cost-4',
     5: 'bg-cost-5'
   };
+  
+  const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   
   const handleImageError = () => {
     const nextIndex = currentSourceIndex + 1;

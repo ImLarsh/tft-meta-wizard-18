@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,12 +10,26 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, MapPin, Crown } from 'lucide-react';
+import { Loader2, MapPin, Crown, Plus, X } from 'lucide-react';
 import ChampionIcon from './ChampionIcon';
 import { useComps } from '@/contexts/CompsContext';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import BoardPositioning from './BoardPositioning';
+
+// Common TFT items for the dropdown
+const commonItems = [
+  "B.F. Sword", "Recurve Bow", "Needlessly Large Rod", "Tear of the Goddess", 
+  "Chain Vest", "Negatron Cloak", "Giant's Belt", "Spatula", "Sparring Gloves",
+  "Infinity Edge", "Giant Slayer", "Bloodthirster", "Deathblade", 
+  "Rapid Firecannon", "Guinsoo's Rageblade", "Runaan's Hurricane", "Statikk Shiv", 
+  "Hextech Gunblade", "Archangel's Staff", "Rabadon's Deathcap", "Morellonomicon", "Jeweled Gauntlet",
+  "Blue Buff", "Frozen Heart", "Chalice of Power", "Spear of Shojin",
+  "Bramble Vest", "Gargoyle Stoneplate", "Sunfire Cape", "Locket of the Iron Solari",
+  "Dragon's Claw", "Quicksilver", "Zephyr", "Ionic Spark",
+  "Warmog's Armor", "Redemption", "Zz'Rot Portal", "Banshee's Claw",
+  "Thief's Gloves", "Hand of Justice", "Titan's Resolve", "Last Whisper"
+];
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -43,6 +58,8 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
   const [activeTab, setActiveTab] = useState("general");
   const [newChampName, setNewChampName] = useState("");
   const [newChampIsCarry, setNewChampIsCarry] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const { traitMappings } = useComps();
   const availableSets = Object.keys(traitMappings);
@@ -90,11 +107,25 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
       cost: cost as 1 | 2 | 3 | 4 | 5,
       isCarry: newChampIsCarry,
       position: null,
+      items: selectedItems.length > 0 ? [...selectedItems] : undefined,
     };
     
     setFinalComp([...finalComp, newChampion]);
     setNewChampName("");
     setNewChampIsCarry(false);
+    setSelectedItems([]);
+  };
+
+  const addItemToChampion = () => {
+    if (!selectedItem || selectedItems.includes(selectedItem) || selectedItems.length >= 3) return;
+    setSelectedItems([...selectedItems, selectedItem]);
+    setSelectedItem("");
+  };
+
+  const removeItemFromSelection = (index: number) => {
+    const newItems = [...selectedItems];
+    newItems.splice(index, 1);
+    setSelectedItems(newItems);
   };
 
   const removeChampion = (index: number) => {
@@ -392,6 +423,19 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                             Position: ({champ.position.row}, {champ.position.col})
                           </div>
                         )}
+
+                        {champ.items && champ.items.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-xs text-muted-foreground mb-1">Items:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {champ.items.map((item, idx) => (
+                                <span key={idx} className="text-xs bg-secondary/30 px-1.5 py-0.5 rounded">
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -420,7 +464,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                     </select>
                   </div>
                   
-                  <div className="flex items-end mb-1">
+                  <div className="flex items-end gap-4">
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -433,8 +477,58 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                         Is Carry?
                       </Label>
                     </div>
+
+                    <div className="flex-1">
+                      <Select
+                        value={selectedItem}
+                        onValueChange={setSelectedItem}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select Item" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {commonItems.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <Button 
+                      type="button" 
+                      size="sm"
+                      onClick={addItemToChampion}
+                      disabled={!selectedItem || selectedItems.includes(selectedItem) || selectedItems.length >= 3}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Item
+                    </Button>
                   </div>
                 </div>
+
+                {selectedItems.length > 0 && (
+                  <div>
+                    <Label className="mb-2 block">Selected Items ({selectedItems.length}/3)</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedItems.map((item, index) => (
+                        <div key={index} className="flex items-center gap-1 bg-secondary/30 rounded-md px-2 py-1">
+                          <span className="text-xs">{item}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 ml-1"
+                            onClick={() => removeItemFromSelection(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
                 <Button 
                   type="button" 

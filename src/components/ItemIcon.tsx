@@ -19,15 +19,16 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '');
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
-  // Multiple image sources to try - added more reliable sources
-  const primarySource = `https://cdn.metatft.com/file/metatft/items/${normalizedName.toLowerCase()}.png`;
-  const secondarySource = `https://rerollcdn.com/items/${normalizedName.toLowerCase()}.png`;
-  const tertiarySource = `https://cdn.communitydragon.org/latest/item/${normalizedName.toLowerCase()}/icon`;
-  const fourthSource = `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/${normalizedName.toLowerCase()}.png`;
-  const fifthSource = `https://cdn.mobalytics.gg/assets/tft/images/items/set9/${normalizedName.toLowerCase()}.png`;
+  // Multiple image sources to try with different naming patterns
+  const mobalyticsUrl = `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName.toLowerCase()}.png`;
+  const mobalyticsItemsUrl = `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedName.toLowerCase()}.png`;
+  const metaTftUrl = `https://cdn.metatft.com/file/metatft/items/${normalizedName.toLowerCase()}.png`;
+  const rerollUrl = `https://rerollcdn.com/items/${normalizedName.toLowerCase()}.png`;
+  const ddragonUrl = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/${normalizedName.toLowerCase()}.png`;
+  const communityDragonUrl = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${normalizedName.toLowerCase()}.png`;
   
-  // Fallback image
-  const fallbackUrl = '/placeholder.svg';
+  // Fallback image - use a generic placeholder
+  const fallbackUrl = 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=30&h=30&fit=crop&auto=format';
   
   // Size classes
   const sizeClasses = {
@@ -40,19 +41,22 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     const target = e.target as HTMLImageElement;
     
     // Try each fallback source in sequence
-    if (target.src === primarySource) {
-      console.log(`Primary source failed for item ${name}, trying secondary`);
-      target.src = secondarySource;
-    } else if (target.src === secondarySource) {
-      console.log(`Secondary source failed for item ${name}, trying tertiary`);
-      target.src = tertiarySource;
-    } else if (target.src === tertiarySource) {
-      console.log(`Tertiary source failed for item ${name}, trying fourth source`);
-      target.src = fourthSource;
-    } else if (target.src === fourthSource) {
-      console.log(`Fourth source failed for item ${name}, trying fifth source`);
-      target.src = fifthSource;
-    } else if (target.src === fifthSource) {
+    if (target.src === mobalyticsUrl) {
+      console.log(`First source failed for item ${name}, trying source 2`);
+      target.src = mobalyticsItemsUrl;
+    } else if (target.src === mobalyticsItemsUrl) {
+      console.log(`Second source failed for item ${name}, trying source 3`);
+      target.src = metaTftUrl;
+    } else if (target.src === metaTftUrl) {
+      console.log(`Third source failed for item ${name}, trying source 4`);
+      target.src = rerollUrl;
+    } else if (target.src === rerollUrl) {
+      console.log(`Fourth source failed for item ${name}, trying source 5`);
+      target.src = ddragonUrl;
+    } else if (target.src === ddragonUrl) {
+      console.log(`Fifth source failed for item ${name}, trying source 6`);
+      target.src = communityDragonUrl;
+    } else {
       console.log(`All image sources failed for item ${name}, using fallback`);
       setImgError(true);
       target.src = fallbackUrl;
@@ -76,7 +80,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
         </div>
       ) : (
         <img
-          src={primarySource}
+          src={mobalyticsUrl}
           alt={name}
           className="w-full h-full object-cover"
           onError={handleImageError}

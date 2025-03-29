@@ -21,15 +21,16 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
-  // New, more reliable sources
-  const ddragonUrl = `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName}.png`;
-  const communityDragonUrl = `https://raw.communitydragon.org/latest/game/assets/characters/${normalizedName.toLowerCase()}/hud/${normalizedName.toLowerCase()}_square.png`;
-  const tftUrl = `https://cdn.metatft.com/file/metatft/champions/${normalizedName.toLowerCase()}.png`;
-  const rerollUrl = `https://rerollcdn.com/characters/${normalizedName.toLowerCase()}.png`;
-  const cdnGamepediaUrl = `https://cdn.mobalytics.gg/assets/tft/images/champions/set9/${normalizedName.toLowerCase()}.png`;
+  // Try multiple reliable sources in different formats
+  const communityDragonUrlFull = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`;
+  const communityDragonUrlLowcase = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName.toLowerCase()}.png`;
+  const tftAssetsUrl = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name}.png`;
+  const mobalyticsUrl = `https://cdn.mobalytics.gg/assets/tft/images/champions/thumbnails/${normalizedName.toLowerCase()}.png`;
+  const mobalyticsChampionUrl = `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName.toLowerCase()}.png`;
+  const metaTFTUrl = `https://cdn.metatft.com/file/metatft/champions/${normalizedName.toLowerCase()}.png`;
   
-  // Fallback image
-  const fallbackUrl = '/placeholder.svg';
+  // Fallback image - use a generic placeholder
+  const fallbackUrl = 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=40&h=40&fit=crop&auto=format';
   
   // Size classes
   const sizeClasses = {
@@ -59,19 +60,22 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     const target = e.target as HTMLImageElement;
     
     // Try each fallback source in sequence
-    if (target.src === ddragonUrl) {
-      console.log(`DDragon failed for ${name}, trying Community Dragon`);
-      target.src = communityDragonUrl;
-    } else if (target.src === communityDragonUrl) {
-      console.log(`Community Dragon failed for ${name}, trying TFT source`);
-      target.src = tftUrl;
-    } else if (target.src === tftUrl) {
-      console.log(`TFT source failed for ${name}, trying Reroll CDN`);
-      target.src = rerollUrl;
-    } else if (target.src === rerollUrl) {
-      console.log(`Reroll CDN failed for ${name}, trying Mobalytics`);
-      target.src = cdnGamepediaUrl;
-    } else if (target.src === cdnGamepediaUrl) {
+    if (target.src === communityDragonUrlFull) {
+      console.log(`First source failed for ${name}, trying source 2`);
+      target.src = communityDragonUrlLowcase;
+    } else if (target.src === communityDragonUrlLowcase) {
+      console.log(`Second source failed for ${name}, trying source 3`);
+      target.src = tftAssetsUrl;
+    } else if (target.src === tftAssetsUrl) {
+      console.log(`Third source failed for ${name}, trying source 4`);
+      target.src = mobalyticsUrl;
+    } else if (target.src === mobalyticsUrl) {
+      console.log(`Fourth source failed for ${name}, trying source 5`);
+      target.src = mobalyticsChampionUrl;
+    } else if (target.src === mobalyticsChampionUrl) {
+      console.log(`Fifth source failed for ${name}, trying source 6`);
+      target.src = metaTFTUrl;
+    } else {
       console.log(`All image sources failed for ${name}, using fallback`);
       setImgError(true);
       target.src = fallbackUrl;
@@ -97,7 +101,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
         </div>
       ) : (
         <img
-          src={ddragonUrl}
+          src={communityDragonUrlFull}
           alt={name}
           className="w-full h-full object-cover"
           onError={handleImageError}

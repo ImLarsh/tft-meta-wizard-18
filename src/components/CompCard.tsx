@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TFTComp } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
@@ -119,17 +118,12 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
         
         <div className="flex flex-wrap gap-2 mb-3">
           {comp.finalComp.map((champion) => (
-            <div key={champion.name} className={`relative ${champion.isCarry ? 'animate-pulse-subtle' : ''}`}>
-              <ChampionIcon name={champion.name} cost={champion.cost} />
-              {champion.isCarry && (
-                <div className="absolute -top-2 left-0 w-full flex justify-center z-10">
-                  <div className="flex">
-                    <Star size={8} fill="#FFD700" color="#FFD700" />
-                    <Star size={8} fill="#FFD700" color="#FFD700" />
-                    <Star size={8} fill="#FFD700" color="#FFD700" />
-                  </div>
-                </div>
-              )}
+            <div key={champion.name} className="relative">
+              <ChampionIcon 
+                name={champion.name} 
+                cost={champion.cost} 
+                isCarry={champion.isCarry}
+              />
             </div>
           ))}
         </div>

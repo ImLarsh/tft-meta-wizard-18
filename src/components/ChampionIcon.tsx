@@ -101,22 +101,13 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     lg: 'w-16 h-16'
   };
   
-  // Cost-specific background classes (for the small cost indicator)
-  const costBgClasses = {
-    1: 'bg-cost-1',
-    2: 'bg-cost-2',
-    3: 'bg-cost-3',
-    4: 'bg-cost-4',
-    5: 'bg-cost-5'
-  };
-  
-  // Cost-specific border classes with proper colors
-  const costBorderClasses = {
-    1: 'border-2 border-cost-1', // white/gray for 1-cost
-    2: 'border-2 border-cost-2', // green for 2-cost
-    3: 'border-2 border-cost-3', // blue for 3-cost
-    4: 'border-2 border-cost-4', // pink/purple for 4-cost
-    5: 'border-2 border-cost-5'  // yellow/gold for 5-cost
+  // Cost-specific text colors for the number indicator
+  const costTextColors = {
+    1: 'text-cost-1', // white/gray for 1-cost
+    2: 'text-cost-2', // green for 2-cost
+    3: 'text-cost-3', // blue for 3-cost
+    4: 'text-cost-4', // pink/purple for 4-cost
+    5: 'text-cost-5'  // yellow/gold for 5-cost
   };
   
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
@@ -137,7 +128,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       className={cn(
         size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
         'rounded-md overflow-hidden relative',
-        costBorderClasses[cost], // Add cost-specific border
         className
       )}
       onClick={onClick}
@@ -167,7 +157,14 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
           loading="lazy"
         />
       )}
-      {/* Remove the cost indicator as requested */}
+      
+      {/* Cost indicator number */}
+      <div className={cn(
+        "absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-[10px] font-bold rounded-full bg-black/50",
+        costTextColors[cost]
+      )}>
+        {cost}
+      </div>
     </div>
   );
 };

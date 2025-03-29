@@ -1,127 +1,115 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Header from '@/components/Header';
-import CompForm from '@/components/CompForm';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, Save } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { TFTComp } from '@/data/comps';
-import { toast } from '@/components/ui/use-toast';
+import SimpleCompForm from '@/components/SimpleCompForm';
 import { useComps } from '@/contexts/CompsContext';
+import { toast } from '@/components/ui/use-toast';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import PageLayout from '@/components/PageLayout';
 
-const CompEditExisting: React.FC = () => {
-  const navigate = useNavigate();
+const CompEditExisting = () => {
   const { compId } = useParams<{ compId: string }>();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { comps, updateComp } = useComps();
-  const [currentComp, setCurrentComp] = useState<TFTComp | null>(null);
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [comp, setComp] = useState<TFTComp | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
-  // Find the comp to edit
   useEffect(() => {
-    if (compId) {
-      const comp = comps.find(c => c.id === compId);
-      if (comp) {
-        setCurrentComp(comp);
+    if (compId && comps) {
+      const foundComp = comps.find((c) => c.id === compId);
+      if (foundComp) {
+        setComp(foundComp);
       } else {
-        toast({
-          title: "Error",
-          description: "Composition not found",
-          variant: "destructive",
-        });
-        navigate('/');
+        setNotFound(true);
       }
     }
-  }, [compId, comps, navigate]);
+  }, [compId, comps]);
 
-  const handleSubmit = (compData: TFTComp) => {
+  const handleUpdateComp = (updatedComp: TFTComp) => {
     setIsSubmitting(true);
     
     try {
-      // Make sure we keep the original ID
-      const updatedComp = { ...compData, id: compId! };
+      // Keep the original ID
+      updatedComp.id = compId || updatedComp.id;
       
-      // Save the updated comp to our context/localStorage
+      // Update comp in context
       updateComp(updatedComp);
       
-      // Log the data that would be saved
-      console.log('Updating comp data:', updatedComp);
-      
-      // Show success message
       toast({
-        title: "Success",
-        description: "Your composition has been updated!",
+        title: "Comp Updated",
+        description: `"${updatedComp.name}" has been updated successfully!`,
       });
       
-      // Navigate back to the main page
+      // Navigate to home
       navigate('/');
     } catch (error) {
-      console.error('Error saving comp:', error);
+      console.error('Error updating comp:', error);
       toast({
         title: "Error",
-        description: "There was a problem updating your composition.",
+        description: "Failed to update composition. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-  
-  if (!currentComp) {
+
+  if (notFound) {
     return (
-      <div className="min-h-screen flex flex-col bg-background/95 bg-[url('/hexagon-pattern.png')] bg-repeat">
-        <Header />
-        <main className="flex-1 container py-8 flex justify-center items-center">
-          <div className="text-center">
-            <p className="text-2xl">Loading composition...</p>
-            <Button onClick={() => navigate('/')} className="mt-4">
-              Return Home
-            </Button>
-          </div>
-        </main>
-      </div>
+      <PageLayout>
+        <div className="flex flex-col items-center justify-center py-12">
+          <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
+          <h1 className="text-2xl font-bold mb-2">Composition Not Found</h1>
+          <p className="text-muted-foreground mb-6">
+            The composition you're looking for doesn't exist or has been deleted.
+          </p>
+          <Button onClick={() => navigate('/')}>
+            Return to Homepage
+          </Button>
+        </div>
+      </PageLayout>
     );
   }
-  
+
   return (
-    <div className="min-h-screen flex flex-col bg-background/95 bg-[url('/hexagon-pattern.png')] bg-repeat">
-      <Header />
-      <main className="flex-1 container py-8">
-        <div className="flex items-center gap-2 mb-6">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')} 
-            className="hover:bg-primary/10 gaming-button"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back
-          </Button>
-          <h1 className="text-3xl font-bold flex items-center">
-            <Sparkles className="h-6 w-6 text-primary mr-2 animate-pulse-subtle" />
-            Edit Composition: {currentComp.name}
-          </h1>
-        </div>
-        
-        <div className="bg-card border border-primary/20 rounded-lg shadow-md p-6 backdrop-blur-sm gaming-card">
-          <CompForm initialData={currentComp} onSubmit={handleSubmit} isSubmitting={isSubmitting} />
-        </div>
-      </main>
-      
-      <footer className="bg-card/90 backdrop-blur py-8 border-t border-primary/10">
-        <div className="container">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary animate-pulse-subtle" />
-              <span className="text-xl font-bold text-primary">TFT</span>
-              <span className="text-xl font-bold glow-text">Genie</span>
-            </div>
-            
-            <div className="text-sm text-muted-foreground">
-              TFT Genie is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends.
-            </div>
+    <PageLayout>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="mr-2"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+            <h1 className="text-2xl font-bold">Edit Composition</h1>
           </div>
         </div>
-      </footer>
-    </div>
+        
+        <Alert className="mb-6">
+          <AlertTitle>Edit TFT Comp</AlertTitle>
+          <AlertDescription>
+            Make changes to your team composition and save to update it.
+          </AlertDescription>
+        </Alert>
+        
+        {comp && (
+          <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
+            <SimpleCompForm 
+              initialData={comp}
+              onSubmit={handleUpdateComp}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+        )}
+      </div>
+    </PageLayout>
   );
 };
 

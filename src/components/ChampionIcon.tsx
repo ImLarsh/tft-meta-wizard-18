@@ -48,6 +48,16 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     normalizedName = "jarvaniv";
   } else if (name === "LeBlanc" || name === "Le Blanc") {
     normalizedName = "leblanc";
+  } else if (name === "Kobuko") {
+    normalizedName = "kobuko";
+  } else if (name === "Rhaast") {
+    normalizedName = "rhaast";
+  } else if (name === "Kog'Maw" || name === "KogMaw") {
+    normalizedName = "kogmaw";
+  } else if (name === "Aurora") {
+    normalizedName = "aurora";
+  } else if (name === "Naafiri") {
+    normalizedName = "naafiri";
   } else {
     // Standard normalization for other champions - safely handle name
     normalizedName = name ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unknown';
@@ -58,17 +68,26 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   
   // New and more reliable image sources
   const sources = [
-    // TFT set 10 specific sources
+    // TFT set 10 & 14 specific sources
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
+    `https://raw.communitydragon.org/pbe/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
+    `https://raw.communitydragon.org/latest/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
+
+    // TFT general sources
+    `https://cdn.metatft.com/file/metatft/champions/${normalizedName}.png`,
+    `https://rerollcdn.com/characters/${normalizedName}.png`,
+    `https://cdn.tft.tools/champions/${normalizedName}.png`,
     
     // Riot Data Dragon - First try with normalized name
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     
     // Then try with original name (for Data Dragon which sometimes uses spaces)
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
     `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name ? name.replace(/\s+/g, '') : 'Unknown'}_0.jpg`,
     
     // Community Dragon
@@ -79,16 +98,9 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     `https://cdn.mobalytics.gg/assets/tft/images/champions/thumbnails/${normalizedName}.png`,
     `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName}.png`,
     
-    // MetaTFT & Reroll
-    `https://cdn.metatft.com/file/metatft/champions/${normalizedName}.png`,
-    `https://rerollcdn.com/characters/${normalizedName}.png`,
-    
     // League of Legends asset links
     `https://static.wikia.nocookie.net/leagueoflegends/images/latest/scale-to-width-down/123?cb=20200412015006&path-prefix=${normalizedName}`,
-    `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName}.png`,
-    
-    // TFT Tactics
-    `https://cdn.tft.tools/champions/${normalizedName}.png`
+    `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName}.png`
   ];
   
   // Fallback image - use a more reliable placeholder

@@ -1,14 +1,14 @@
 
-import { type Config } from "tailwindcss";
+import type { Config } from "tailwindcss";
 
-export default {
+const config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+	],
   prefix: "",
   theme: {
     container: {
@@ -20,12 +20,6 @@ export default {
     },
     extend: {
       colors: {
-        tft: {
-          gold: "#FFD700",
-          cyan: "#00FFFF",
-          purple: "#A020F0",
-          red: "#FF0000",
-        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -59,13 +53,17 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        cost: {
-          1: "#949494", // Gray for 1-cost units
-          2: "#11B288", // Green for 2-cost units  
-          3: "#207AC7", // Blue for 3-cost units
-          4: "#C440DA", // Purple for 4-cost units
-          5: "#FFB93B", // Gold for 5-cost units
-        }
+        // TFT cost colors
+        'cost-1': '#ffffff', // white for 1-cost
+        'cost-2': '#62c46c', // green for 2-cost
+        'cost-3': '#37a6ff', // blue for 3-cost
+        'cost-4': '#e664f0', // pink/purple for 4-cost
+        'cost-5': '#ffb93b', // yellow/gold for 5-cost
+        // TFT tier colors
+        'tft-gold': '#F9DC5C',
+        'tft-cyan': '#4CC9F0',
+        'tft-purple': '#7D4CDB',
+        'tft-red': '#E64C66',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -81,22 +79,24 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
         "pulse-subtle": {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.8" },
-        },
-        "spin-slow": {
-          "0%": { transform: "rotate(0deg)" },
-          "100%": { transform: "rotate(360deg)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-subtle": "pulse-subtle 3s ease-in-out infinite",
         "spin-slow": "spin-slow 8s linear infinite",
+        "pulse-subtle": "pulse-subtle 3s ease-in-out infinite",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+} satisfies Config
+
+export default config;

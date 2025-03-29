@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
+import { Home, List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 
 const Header: React.FC = () => {
@@ -35,13 +35,26 @@ const Header: React.FC = () => {
     <header className={`bg-card/80 backdrop-blur-md sticky top-0 z-10 border-b transition-all duration-300 ${scrolled ? 'shadow-md border-primary/20' : 'shadow-sm border-primary/10'}`}>
       <div className="container py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className={`flex items-center space-x-2 transition-transform duration-300 ${mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
-            <div className="flex items-center group">
-              <Sparkles className="h-6 w-6 text-primary animate-pulse-subtle group-hover:animate-spin-slow transition-all duration-300" />
-              <span className="text-2xl font-bold ml-2 gradient-text group-hover:opacity-80 transition-opacity duration-300">TFT</span>
-              <span className="text-2xl font-bold glow-text group-hover:text-primary transition-colors duration-300">Genie</span>
-            </div>
-          </Link>
+          <div className="flex items-center space-x-2">
+            <Link to="/" className={`flex items-center space-x-2 transition-transform duration-300 ${mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
+              <div className="flex items-center group">
+                <Sparkles className="h-6 w-6 text-primary animate-pulse-subtle group-hover:animate-spin-slow transition-all duration-300" />
+                <span className="text-2xl font-bold ml-2 gradient-text group-hover:opacity-80 transition-opacity duration-300">TFT</span>
+                <span className="text-2xl font-bold glow-text group-hover:text-primary transition-colors duration-300">Genie</span>
+              </div>
+            </Link>
+            
+            <Link 
+              to="/" 
+              className={`ml-2 p-2 rounded-full hover:bg-primary/10 transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}
+              aria-label="Home"
+            >
+              <Home 
+                className={`h-5 w-5 text-muted-foreground hover:text-primary transition-colors 
+                  ${location.pathname === '/' ? 'text-primary' : ''}`} 
+              />
+            </Link>
+          </div>
           
           <nav className="flex items-center space-x-2">
             {/* Theme Toggle Button */}

@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import TFTBoardBuilder from '@/components/TFTBoardBuilder';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, HelpCircle, Save, Crown, Plus, Search } from 'lucide-react';
+import { ArrowLeft, Sparkles, HelpCircle, Save, Crown, Plus, Search, X } from 'lucide-react';
 import { Champion, TFTComp } from '@/data/comps';
 import { toast } from '@/components/ui/use-toast';
 import { useComps } from '@/contexts/CompsContext';
@@ -40,6 +39,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import ChampionDetailCard from '@/components/ChampionDetailCard';
 import ItemSearchBar from '@/components/ItemSearchBar';
 import ItemIcon from '@/components/ItemIcon';
+import ChampionIcon from '@/components/ChampionIcon';
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
@@ -58,7 +58,6 @@ const CompBuilder: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('board');
   
-  // New state for champion selection and item management
   const [selectedChampionName, setSelectedChampionName] = useState('');
   const [selectedChampionCost, setSelectedChampionCost] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [isCarry, setIsCarry] = useState(false);
@@ -78,7 +77,6 @@ const CompBuilder: React.FC = () => {
     },
   });
 
-  // Generate champions for the available pool based on the selected TFT version
   useEffect(() => {
     const tftVersion = form.watch("tftVersion");
     if (!tftVersion || !traitMappings[tftVersion]) return;
@@ -87,9 +85,7 @@ const CompBuilder: React.FC = () => {
     const champions: Champion[] = [];
     
     if (mappings && mappings.championTraits) {
-      // Convert to array of champions with costs from the Set Manager
       Object.keys(mappings.championTraits).forEach(championName => {
-        // Get cost from championCosts in the mappings
         const cost = mappings.championCosts?.[championName] || 1;
         champions.push({
           name: championName,
@@ -104,7 +100,6 @@ const CompBuilder: React.FC = () => {
     setAvailableChampions(champions);
   }, [form.watch("tftVersion"), traitMappings]);
 
-  // Handle saving the board champions
   const handleSaveBoard = (champions: Champion[]) => {
     setBoardChampions(champions);
     toast({
@@ -113,42 +108,36 @@ const CompBuilder: React.FC = () => {
     });
   };
 
-  // Update champion details
   const updateChampion = (index: number, updatedChampion: Champion) => {
     const newChampions = [...boardChampions];
     newChampions[index] = updatedChampion;
     setBoardChampions(newChampions);
   };
 
-  // Remove champion
   const removeChampion = (index: number) => {
     const newChampions = [...boardChampions];
     newChampions.splice(index, 1);
     setBoardChampions(newChampions);
   };
 
-  // Add selected item to the champion before adding to board
   const addItemToSelection = (item: string) => {
     if (selectedItems.length < 3) {
       setSelectedItems([...selectedItems, item]);
     }
   };
 
-  // Remove item from selection
   const removeItemFromSelection = (index: number) => {
     const newItems = [...selectedItems];
     newItems.splice(index, 1);
     setSelectedItems(newItems);
   };
 
-  // Select champion from the available list
   const selectChampion = (champion: Champion) => {
     setSelectedChampionName(champion.name);
     setSelectedChampionCost(champion.cost);
     setShowChampionSelector(false);
   };
 
-  // Add champion with selected items to the board
   const addChampionToBoard = () => {
     if (!selectedChampionName) return;
     
@@ -160,10 +149,8 @@ const CompBuilder: React.FC = () => {
       items: selectedItems.length > 0 ? [...selectedItems] : undefined,
     };
     
-    // Add to the board champions
     setBoardChampions([...boardChampions, newChampion]);
     
-    // Reset the selection
     setSelectedChampionName('');
     setSelectedChampionCost(1);
     setIsCarry(false);
@@ -175,12 +162,10 @@ const CompBuilder: React.FC = () => {
     });
   };
 
-  // Filter champions based on search query
   const filteredChampions = availableChampions.filter(champion => 
     champion.name.toLowerCase().includes(championSearchQuery.toLowerCase())
   );
 
-  // Handle form submission
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     if (boardChampions.length === 0) {
       toast({
@@ -194,11 +179,9 @@ const CompBuilder: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Extract traits from the placed champions
       const tftVersion = data.tftVersion;
       const championTraits = traitMappings[tftVersion]?.championTraits || {};
       
-      // Count traits
       const traitCounts: Record<string, number> = {};
       boardChampions.forEach(champion => {
         const traits = championTraits[champion.name] || [];
@@ -207,14 +190,12 @@ const CompBuilder: React.FC = () => {
         });
       });
       
-      // Convert to trait array
       const traits = Object.entries(traitCounts).map(([name, count]) => ({
         name,
         count,
         version: tftVersion,
       }));
       
-      // Create comp object
       const comp: TFTComp = {
         id: uuidv4(),
         name: data.name,
@@ -235,7 +216,6 @@ const CompBuilder: React.FC = () => {
         },
       };
       
-      // Save the comp
       await addComp(comp);
       
       toast({
@@ -243,7 +223,6 @@ const CompBuilder: React.FC = () => {
         description: "Your composition has been saved!",
       });
       
-      // Navigate back to the home page
       navigate('/');
     } catch (error) {
       console.error("Error saving comp:", error);
@@ -279,7 +258,6 @@ const CompBuilder: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Board Builder & Champion Details - Takes up 3 columns on large screens */}
           <div className="lg:col-span-3 space-y-6">
             <Card className="border border-primary/20 shadow-md backdrop-blur-sm">
               <CardHeader className="pb-2">
@@ -329,7 +307,6 @@ const CompBuilder: React.FC = () => {
                 </TabsContent>
                 <TabsContent value="add" className="mt-0">
                   <div className="space-y-6">
-                    {/* Champion selection */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium">Select Champion</h3>
                       
@@ -405,7 +382,6 @@ const CompBuilder: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Item selection */}
                     {selectedChampionName && (
                       <div className="space-y-4">
                         <h3 className="text-lg font-medium">Select Items (Max 3)</h3>
@@ -448,7 +424,6 @@ const CompBuilder: React.FC = () => {
             </Card>
           </div>
           
-          {/* Comp Details Form - Takes up 2 columns on large screens */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="border border-primary/20 shadow-md backdrop-blur-sm">
               <CardHeader>

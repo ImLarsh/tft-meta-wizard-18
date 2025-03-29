@@ -9,13 +9,61 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      tft_comps: {
+        Row: {
+          comps: Json
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          comps?: Json
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          comps?: Json
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tft_trait_mappings: {
+        Row: {
+          created_at: string | null
+          id: string
+          mappings: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mappings?: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mappings?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_tft_comps_table_if_not_exists: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      create_tft_trait_mappings_table_if_not_exists: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

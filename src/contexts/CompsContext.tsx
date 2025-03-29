@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import defaultComps, { TFTComp } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
@@ -252,13 +253,13 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         // Save to Supabase
         const { data: existingComps, error: checkError } = await supabase
           .from('tft_comps')
-          .select('*');
+          .select('id, comps');
           
         if (existingComps && existingComps.length > 0) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_comps')
-            .update({ comps: comps })
+            .update({ comps })
             .eq('id', existingComps[0].id);
             
           if (updateError) {
@@ -268,7 +269,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_comps')
-            .insert([{ comps: comps }]);
+            .insert([{ comps }]);
             
           if (insertError) {
             console.error('Error inserting comps:', insertError);
@@ -278,7 +279,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         // Save trait mappings
         const { data: existingMappings, error: checkMappingsError } = await supabase
           .from('tft_trait_mappings')
-          .select('*');
+          .select('id, mappings');
           
         if (existingMappings && existingMappings.length > 0) {
           // Update existing record

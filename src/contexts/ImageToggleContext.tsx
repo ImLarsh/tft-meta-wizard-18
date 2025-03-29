@@ -1,9 +1,8 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 
 type ImageToggleContextType = {
   useTftImages: boolean;
-  toggleImageSource: () => void;
 };
 
 const ImageToggleContext = createContext<ImageToggleContextType | undefined>(undefined);
@@ -17,12 +16,11 @@ export const useImageToggle = () => {
 };
 
 export const ImageToggleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [useTftImages, setUseTftImages] = useState<boolean>(true);
-
-  const toggleImageSource = () => setUseTftImages(prev => !prev);
+  // Always use TFT images
+  const useTftImages = true;
 
   return (
-    <ImageToggleContext.Provider value={{ useTftImages, toggleImageSource }}>
+    <ImageToggleContext.Provider value={{ useTftImages }}>
       {children}
     </ImageToggleContext.Provider>
   );

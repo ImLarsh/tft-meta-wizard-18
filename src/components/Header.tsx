@@ -1,10 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, List, Sparkles, Settings, Moon, Sun, SwitchCamera } from 'lucide-react';
+import { Home, List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
-import { Switch } from '@/components/ui/switch';
-import { useImageToggle } from '@/contexts/ImageToggleContext';
+
 const Header: React.FC = () => {
   const {
     theme,
@@ -13,10 +13,7 @@ const Header: React.FC = () => {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const {
-    useTftImages,
-    toggleImageSource
-  } = useImageToggle();
+  
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -33,6 +30,7 @@ const Header: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  
   return <header className={`bg-card/80 backdrop-blur-md sticky top-0 z-10 border-b transition-all duration-300 ${scrolled ? 'shadow-md border-primary/20' : 'shadow-sm border-primary/10'}`}>
       <div className="container py-4">
         <div className="flex items-center justify-between">
@@ -54,20 +52,6 @@ const Header: React.FC = () => {
           </div>
           
           <nav className="flex items-center space-x-2">
-            {/* Image Source Toggle */}
-            <div className={`flex items-center space-x-2 mr-2 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`} style={{
-            transitionDelay: '50ms'
-          }}>
-              <span className="text-sm text-muted-foreground hidden sm:inline"></span>
-              <div className="flex items-center">
-                <SwitchCamera className="h-4 w-4 mr-2 text-muted-foreground" />
-                <Switch checked={useTftImages} onCheckedChange={toggleImageSource} aria-label="Toggle between TFT and LoL images" />
-                <span className="ml-2 text-xs text-muted-foreground hidden sm:inline">
-                  {useTftImages ? 'TFT' : 'LoL'}
-                </span>
-              </div>
-            </div>
-            
             {/* Theme Toggle Button */}
             <Button variant="ghost" size="icon" onClick={toggleTheme} className={`mr-2 hover:bg-primary/10 hover-glow transition-all duration-300 ease-in-out ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`} style={{
             transitionDelay: '100ms'

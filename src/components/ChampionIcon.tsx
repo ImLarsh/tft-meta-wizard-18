@@ -18,14 +18,38 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   const [imgError, setImgError] = useState(false);
   
   // Normalize the champion name for different API formats
-  const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  // Fix for double names (e.g., "MissFortune") and ensure proper normalization
+  let normalizedName;
+  
+  // Special case handling for champions with known naming issues
+  if (name === "MissFortune") {
+    normalizedName = "missfortune";
+  } else if (name === "AurelionSol") {
+    normalizedName = "aurelionsol";
+  } else if (name === "TahmKench") {
+    normalizedName = "tahmkench";
+  } else if (name === "XinZhao") {
+    normalizedName = "xinzhao";
+  } else if (name === "MasterYi") {
+    normalizedName = "masteryi";
+  } else if (name === "TwistedFate") {
+    normalizedName = "twistedfate";
+  } else if (name === "KSante" || name === "KSante") {
+    normalizedName = "ksante";
+  } else if (name === "JarvanIV") {
+    normalizedName = "jarvaniv";
+  } else {
+    // Standard normalization for other champions
+    normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+  
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
   // New and more reliable image sources
   const sources = [
     // TFT set 10 specific sources
-    `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName.toLowerCase()}/hud/tft10_${normalizedName.toLowerCase()}_square.tft_set10.png`,
-    `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName.toLowerCase()}/hud/tft10_${normalizedName.toLowerCase()}_square.tft_set10.png`,
+    `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
+    `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     
     // Riot Data Dragon
     `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name}.png`,
@@ -33,20 +57,23 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name}_0.jpg`,
     
     // Community Dragon
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName.toLowerCase()}.png`,
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName.toLowerCase()}/${normalizedName.toLowerCase()}_0.jpg`,
+    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
+    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName}/${normalizedName}_0.jpg`,
     
     // Mobalytics
-    `https://cdn.mobalytics.gg/assets/tft/images/champions/thumbnails/${normalizedName.toLowerCase()}.png`,
-    `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName.toLowerCase()}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/champions/thumbnails/${normalizedName}.png`,
+    `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName}.png`,
     
     // MetaTFT & Reroll
-    `https://cdn.metatft.com/file/metatft/champions/${normalizedName.toLowerCase()}.png`,
-    `https://rerollcdn.com/characters/${normalizedName.toLowerCase()}.png`,
+    `https://cdn.metatft.com/file/metatft/champions/${normalizedName}.png`,
+    `https://rerollcdn.com/characters/${normalizedName}.png`,
     
     // League of Legends asset links
-    `https://static.wikia.nocookie.net/leagueoflegends/images/latest/scale-to-width-down/123?cb=20200412015006&path-prefix=${normalizedName.toLowerCase()}`,
-    `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName.toLowerCase()}.png`
+    `https://static.wikia.nocookie.net/leagueoflegends/images/latest/scale-to-width-down/123?cb=20200412015006&path-prefix=${normalizedName}`,
+    `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName}.png`,
+    
+    // TFT Tactics
+    `https://cdn.tft.tools/champions/${normalizedName}.png`
   ];
   
   // Fallback image - use a more reliable placeholder

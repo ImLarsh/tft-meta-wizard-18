@@ -15,9 +15,14 @@ const ItemIcon: React.FC<ItemIconProps> = ({
 }) => {
   const [imgError, setImgError] = useState(false);
   
-  // Normalize the item name for URLs
-  const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '');
-  const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
+  // Normalize the item name for URLs - handle spaces and camelCase better
+  const normalizedName = name
+    .replace(/\s+/g, '') // Remove spaces
+    .toLowerCase() // Convert to lowercase
+    .replace(/[^a-z0-9]/g, ''); // Remove special characters
+    
+  // For display purposes in fallback
+  const displayName = name.replace(/([A-Z])/g, ' $1').trim(); 
   
   // Primary source from TFT Tactics
   const tftTacticsUrl = `https://cdn.tft.tools/items/${normalizedName}.png`;

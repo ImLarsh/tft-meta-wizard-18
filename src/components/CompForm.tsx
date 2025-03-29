@@ -44,16 +44,6 @@ interface CompFormProps {
   isSubmitting?: boolean;
 }
 
-const commonChampions = [
-  "Ahri", "Akali", "Amumu", "Annie", "Aphelios", "Bard", "Caitlyn", 
-  "Corki", "Ekko", "Evelynn", "Garen", "Gragas", "Illaoi", "Jax", 
-  "Jhin", "Jinx", "Kayle", "Kayn", "Kennen", "Karthus", "Lillia", 
-  "Lucian", "Lulu", "Lux", "Miss Fortune", "Mordekaiser", "Neeko", 
-  "Olaf", "Pantheon", "Poppy", "Qiyana", "Samira", "Senna", "Seraphine", 
-  "Sett", "Sona", "Tahm Kench", "Taric", "Thresh", "Twisted Fate", 
-  "Twitch", "Urgot", "Vex", "Vi", "Viego", "Yasuo", "Yone", "Yorick", "Zac", "Ziggs"
-];
-
 const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting = false }) => {
   const [earlyGame, setEarlyGame] = useState<Champion[]>(initialData?.earlyGame || []);
   const [finalComp, setFinalComp] = useState<Champion[]>(initialData?.finalComp || []);
@@ -76,6 +66,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   const [newTraitVersion, setNewTraitVersion] = useState<string>(initialData?.tftVersion || "Set 10");
 
   const [activeTab, setActiveTab] = useState("general");
+  const [filteredChampions, setFilteredChampions] = useState<string[]>([]);
 
   const { traitMappings } = useComps();
   const availableSets = Object.keys(traitMappings);
@@ -109,9 +100,19 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
 
+  // Update filtered champions whenever the TFT version changes
   useEffect(() => {
+    // Get all champions for the current set
+    const championsInCurrentSet = Object.keys(currentTraitMap);
+    setFilteredChampions(championsInCurrentSet);
+    
+    // Clear the champion name if it's not in the current set
+    if (newChampName && !championsInCurrentSet.includes(newChampName)) {
+      setNewChampName("");
+    }
+    
     setNewTraitVersion(currentTftVersion);
-  }, [currentTftVersion]);
+  }, [currentTftVersion, currentTraitMap, newChampName]);
 
   const handleUpdatePositions = (updatedChampions: Champion[]) => {
     setFinalComp(updatedChampions);
@@ -499,12 +500,13 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                       <Input 
                         value={newChampName} 
                         onChange={(e) => setNewChampName(e.target.value)}
-                        placeholder="Champion Name"
+                        placeholder={filteredChampions.length > 0 ? "Champion Name" : `No champions for ${currentTftVersion}`}
+                        disabled={filteredChampions.length === 0}
                       />
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
                       <div className="max-h-[200px] overflow-y-auto">
-                        {commonChampions
+                        {filteredChampions
                           .filter(name => name.toLowerCase().includes(newChampName.toLowerCase()))
                           .map((name, index) => (
                             <Button
@@ -549,7 +551,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                       setNewChampType("early");
                       handleAddChampion();
                     }}
-                    disabled={!newChampName}
+                    disabled={!newChampName || filteredChampions.length === 0}
                   >
                     Add Champion
                   </Button>
@@ -602,12 +604,13 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                         <Input 
                           value={newChampName} 
                           onChange={(e) => setNewChampName(e.target.value)}
-                          placeholder="Champion Name"
+                          placeholder={filteredChampions.length > 0 ? "Champion Name" : `No champions for ${currentTftVersion}`}
+                          disabled={filteredChampions.length === 0}
                         />
                       </PopoverTrigger>
                       <PopoverContent className="w-full p-0" align="start">
                         <div className="max-h-[200px] overflow-y-auto">
-                          {commonChampions
+                          {filteredChampions
                             .filter(name => name.toLowerCase().includes(newChampName.toLowerCase()))
                             .map((name, index) => (
                               <Button
@@ -723,12 +726,22 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                     setNewChampType("final");
                     handleAddChampion();
                   }}
-                  disabled={!newChampName}
+                  disabled={!newChampName || filteredChampions.length === 0}
                   className="w-full"
                 >
                   Add Champion to Final Comp
                 </Button>
               </div>
+              
+              {/* Display info about current set champions */}
+              {filteredChampions.length > 0 && (
+                <div className="bg-secondary/20 p-4 rounded-md">
+                  <h4 className="text-sm font-medium mb-2">Champions in {currentTftVersion} - {traitMappings[currentTftVersion]?.name || ''}</h4>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {filteredChampions.length} champions available in this set
+                  </p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
@@ -898,116 +911,3 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               </h3>
               
               <div className="bg-card/50 border border-border rounded-lg p-6">
-                <BoardPositioning
-                  champions={finalComp as PositionedChampion[]}
-                  editable={true}
-                  onUpdatePositions={handleUpdatePositions}
-                />
-              </div>
-              
-              <p className="text-sm text-muted-foreground">
-                Drag and drop champions to position them on the board. This will be displayed in the composition card.
-              </p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="strategy" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Strengths</h3>
-                
-                <div className="flex flex-wrap gap-2">
-                  {strengths.map((strength, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
-                      <span className="text-sm">{strength}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-5 w-5 p-0"
-                        onClick={() => removeStrength(index)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="flex gap-2">
-                  <Input 
-                    value={newStrength} 
-                    onChange={(e) => setNewStrength(e.target.value)}
-                    placeholder="Strength"
-                    className="flex-1"
-                  />
-                  <Button 
-                    type="button" 
-                    onClick={handleAddStrength}
-                    disabled={!newStrength || strengths.includes(newStrength)}
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Weaknesses</h3>
-                
-                <div className="flex flex-wrap gap-2">
-                  {weaknesses.map((weakness, index) => (
-                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
-                      <span className="text-sm">{weakness}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-5 w-5 p-0"
-                        onClick={() => removeWeakness(index)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="flex gap-2">
-                  <Input 
-                    value={newWeakness} 
-                    onChange={(e) => setNewWeakness(e.target.value)}
-                    placeholder="Weakness"
-                    className="flex-1"
-                  />
-                  <Button 
-                    type="button" 
-                    onClick={handleAddWeakness}
-                    disabled={!newWeakness || weaknesses.includes(newWeakness)}
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-        
-        <div className="flex justify-between pt-6 border-t border-border">
-          <Button type="button" variant="outline">
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>Save Composition</>
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};
-
-export default CompForm;

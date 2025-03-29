@@ -32,10 +32,7 @@ const CompEditExisting = () => {
     setIsSubmitting(true);
     
     try {
-      // Keep the original ID
       updatedComp.id = compId || updatedComp.id;
-      
-      // Update comp in context
       updateComp(updatedComp);
       
       toast({
@@ -43,7 +40,6 @@ const CompEditExisting = () => {
         description: `"${updatedComp.name}" has been updated successfully!`,
       });
       
-      // Navigate to home
       navigate('/');
     } catch (error) {
       console.error('Error updating comp:', error);

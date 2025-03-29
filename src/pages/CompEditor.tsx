@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
@@ -15,7 +14,7 @@ const CompEditor = () => {
   const { addComp } = useComps();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   const handleAddComp = (comp: TFTComp) => {
     setIsSubmitting(true);
     

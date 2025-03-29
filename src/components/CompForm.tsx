@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Plus, Trash, X } from 'lucide-react';
+import { Plus, Trash, X, Loader2 } from 'lucide-react';
 import ChampionIcon from './ChampionIcon';
 
 // Schema for form validation
@@ -28,6 +27,7 @@ const formSchema = z.object({
 interface CompFormProps {
   initialData?: TFTComp;
   onSubmit: (data: TFTComp) => void;
+  isSubmitting?: boolean;
 }
 
 // Common champion names for dropdown suggestions
@@ -57,7 +57,7 @@ const commonItems = [
   "Sunfire Cape", "Bramble Vest", "Ionic Spark", "Redemption", "Chalice of Power"
 ];
 
-const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit }) => {
+const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting = false }) => {
   const [earlyGame, setEarlyGame] = useState<Champion[]>(initialData?.earlyGame || []);
   const [finalComp, setFinalComp] = useState<Champion[]>(initialData?.finalComp || []);
   const [keyItems, setKeyItems] = useState<string[]>(initialData?.keyItems || []);
@@ -203,7 +203,13 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit }) => {
 
     // Construct the final comp object
     const newComp: TFTComp = {
-      ...values,
+      id: values.id,
+      name: values.name,
+      tier: values.tier,
+      playstyle: values.playstyle,
+      difficulty: values.difficulty,
+      description: values.description,
+      patch: values.patch,
       earlyGame,
       finalComp,
       keyItems,
@@ -840,7 +846,16 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit }) => {
         </div>
 
         <div className="pt-6 space-x-2 flex justify-end">
-          <Button type="submit" size="lg">Save Composition</Button>
+          <Button type="submit" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save Composition'
+            )}
+          </Button>
         </div>
       </form>
     </Form>

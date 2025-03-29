@@ -1,20 +1,33 @@
 
 import React, { useState } from 'react';
 import CompCard from './CompCard';
-import tftComps, { TFTComp } from '@/data/comps';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SearchX } from 'lucide-react';
+import { SearchX, Trash2 } from 'lucide-react';
+import { useComps } from '@/contexts/CompsContext';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from '@/components/ui/use-toast';
 
 const CompTierList: React.FC = () => {
+  const { comps, removeComp } = useComps();
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     tier: 'all',
     playstyle: 'all',
   });
+  const [compToDelete, setCompToDelete] = useState<string | null>(null);
   
   // Filter comps based on search and filters
-  const filteredComps = tftComps.filter((comp) => {
+  const filteredComps = comps.filter((comp) => {
     // Search filter
     const matchesSearch = searchTerm === '' || 
       comp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -35,15 +48,24 @@ const CompTierList: React.FC = () => {
       [key]: value
     }));
   };
+
+  const handleDeleteComp = (compId: string) => {
+    removeComp(compId);
+    setCompToDelete(null);
+    toast({
+      title: "Composition Deleted",
+      description: "The composition has been removed successfully",
+    });
+  };
   
   // Group comps by tier if not filtering
   const tierOrder = ['S', 'A', 'B', 'C'];
-  const groupedComps: Record<string, TFTComp[]> = {};
+  const groupedComps: Record<string, typeof comps> = {};
   
   if (filters.tier === 'all' && filters.playstyle === 'all' && searchTerm === '') {
     // Organize by tier
     tierOrder.forEach(tier => {
-      groupedComps[tier] = tftComps.filter(comp => comp.tier === tier);
+      groupedComps[tier] = comps.filter(comp => comp.tier === tier);
     });
   }
   
@@ -134,7 +156,17 @@ const CompTierList: React.FC = () => {
               <TabsContent key={tier} value={tier}>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {groupedComps[tier]?.map(comp => (
-                    <CompCard key={comp.id} comp={comp} />
+                    <div key={comp.id} className="relative group">
+                      <CompCard comp={comp} />
+                      <Button 
+                        variant="destructive" 
+                        size="icon" 
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => setCompToDelete(comp.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   ))}
                 </div>
               </TabsContent>
@@ -146,7 +178,17 @@ const CompTierList: React.FC = () => {
             {filteredComps.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredComps.map(comp => (
-                  <CompCard key={comp.id} comp={comp} />
+                  <div key={comp.id} className="relative group">
+                    <CompCard comp={comp} />
+                    <Button 
+                      variant="destructive" 
+                      size="icon" 
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => setCompToDelete(comp.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -168,6 +210,24 @@ const CompTierList: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!compToDelete} onOpenChange={() => setCompToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Composition</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this composition? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => compToDelete && handleDeleteComp(compToDelete)}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 };

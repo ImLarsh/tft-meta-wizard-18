@@ -7,17 +7,20 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { TFTComp } from '@/data/comps';
 import { toast } from '@/components/ui/use-toast';
+import { useComps } from '@/contexts/CompsContext';
 
 const CompEditor: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { addComp } = useComps();
 
   const handleSubmit = (compData: TFTComp) => {
     setIsSubmitting(true);
     
-    // In a real application, this would save to a database
-    // For now, we'll simulate a successful save with a timeout
-    setTimeout(() => {
+    try {
+      // Save the comp to our context/localStorage
+      addComp(compData);
+      
       // Log the data that would be saved
       console.log('Saving comp data:', compData);
       
@@ -27,11 +30,18 @@ const CompEditor: React.FC = () => {
         description: "Your composition has been saved!",
       });
       
-      setIsSubmitting(false);
-      
       // Navigate back to the main page
       navigate('/');
-    }, 1000);
+    } catch (error) {
+      console.error('Error saving comp:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem saving your composition.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -47,7 +57,7 @@ const CompEditor: React.FC = () => {
         </div>
         
         <div className="bg-card border border-border/40 rounded-lg shadow-sm p-6">
-          <CompForm onSubmit={handleSubmit} />
+          <CompForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
         </div>
       </main>
       

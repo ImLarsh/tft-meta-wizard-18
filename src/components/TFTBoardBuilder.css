@@ -10,29 +10,29 @@
 
 .board-row {
   display: flex;
-  gap: 5px;
+  gap: 10px;
 }
 
 .hexagon-cell {
-  width: 45px;
-  height: 45px;
+  width: 80px;
+  height: 80px;
   position: relative;
   cursor: pointer;
   transition: transform 0.2s;
-  padding-top: 14px;
-  padding-bottom: 14px;
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 @media (max-width: 640px) {
   .hexagon-cell {
-    width: 35px;
-    height: 35px;
+    width: 60px;
+    height: 60px;
   }
 }
 
 .compact .hexagon-cell {
-  width: 30px;
-  height: 30px;
+  width: 45px;
+  height: 45px;
 }
 
 .hexagon {
@@ -68,8 +68,8 @@
 }
 
 .champion-content {
-  width: 95%;
-  height: 95%;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,18 +87,7 @@
 
 .carry-stars {
   position: absolute;
-  top: -14px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 1px;
-  z-index: 5;
-}
-
-.items-container {
-  position: absolute;
-  bottom: -14px;
+  top: -24px;
   left: 0;
   width: 100%;
   display: flex;
@@ -107,9 +96,20 @@
   z-index: 5;
 }
 
+.items-container {
+  position: absolute;
+  bottom: -24px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  z-index: 5;
+}
+
 .board-wrapper {
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
 }
 

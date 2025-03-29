@@ -19,14 +19,22 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '');
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
+  // Primary source from Mobalytics
+  const mobalyticsUrl = `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName}.png`;
+  
   // More comprehensive list of image sources to try with different naming patterns
   const sources = [
-    // TFT Set 10 specific
-    `https://raw.communitydragon.org/pbe/game/assets/items/icons2d/tft_item_${normalizedName.toLowerCase()}.tft_set10.png`,
-    
-    // Mobalytics sources
+    // Primary Mobalytics sources
+    mobalyticsUrl,
     `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName.toLowerCase()}.png`,
     `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedName.toLowerCase()}.png`,
+    
+    // Alternative item naming schemes for Mobalytics
+    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/tft10_${normalizedName.toLowerCase()}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/tft_${normalizedName.toLowerCase()}.png`,
+    
+    // TFT Set 10 specific from Community Dragon
+    `https://raw.communitydragon.org/pbe/game/assets/items/icons2d/tft_item_${normalizedName.toLowerCase()}.tft_set10.png`,
     
     // MetaTFT and Reroll
     `https://cdn.metatft.com/file/metatft/items/${normalizedName.toLowerCase()}.png`,
@@ -47,8 +55,8 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     `https://lolg-cdn.porofessor.gg/img/tft/items/${normalizedName.toLowerCase()}.png`
   ];
   
-  // Fallback image - use a reliable generic item
-  const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/3094.png';
+  // Fallback image - generic item icon from Mobalytics
+  const fallbackUrl = 'https://cdn.mobalytics.gg/assets/tft/images/items/set10/archangelsstaff.png';
   
   // Size classes
   const sizeClasses = {
@@ -62,10 +70,10 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   const handleImageError = () => {
     const nextIndex = currentSourceIndex + 1;
     if (nextIndex < sources.length) {
-      console.log(`Source ${currentSourceIndex} failed for item ${name}, trying source ${nextIndex}`);
+      // Try next source
       setCurrentSourceIndex(nextIndex);
     } else {
-      console.log(`All image sources failed for item ${name}, using fallback`);
+      // All sources failed, use fallback text
       setImgError(true);
     }
   };

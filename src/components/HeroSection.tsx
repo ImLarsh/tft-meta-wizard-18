@@ -1,6 +1,8 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const HeroSection: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -53,7 +55,15 @@ const HeroSection: React.FC = () => {
             Your magical companion for Teamfight Tactics success. Discover the best team compositions and climb the ranks with our mystical meta insights.
           </p>
           
-          {/* Button removed */}
+          {/* Add Create Comp button */}
+          <div className="mt-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            <Link to="/create">
+              <Button className="gaming-button py-3 px-6 rounded-lg text-lg font-medium animate-glow bg-primary hover:bg-primary/90">
+                <Sparkles className="h-5 w-5 mr-2 animate-pulse-subtle" />
+                Create Comp
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
       

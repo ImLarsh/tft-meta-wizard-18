@@ -1,9 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
 import { Champion } from '@/data/comps';
-import { MapPin, FlipHorizontal, Star } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import './TFTBoardBuilder.css';
 
@@ -127,8 +126,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       const rowCells = [];
       
       for (let col = 0; col < cols; col++) {
-        // For even rows, we need all 7 hexagons
-        // For odd rows, we need 6 hexagons with an offset
         if (row % 2 === 1 && col === cols - 1) continue;
         
         const championAtPosition = positionedChampions.find(

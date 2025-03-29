@@ -9,15 +9,15 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'dark',
+  theme: 'light', // Changed default to light so our dark purple theme shows first
   toggleTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Get initial theme from localStorage or default to dark
+  // Get initial theme from localStorage or default to light (dark purple theme)
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme') as Theme;
-    return savedTheme || 'dark';
+    return savedTheme || 'light';
   });
 
   // Update the theme class and store in localStorage when it changes

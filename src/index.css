@@ -1,38 +1,37 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
  
 @layer base {
   :root {
-    /* Light Purple Theme for Light Mode */
-    --background: 270 25% 97%; /* Light purple background */
-    --foreground: 270 10% 10%;
+    /* Dark Purple Theme for Light Mode */
+    --background: 270 25% 20%; /* Dark purple background */
+    --foreground: 0 0% 95%;
     
-    --card: 270 25% 94%; /* Slightly darker for cards */
-    --card-foreground: 270 10% 10%;
+    --card: 270 25% 22%; /* Slightly darker for cards */
+    --card-foreground: 0 0% 95%;
     
-    --popover: 270 25% 94%;
-    --popover-foreground: 270 10% 10%;
+    --popover: 270 25% 22%;
+    --popover-foreground: 0 0% 95%;
     
-    --primary: 275 85% 47%; /* Vibrant purple */
+    --primary: 275 85% 65%; /* Vibrant purple */
     --primary-foreground: 0 0% 98%;
     
-    --secondary: 270 25% 90%; /* Light purple for secondary elements */
-    --secondary-foreground: 270 10% 15%;
+    --secondary: 270 25% 28%; /* Dark purple for secondary elements */
+    --secondary-foreground: 0 0% 95%;
     
-    --muted: 270 25% 90%;
-    --muted-foreground: 270 10% 40%;
+    --muted: 270 25% 28%;
+    --muted-foreground: 270 10% 70%;
     
-    --accent: 275 65% 92%; /* Light purple accent */
-    --accent-foreground: 270 10% 15%;
+    --accent: 275 65% 30%; /* Dark purple accent */
+    --accent-foreground: 0 0% 95%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 270 25% 85%; /* Light purple border */
-    --input: 270 25% 85%;
-    --ring: 275 85% 47%;
+    --border: 270 25% 30%; /* Dark purple border */
+    --input: 270 25% 30%;
+    --ring: 275 85% 65%;
     
     --radius: 0.5rem;
   }
@@ -68,7 +67,7 @@
     --ring: 275 85% 65%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;

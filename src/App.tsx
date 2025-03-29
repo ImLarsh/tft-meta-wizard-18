@@ -10,6 +10,9 @@ import { CompsProvider } from './contexts/CompsContext';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
 
+// Add some additional styles for better UI spacing
+import './index.css';
+
 function App() {
   return (
     <CompsProvider>

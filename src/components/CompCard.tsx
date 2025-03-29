@@ -38,7 +38,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
           </div>
           <h3 className="text-lg font-bold">{comp.name}</h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {comp.tftVersion && (
             <span className="text-xs bg-secondary/70 px-2 py-1 rounded">
               {comp.tftVersion}
@@ -49,6 +49,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
             size="sm" 
             onClick={() => setExpanded(!expanded)}
             className="hover:bg-secondary/50"
+            aria-label={expanded ? "Collapse details" : "Expand details"}
           >
             {expanded ? 'Collapse' : 'Expand'}
             <ChevronRight className={`ml-1 h-4 w-4 transform transition-transform ${expanded ? 'rotate-90' : ''}`} />

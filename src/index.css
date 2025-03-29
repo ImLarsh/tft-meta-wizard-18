@@ -96,6 +96,18 @@
     transform: translateY(-2px);
   }
   
+  .tft-card-actions {
+    @apply absolute top-3 right-3 flex gap-2 z-10 opacity-0 transition-opacity duration-200;
+  }
+  
+  .tft-card:hover .tft-card-actions {
+    @apply opacity-100;
+  }
+  
+  .grid-comp-list {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+  
   .champion-border-1 {
     @apply border-2 border-cost-1;
   }
@@ -116,7 +128,6 @@
     @apply border-2 border-cost-5;
   }
   
-  /* TFT Board Styling */
   .tft-board-container {
     @apply flex justify-center items-center;
   }

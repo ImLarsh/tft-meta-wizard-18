@@ -102,14 +102,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   };
   
   // Cost-specific classes
-  const costClasses = {
-    1: 'border-cost-1/70',
-    2: 'border-cost-2/70',
-    3: 'border-cost-3/70',
-    4: 'border-cost-4/70',
-    5: 'border-cost-5/70'
-  };
-  
   const costBgClasses = {
     1: 'bg-cost-1',
     2: 'bg-cost-2',
@@ -135,19 +127,17 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     <div 
       className={cn(
         size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
-        `champion-border-${cost}`,
-        'rounded-md overflow-hidden relative border',
-        costClasses[cost],
+        'rounded-md overflow-hidden relative',
         className
       )}
       onClick={onClick}
     >
       {isCarry && (
-        <div className="absolute -top-3 left-0 w-full flex justify-center z-10">
+        <div className="absolute -top-2 left-0 w-full flex justify-center z-10">
           <div className="flex">
-            <Star size={10} fill="#FFD700" color="#FFD700" />
-            <Star size={10} fill="#FFD700" color="#FFD700" />
-            <Star size={10} fill="#FFD700" color="#FFD700" />
+            <Star size={8} fill="#FFD700" color="#FFD700" />
+            <Star size={8} fill="#FFD700" color="#FFD700" />
+            <Star size={8} fill="#FFD700" color="#FFD700" />
           </div>
         </div>
       )}

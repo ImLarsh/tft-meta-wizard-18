@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
@@ -128,11 +129,11 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDrop={(e) => handleDrop(e, row, col)}
           >
             {championAtPosition && championAtPosition.isCarry && (
-              <div className="absolute -top-3 z-10 w-full flex justify-center">
+              <div className="absolute -top-2 z-10 w-full flex justify-center">
                 <div className="flex">
-                  <Star size={10} fill="#FFD700" color="#FFD700" />
-                  <Star size={10} fill="#FFD700" color="#FFD700" />
-                  <Star size={10} fill="#FFD700" color="#FFD700" />
+                  <Star size={8} fill="#FFD700" color="#FFD700" />
+                  <Star size={8} fill="#FFD700" color="#FFD700" />
+                  <Star size={8} fill="#FFD700" color="#FFD700" />
                 </div>
               </div>
             )}
@@ -215,9 +216,9 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                 <div className="champion-info">
                   {champion.isCarry && (
                     <div className="flex mb-1 justify-center">
-                      <Star size={12} fill="#FFD700" color="#FFD700" />
-                      <Star size={12} fill="#FFD700" color="#FFD700" />
-                      <Star size={12} fill="#FFD700" color="#FFD700" />
+                      <Star size={8} fill="#FFD700" color="#FFD700" />
+                      <Star size={8} fill="#FFD700" color="#FFD700" />
+                      <Star size={8} fill="#FFD700" color="#FFD700" />
                     </div>
                   )}
                   <ChampionIcon

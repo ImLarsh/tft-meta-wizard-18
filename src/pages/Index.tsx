@@ -15,25 +15,15 @@ const Index = () => {
         
         <section className="py-12 bg-muted/20">
           <div className="container">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div>
-                <h2 className="text-3xl font-bold mb-4 flex items-center">
-                  <Sparkles className="h-6 w-6 text-primary mr-2" />
-                  Stay Ahead of the Meta
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  TFT Genie helps you stay competitive with the latest team compositions, item builds, and strategies. 
-                  Our data is updated with each patch to ensure you're always playing the strongest comps.
-                </p>
-              </div>
-              
-              <div className="rounded-lg overflow-hidden shadow-xl border border-border/40">
-                <img 
-                  src="https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt493aca2f3aecea48/66077f26e4bc39c8f0c487b2/TFT_Set14_CyberCity_Header.jpg" 
-                  alt="TFT Cyber City Set 14" 
-                  className="w-full h-auto"
-                />
-              </div>
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-4 flex items-center justify-center">
+                <Sparkles className="h-6 w-6 text-primary mr-2" />
+                Stay Ahead of the Meta
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                TFT Genie helps you stay competitive with the latest team compositions, item builds, and strategies. 
+                Our data is updated with each patch to ensure you're always playing the strongest comps.
+              </p>
             </div>
           </div>
         </section>

@@ -23,6 +23,8 @@ interface CompsContextType {
   traitMappings: TraitMappingsState;
   updateTraitMappings: (tftVersion: string, mapping: TraitMapping) => void;
   removeSet: (tftVersion: string) => void;
+  setTraitMappings: (mappings: TraitMappingsState) => void;
+  addTraitMapping: (tftVersion: string, mapping: TraitMapping) => void;
 }
 
 const CompsContext = createContext<CompsContextType | undefined>(undefined);
@@ -154,6 +156,13 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }));
   };
 
+  const addTraitMapping = (tftVersion: string, mapping: TraitMapping) => {
+    setTraitMappings((prev) => ({
+      ...prev,
+      [tftVersion]: mapping
+    }));
+  };
+
   const removeSet = (tftVersion: string) => {
     setTraitMappings((prev) => {
       const updated = { ...prev };
@@ -175,7 +184,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         getCompById,
         traitMappings,
         updateTraitMappings,
-        removeSet
+        removeSet,
+        setTraitMappings,
+        addTraitMapping
       }}
     >
       {children}

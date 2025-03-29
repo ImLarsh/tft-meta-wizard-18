@@ -137,7 +137,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       className={cn(
         size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
         'rounded-md overflow-hidden relative',
-        costBorderClasses[cost], // Add cost-specific border
+        costBorderClasses[cost], // Apply cost-specific border color
         className
       )}
       onClick={onClick}

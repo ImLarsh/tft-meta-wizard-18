@@ -32,27 +32,27 @@ const ParticlesBackground: React.FC = () => {
       containerRef.current.innerHTML = '';
       particles.current = [];
       
-      const count = Math.floor(window.innerWidth / 15); // More particles
+      const count = Math.min(40, Math.floor(window.innerWidth / 40)); // Fewer particles
       
       const colors = theme === 'dark' 
         ? [
-            'rgba(155, 135, 245, 0.4)', 
-            'rgba(138, 43, 226, 0.3)', 
-            'rgba(186, 85, 211, 0.35)',
-            'rgba(123, 104, 238, 0.4)', 
-            'rgba(106, 90, 205, 0.35)',
-            'rgba(147, 112, 219, 0.3)'
+            'rgba(155, 135, 245, 0.2)', 
+            'rgba(138, 43, 226, 0.15)', 
+            'rgba(186, 85, 211, 0.2)',
+            'rgba(123, 104, 238, 0.2)', 
+            'rgba(106, 90, 205, 0.15)',
+            'rgba(147, 112, 219, 0.15)'
           ]
         : [
-            'rgba(155, 135, 245, 0.5)', 
-            'rgba(138, 43, 226, 0.4)', 
-            'rgba(186, 85, 211, 0.45)',
-            'rgba(123, 104, 238, 0.5)', 
-            'rgba(106, 90, 205, 0.45)',
-            'rgba(147, 112, 219, 0.4)'
+            'rgba(155, 135, 245, 0.15)', 
+            'rgba(138, 43, 226, 0.1)', 
+            'rgba(186, 85, 211, 0.15)',
+            'rgba(123, 104, 238, 0.15)', 
+            'rgba(106, 90, 205, 0.1)',
+            'rgba(147, 112, 219, 0.1)'
           ];
       
-      const shapes = ['circle', 'square', 'triangle', 'diamond', 'hexagon'];
+      const shapes = ['circle', 'square'];
       
       // Create regular particles
       for (let i = 0; i < count; i++) {
@@ -60,24 +60,24 @@ const ParticlesBackground: React.FC = () => {
         particle.className = 'particle';
         
         // Random properties for each particle
-        const size = Math.random() * 8 + 2; // Size between 2-10px
+        const size = Math.random() * 6 + 2; // Size between 2-8px
         const x = Math.random() * window.innerWidth;
         const y = Math.random() * window.innerHeight * -1; // Start above viewport
-        const speedY = Math.random() * 0.4 + 0.1; // Increase fall speed variety
-        const speedX = (Math.random() - 0.5) * 0.3; // More horizontal drift
+        const speedY = Math.random() * 0.2 + 0.1; // Reduced fall speed
+        const speedX = (Math.random() - 0.5) * 0.1; // Less horizontal drift
         const animationDuration = Math.random() * 40 + 15; // Between 15-55s
         const color = colors[Math.floor(Math.random() * colors.length)];
-        const glow = Math.random() > 0.6; // 40% of particles will glow
+        const glow = Math.random() > 0.8; // 20% of particles will glow
         const shape = shapes[Math.floor(Math.random() * shapes.length)];
         const rotation = Math.random() * 360;
-        const rotationSpeed = (Math.random() - 0.5) * 2;
+        const rotationSpeed = (Math.random() - 0.5) * 1;
         
         // Apply custom styles
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         particle.style.left = `${x}px`;
         particle.style.top = `${y}px`;
-        particle.style.opacity = (Math.random() * 0.7 + 0.3).toString(); // More opaque
+        particle.style.opacity = (Math.random() * 0.4 + 0.1).toString(); // More transparent
         particle.style.animationDuration = `${animationDuration}s`;
         particle.style.backgroundColor = color;
         particle.style.transform = `rotate(${rotation}deg)`;
@@ -87,24 +87,10 @@ const ParticlesBackground: React.FC = () => {
           particle.style.borderRadius = '50%';
         } else if (shape === 'square') {
           particle.style.borderRadius = '0';
-        } else if (shape === 'triangle') {
-          particle.style.width = '0';
-          particle.style.height = '0';
-          particle.style.backgroundColor = 'transparent';
-          particle.style.borderLeft = `${size/2}px solid transparent`;
-          particle.style.borderRight = `${size/2}px solid transparent`;
-          particle.style.borderBottom = `${size}px solid ${color}`;
-        } else if (shape === 'diamond') {
-          particle.style.transform = `rotate(45deg) scale(${size/10})`;
-          particle.style.width = '10px';
-          particle.style.height = '10px';
-          particle.style.borderRadius = '2px';
-        } else if (shape === 'hexagon') {
-          particle.style.clipPath = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)';
         }
         
         if (glow) {
-          particle.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+          particle.style.boxShadow = `0 0 ${size}px ${color}`;
           particle.classList.add('particle-glow');
         }
         
@@ -124,114 +110,6 @@ const ParticlesBackground: React.FC = () => {
           rotation,
           rotationSpeed
         });
-      }
-      
-      // Add some larger, special particles
-      for (let i = 0; i < Math.floor(count / 8); i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle special-particle';
-        
-        const size = Math.random() * 15 + 10; // Larger particles
-        const x = Math.random() * window.innerWidth;
-        const y = Math.random() * window.innerHeight * -1;
-        const speedY = Math.random() * 0.1 + 0.05; // Slower
-        const speedX = (Math.random() - 0.5) * 0.08;
-        const animationDuration = Math.random() * 60 + 30; // Longer duration
-        const color = theme === 'dark' 
-          ? 'rgba(155, 135, 245, 0.2)'
-          : 'rgba(155, 135, 245, 0.3)';
-        
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-        particle.style.opacity = (Math.random() * 0.6 + 0.4).toString();
-        particle.style.animationDuration = `${animationDuration}s`;
-        particle.style.backgroundColor = 'transparent';
-        particle.style.boxShadow = `0 0 ${size * 2.5}px ${color}`;
-        particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '30%';
-        particle.style.border = `2px solid ${color}`;
-        
-        // Add floating effect
-        particle.style.animation = `special-fall ${animationDuration}s linear infinite, float ${Math.random() * 10 + 10}s ease-in-out infinite`;
-        
-        containerRef.current.appendChild(particle);
-        particles.current.push({
-          x,
-          y,
-          size,
-          speedY,
-          speedX,
-          element: particle,
-          animationDuration,
-          color,
-          glow: true
-        });
-      }
-      
-      // Add some abstract geometric lines/paths
-      for (let i = 0; i < Math.floor(count / 20); i++) {
-        const line = document.createElement('div');
-        line.className = 'particle geometric-line';
-        
-        const width = Math.random() * 100 + 50; // Line width between 50-150px
-        const height = Math.random() * 1 + 1; // Line height between 1-2px
-        const x = Math.random() * window.innerWidth;
-        const y = Math.random() * window.innerHeight * -1;
-        const speedY = Math.random() * 0.05 + 0.02; // Very slow
-        const speedX = (Math.random() - 0.5) * 0.03;
-        const animationDuration = Math.random() * 80 + 50; // Very long duration
-        const color = theme === 'dark' 
-          ? 'rgba(155, 135, 245, 0.15)'
-          : 'rgba(155, 135, 245, 0.25)';
-        const rotation = Math.random() * 360;
-        
-        line.style.width = `${width}px`;
-        line.style.height = `${height}px`;
-        line.style.left = `${x}px`;
-        line.style.top = `${y}px`;
-        line.style.opacity = (Math.random() * 0.4 + 0.2).toString();
-        line.style.transform = `rotate(${rotation}deg)`;
-        line.style.animationDuration = `${animationDuration}s`;
-        line.style.backgroundColor = color;
-        line.style.boxShadow = `0 0 10px ${color}`;
-        
-        containerRef.current.appendChild(line);
-        particles.current.push({
-          x,
-          y,
-          size: width, // Use width as size
-          speedY,
-          speedX,
-          element: line,
-          animationDuration,
-          color,
-          glow: true,
-          rotation
-        });
-      }
-      
-      // Add abstract light rays
-      for (let i = 0; i < 3; i++) {
-        const ray = document.createElement('div');
-        ray.className = 'light-ray';
-        
-        const width = Math.random() * 300 + 200; // Ray width between 200-500px
-        const height = Math.random() * 800 + 600; // Ray height between 600-1400px
-        const x = Math.random() * window.innerWidth;
-        const y = Math.random() * window.innerHeight * -1;
-        
-        ray.style.width = `${width}px`;
-        ray.style.height = `${height}px`;
-        ray.style.left = `${x}px`;
-        ray.style.top = `${y}px`;
-        ray.style.opacity = (Math.random() * 0.1 + 0.05).toString(); // Very transparent
-        ray.style.backgroundImage = `linear-gradient(to bottom, ${theme === 'dark' ? 'rgba(155, 135, 245, 0.6)' : 'rgba(155, 135, 245, 0.8)'}, transparent)`;
-        ray.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
-        ray.style.animationDuration = `${Math.random() * 40 + 60}s`; // Very slow animation
-        ray.style.filter = `blur(${Math.random() * 40 + 30}px)`;
-        
-        containerRef.current.appendChild(ray);
       }
     };
     
@@ -260,13 +138,36 @@ const ParticlesBackground: React.FC = () => {
   
   return (
     <>
-      <div ref={containerRef} className="particles-container" />
-      <div className="abstract-background">
-        <div className="blur-circle circle-1"></div>
-        <div className="blur-circle circle-2"></div>
-        <div className="blur-circle circle-3"></div>
-        <div className="blur-circle circle-4"></div>
-      </div>
+      <div 
+        ref={containerRef} 
+        className="particles-container fixed inset-0 pointer-events-none z-0" 
+      />
+      <style jsx>{`
+        .particles-container {
+          overflow: hidden;
+        }
+        .particle {
+          position: absolute;
+          will-change: transform;
+          animation: float-down linear infinite;
+        }
+        @keyframes float-down {
+          0% {
+            transform: translateY(0) rotate(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: var(--opacity, 0.2);
+          }
+          90% {
+            opacity: var(--opacity, 0.2);
+          }
+          100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </>
   );
 };

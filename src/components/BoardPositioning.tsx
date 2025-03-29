@@ -137,7 +137,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
         <div 
           className="tft-board grid grid-cols-7 gap-1 p-2 rounded-lg border border-primary/20 relative overflow-hidden"
           style={{
-            backgroundImage: `url('/lovable-uploads/05dfb5bb-6439-4226-a524-46098004018c.png')`,
+            backgroundImage: `url('/lovable-uploads/db943740-3751-4b05-a8c4-db9822ac6793.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
@@ -145,7 +145,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           }}
         >
           {/* Semi-transparent overlay to ensure cell visibility */}
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]"></div>
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
           
           {board.map((row, rowIndex) => (
             <React.Fragment key={`row-${rowIndex}`}>
@@ -155,7 +155,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   className={`
                     w-12 h-12 rounded-md flex items-center justify-center relative z-10
                     ${editable ? 'hover:border-primary hover:shadow-lg hover:shadow-primary/10 cursor-pointer' : ''}
-                    ${cell ? 'bg-secondary/40' : 'bg-secondary/10'}
+                    ${cell ? 'bg-secondary/20' : 'bg-transparent'}
                     transition-all duration-200 hover:bg-secondary/20
                     ${rowIndex === 0 ? 'mt-1' : ''}
                     ${rowIndex === rows - 1 ? 'mb-1' : ''}

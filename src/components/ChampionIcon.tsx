@@ -101,15 +101,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     lg: 'w-16 h-16'
   };
   
-  // Cost-specific border colors with increased width for visibility
-  const costBorderClasses = {
-    1: 'border-[3px] border-cost-1', // white/gray for 1-cost
-    2: 'border-[3px] border-cost-2', // green for 2-cost  
-    3: 'border-[3px] border-cost-3', // blue for 3-cost
-    4: 'border-[3px] border-cost-4', // pink/purple for 4-cost
-    5: 'border-[3px] border-cost-5'  // yellow/gold for 5-cost
-  };
-  
   // Cost-specific text colors for the number indicator
   const costTextColors = {
     1: 'text-cost-1', // white/gray for 1-cost
@@ -137,10 +128,8 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       className={cn(
         size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
         'rounded-md overflow-hidden relative',
-        costBorderClasses[cost], // Apply cost-specific border color
         className
       )}
-      style={{boxShadow: `0 0 3px var(--cost-${cost})`}} // Add shadow with cost-specific color
       onClick={onClick}
     >
       {isCarry && (

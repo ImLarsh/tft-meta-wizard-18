@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -57,10 +56,8 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
           return diffValues[b.difficulty] - diffValues[a.difficulty];
         });
       case 'most-liked':
-        // Note: For demonstration - in a real app, this would use actual vote counts
         return [...comps].sort((a, b) => getTierValue(a.tier) - getTierValue(b.tier));
       case 'least-liked':
-        // Note: For demonstration - in a real app, this would use actual vote counts
         return [...comps].sort((a, b) => getTierValue(b.tier) - getTierValue(a.tier));
       default:
         return [...comps];
@@ -110,7 +107,6 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
   };
 
   const toggleSort = (option: SortOption) => {
-    // Toggle between different sorting states for the same criteria
     if (option === 'name-asc' && sortBy === 'name-asc') {
       setSortBy('name-desc');
     } else if (option === 'name-desc' && sortBy === 'name-desc') {
@@ -266,16 +262,13 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
           <CollapsibleContent>
             <div className="p-4 border-t">
               <Tabs defaultValue="composition">
-                <TabsList className="grid grid-cols-4 mb-4">
+                <TabsList className="grid grid-cols-2 mb-4">
                   <TabsTrigger value="composition">Composition</TabsTrigger>
-                  <TabsTrigger value="items">Items</TabsTrigger>
                   <TabsTrigger value="positioning">Positioning</TabsTrigger>
-                  <TabsTrigger value="strategy">Strategy</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="composition" className="pt-2">
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Early Game</h4>
                     <div className="flex flex-wrap gap-3">
                       {comp.earlyGame.map((champion) => (
                         <div key={champion.name} className="flex flex-col items-center gap-1">
@@ -286,7 +279,7 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
                     </div>
                   </div>
                   
-                  <div>
+                  <div className="mb-6">
                     <h4 className="text-sm font-medium text-muted-foreground mb-2">Final Composition</h4>
                     <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                       {comp.finalComp.map((champion) => (
@@ -308,45 +301,29 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
                       ))}
                     </div>
                   </div>
-                </TabsContent>
-                
-                <TabsContent value="items" className="pt-2">
-                  <div className="mb-6">
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Key Items</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {comp.keyItems.map((item, idx) => (
-                        <div key={idx} className="bg-secondary/70 px-2 py-1 rounded text-xs flex items-center gap-1">
-                          <ItemIcon name={item} size="sm" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                   
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Item Priority</h4>
-                    {comp.finalComp
-                      .filter(champ => champ.items && champ.items.length > 0)
-                      .map((champion) => (
-                        <div key={champion.name} className="mb-3">
-                          <div className="flex items-center gap-2 mb-1">
-                            <ChampionIcon name={champion.name} cost={champion.cost} size="sm" />
-                            <span className="text-sm font-medium">{champion.name}</span>
-                            {champion.isCarry && (
-                              <span className="text-xs bg-primary/20 text-primary px-1 rounded">Carry</span>
-                            )}
-                          </div>
-                          <div className="flex flex-wrap gap-2 ml-10">
-                            {champion.items && champion.items.map((item, idx) => (
-                              <div key={idx} className="bg-secondary/50 px-2 py-1 rounded text-xs flex items-center gap-1">
-                                <span className="text-primary mr-1">{idx + 1}.</span>
-                                <ItemIcon name={item} size="sm" />
-                                <span>{item}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                    <p className="text-sm mb-4">{comp.description}</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-primary mb-2">Strengths</h4>
+                        <ul className="list-disc list-inside text-sm">
+                          {comp.strengthsWeaknesses.strengths.map((strength, idx) => (
+                            <li key={idx} className="mb-1">{strength}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-destructive mb-2">Weaknesses</h4>
+                        <ul className="list-disc list-inside text-sm">
+                          {comp.strengthsWeaknesses.weaknesses.map((weakness, idx) => (
+                            <li key={idx} className="mb-1">{weakness}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 </TabsContent>
                 
@@ -376,30 +353,6 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
                       <p className="text-muted-foreground">No positioning information available</p>
                     </div>
                   )}
-                </TabsContent>
-                
-                <TabsContent value="strategy" className="pt-2">
-                  <p className="text-sm mb-4">{comp.description}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-primary mb-2">Strengths</h4>
-                      <ul className="list-disc list-inside text-sm">
-                        {comp.strengthsWeaknesses.strengths.map((strength, idx) => (
-                          <li key={idx} className="mb-1">{strength}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium text-destructive mb-2">Weaknesses</h4>
-                      <ul className="list-disc list-inside text-sm">
-                        {comp.strengthsWeaknesses.weaknesses.map((weakness, idx) => (
-                          <li key={idx} className="mb-1">{weakness}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
                 </TabsContent>
               </Tabs>
             </div>

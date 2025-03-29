@@ -158,18 +158,16 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
       {expanded && (
         <div className="border-t border-border/40 p-4">
           <Tabs defaultValue="composition">
-            <TabsList className="grid grid-cols-3 mb-4">
+            <TabsList className="grid grid-cols-2 mb-4">
               <TabsTrigger value="composition">Composition</TabsTrigger>
               <TabsTrigger value="positioning" className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 <span>Positioning</span>
               </TabsTrigger>
-              <TabsTrigger value="strategy">Strategy</TabsTrigger>
             </TabsList>
             
             <TabsContent value="composition" className="pt-2">
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-muted-foreground mb-2">Early Game</h4>
                 <div className="flex flex-wrap gap-3">
                   {comp.earlyGame.map((champion) => (
                     <div key={champion.name} className="flex flex-col items-center gap-1">
@@ -180,7 +178,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                 </div>
               </div>
               
-              <div>
+              <div className="mb-6">
                 <h4 className="text-sm font-medium text-muted-foreground mb-2">Final Composition</h4>
                 <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                   {comp.finalComp.map((champion) => (
@@ -202,6 +200,30 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                   ))}
                 </div>
               </div>
+              
+              <div>
+                <p className="text-sm mb-4">{comp.description}</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-primary mb-2">Strengths</h4>
+                    <ul className="list-disc list-inside text-sm">
+                      {comp.strengthsWeaknesses.strengths.map((strength, idx) => (
+                        <li key={idx} className="mb-1">{strength}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-destructive mb-2">Weaknesses</h4>
+                    <ul className="list-disc list-inside text-sm">
+                      {comp.strengthsWeaknesses.weaknesses.map((weakness, idx) => (
+                        <li key={idx} className="mb-1">{weakness}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
             
             <TabsContent value="positioning" className="pt-2">
@@ -213,7 +235,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                     readonly={true}
                   />
                   <p className="text-xs text-muted-foreground mt-4">
-                    This shows the recommended positioning for the late game board. Position your units as shown for optimal performance.
+                    This shows the recommended positioning for the late game board.
                   </p>
                 </div>
               ) : comp.positioning ? (
@@ -230,40 +252,6 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                   <p className="text-muted-foreground">No positioning information available for this comp</p>
                 </div>
               )}
-            </TabsContent>
-            
-            <TabsContent value="strategy" className="pt-2">
-              <p className="text-sm mb-4">{comp.description}</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <h4 className="text-sm font-medium text-primary mb-2">Strengths</h4>
-                  <ul className="list-disc list-inside text-sm">
-                    {comp.strengthsWeaknesses.strengths.map((strength, idx) => (
-                      <li key={idx} className="mb-1">{strength}</li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium text-destructive mb-2">Weaknesses</h4>
-                  <ul className="list-disc list-inside text-sm">
-                    {comp.strengthsWeaknesses.weaknesses.map((weakness, idx) => (
-                      <li key={idx} className="mb-1">{weakness}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground mb-2">Playstyle Tips</h4>
-                <p className="text-sm">
-                  {comp.playstyle === 'Fast 8' && 'Focus on economy to hit level 8 as quickly as possible. Look for pairs along the way, but prioritize econ.'}
-                  {comp.playstyle === 'Slow Roll' && 'Stay at a specific level (usually 5, 6, or 7) and roll down excess gold above 50 to find your key units.'}
-                  {comp.playstyle === 'Standard' && 'Balance leveling and rolling. Level when it makes sense for your composition\'s power spikes.'}
-                  {comp.playstyle === 'Hyper Roll' && 'Roll aggressively at early levels to find your key units. Prioritize 3-starring your core champions.'}
-                </p>
-              </div>
             </TabsContent>
           </Tabs>
         </div>

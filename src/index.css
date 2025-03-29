@@ -120,27 +120,28 @@
 }
 
 .board-container {
-  @apply rounded-lg bg-[#0A071D] p-4 border border-purple-900/30 shadow-lg;
+  @apply rounded-lg bg-[#0A071D] p-6 border border-purple-900/30 shadow-lg;
   background-image: radial-gradient(circle at center, rgba(139, 92, 246, 0.05) 0%, rgba(10, 7, 29, 1) 70%);
 }
 
 .board-grid {
-  @apply flex flex-col items-center gap-[-6px] p-4;
+  @apply flex flex-col items-center gap-0 p-4;
 }
 
 .board-row {
-  @apply flex gap-1 my-[-6px];
+  @apply flex gap-3 my-0;
+  margin-bottom: 12px; /* Increased vertical spacing between rows */
 }
 
 /* Staggered hexagon grid */
 .board-row:nth-child(even) {
-  @apply ml-[14px];
+  @apply ml-[22px]; /* Increased offset for even rows */
 }
 
 .hexagon-cell {
   position: relative;
-  width: 44px;
-  height: 50px;
+  width: 50px; /* Slightly larger cells */
+  height: 58px;
   margin: 0 2px;
 }
 
@@ -156,17 +157,20 @@
 }
 
 .hexagon.empty {
-  @apply bg-transparent border border-purple-500/20;
+  @apply bg-transparent;
+  border: 2px solid rgba(155, 89, 246, 0.2); /* Cleaner purple border */
   background: rgba(91, 33, 182, 0.03);
 }
 
 .hexagon.occupied {
-  @apply bg-purple-900/20 border border-purple-500/40;
+  @apply bg-purple-900/20;
+  border: 2px solid rgba(155, 89, 246, 0.5); /* More visible border when occupied */
   box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.1);
 }
 
 .hexagon.selected {
-  @apply border-purple-500/70 bg-purple-900/40;
+  border: 2px solid rgba(155, 89, 246, 0.9); /* Brighter border when selected */
+  @apply bg-purple-900/40;
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
 }
 

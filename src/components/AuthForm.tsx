@@ -13,9 +13,8 @@ interface AuthFormProps {
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -30,9 +29,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
           throw new Error('Username is required');
         }
         
+        // Generate a fake email based on username for Supabase
+        const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '_')}@example.com`;
+        
         // For signup, create the account without email confirmation
         const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
+          email: fakeEmail,
           password,
           options: {
             data: {
@@ -51,8 +53,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
           description: "You are now logged in.",
         });
       } else {
+        // For login, we need to find the user by username first
+        // Get all users with this username
+        const { data: users, error: getUserError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('username', username)
+          .single();
+
+        if (getUserError) {
+          throw new Error('Invalid username or password');
+        }
+
+        // Now login with the associated email
+        const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '_')}@example.com`;
+        
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
+          email: fakeEmail,
           password,
         });
 
@@ -81,31 +98,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-      {mode === 'signup' && (
-        <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            type="text"
-            placeholder="your_username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            autoComplete="username"
-          />
-        </div>
-      )}
-      
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="username">Username</Label>
         <Input
-          id="email"
-          type="email"
-          placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          id="username"
+          type="text"
+          placeholder="your_username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
-          autoComplete="email"
+          autoComplete="username"
         />
       </div>
       

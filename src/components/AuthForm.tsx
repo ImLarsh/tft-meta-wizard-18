@@ -30,22 +30,25 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
           throw new Error('Username is required');
         }
         
-        const { error: signUpError } = await supabase.auth.signUp({
+        // For signup, create the account without email confirmation
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               username,
             },
-            emailRedirectTo: window.location.origin,
+            // Don't redirect for email confirmation
+            emailRedirectTo: undefined,
           },
         });
 
         if (signUpError) throw signUpError;
 
+        // Auto sign in after signup is handled by Supabase's auth state change
         toast({
           title: "Account created successfully",
-          description: "Please check your email for a confirmation link.",
+          description: "You are now logged in.",
         });
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({

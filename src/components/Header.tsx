@@ -1,11 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, List, Sparkles, Settings, Moon, Sun, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/providers/AuthProvider';
 import {
   Dialog,
@@ -34,9 +31,8 @@ const Header: React.FC = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
   
-  const { user, username } = useAuth();
+  const { user, username, signOut } = useAuth();
   
-  // Handle scroll effects
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -56,24 +52,6 @@ const Header: React.FC = () => {
     };
   }, []);
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out successfully",
-        description: "You have been signed out of your account",
-      });
-      navigate('/');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast({
-        title: "Error signing out",
-        description: "There was a problem signing you out",
-        variant: "destructive",
-      });
-    }
-  };
-  
   return (
     <header className={`bg-card/80 backdrop-blur-md sticky top-0 z-10 border-b transition-all duration-300 ${scrolled ? 'shadow-md border-primary/20' : 'shadow-sm border-primary/10'}`}>
       <div className="container py-4">
@@ -115,6 +93,13 @@ const Header: React.FC = () => {
                 <Moon className="h-5 w-5 text-primary animate-pulse-subtle" />
               )}
             </Button>
+            
+            {/* Welcome Message when signed in */}
+            {user && username && (
+              <div className={`mr-4 font-medium text-sm text-foreground/90 transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+                Welcome, <span className="text-primary font-semibold">{username}</span>!
+              </div>
+            )}
             
             {/* Nav Items with staggered animation */}
             <Link to="/sets">
@@ -218,7 +203,7 @@ const Header: React.FC = () => {
                     Welcome, {username || 'User'}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
+                  <DropdownMenuItem onClick={signOut}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
                   </DropdownMenuItem>

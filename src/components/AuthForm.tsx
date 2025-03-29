@@ -30,7 +30,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
           throw new Error('Username and email are required');
         }
         
-        // For signup, create the account without email confirmation
+        // Get the current site URL for proper redirection
+        const siteUrl = window.location.origin;
+        
+        // For signup, create the account with proper redirection
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -38,18 +41,26 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
             data: {
               username,
             },
-            emailRedirectTo: undefined,
+            emailRedirectTo: `${siteUrl}/auth/callback`,
           },
         });
 
         if (signUpError) throw signUpError;
 
-        // Auto sign in after signup is handled by Supabase's auth state change
-        toast({
-          title: "Account created successfully",
-          description: "You are now logged in.",
-        });
+        if (data.user && data.user.identities && data.user.identities.length === 0) {
+          toast({
+            title: "Account already exists",
+            description: "Please login with your existing account",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Verification email sent",
+            description: "Please check your email to verify your account before logging in.",
+          });
+        }
       } else {
+        // Login
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,

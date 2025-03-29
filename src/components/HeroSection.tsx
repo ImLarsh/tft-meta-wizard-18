@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Sparkles, ArrowRight } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   return (
@@ -8,17 +9,21 @@ const HeroSection: React.FC = () => {
       <div className="absolute inset-0 z-0 opacity-20 bg-[url('https://images.contentstack.io/v3/assets/blt76b5e73bfd1451ea/blt4776087682118d5e/60c34a5750e6a9762e8b0ea8/TFT_Web_Set5_Launch_Hero_1920x1080_01.jpg')] bg-cover bg-center"></div>
       <div className="container relative z-10">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-primary">
-            TFT Meta Wizard
-          </h1>
+          <div className="flex items-center justify-center mb-4">
+            <Sparkles className="h-8 w-8 text-primary mr-2" />
+            <h1 className="text-4xl md:text-6xl font-bold text-primary">
+              TFT <span className="text-foreground glow-text">Genie</span>
+            </h1>
+          </div>
           <p className="text-lg md:text-xl mb-8 text-foreground/90">
-            Discover the best team compositions for Teamfight Tactics and climb the ranks with our up-to-date meta analysis.
+            Your magical companion for Teamfight Tactics success. Discover the best team compositions and climb the ranks with our mystical meta insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-base">
+            <Button size="lg" className="text-base gaming-button">
               View Top Comps
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <Button size="lg" variant="outline" className="text-base">
+            <Button size="lg" variant="outline" className="text-base border-primary/40 hover:bg-primary/10">
               Latest Updates
             </Button>
           </div>

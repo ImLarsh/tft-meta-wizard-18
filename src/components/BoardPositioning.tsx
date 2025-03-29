@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Champion } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
+import { ArrowDown } from 'lucide-react';
 
 type Position = {
   row: number;
@@ -25,11 +26,19 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   const rows = 4;
   const cols = 7;
   
+  // Local state for champions
+  const [localChampions, setLocalChampions] = useState<PositionedChampion[]>(champions);
+  
+  // Update local champions when props change
+  useEffect(() => {
+    setLocalChampions(champions);
+  }, [champions]);
+  
   // Create a matrix representation of the board
   const board = Array(rows).fill(null).map(() => Array(cols).fill(null));
   
   // Place champions on the board
-  champions.forEach(champion => {
+  localChampions.forEach(champion => {
     if (champion.position) {
       const { row, col } = champion.position;
       if (row >= 0 && row < rows && col >= 0 && col < cols) {
@@ -44,16 +53,16 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     
     event.preventDefault();
     const championId = event.dataTransfer.getData('championId');
-    const updatedChampions = champions.map(champ => {
+    const updatedChampions = localChampions.map(champ => {
       if (champ.name === championId) {
         // Check if the target cell is already occupied
-        const isOccupied = champions.some(
+        const isOccupied = localChampions.some(
           c => c.position?.row === targetRow && c.position?.col === targetCol
         );
         
         if (isOccupied) {
           // If occupied, swap positions with the champion currently in that cell
-          const occupyingChamp = champions.find(
+          const occupyingChamp = localChampions.find(
             c => c.position?.row === targetRow && c.position?.col === targetCol
           );
           
@@ -81,7 +90,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
         }
       } else if (champ.position?.row === targetRow && champ.position?.col === targetCol) {
         // This is the champion being replaced, swap with the dragged champion's position
-        const draggedChamp = champions.find(c => c.name === championId);
+        const draggedChamp = localChampions.find(c => c.name === championId);
         return {
           ...champ,
           position: draggedChamp?.position || null
@@ -90,6 +99,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       return champ;
     });
     
+    setLocalChampions(updatedChampions);
     onUpdatePositions && onUpdatePositions(updatedChampions);
   };
   
@@ -104,7 +114,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   const handleRemoveFromBoard = (championName: string) => {
     if (!editable) return;
     
-    const updatedChampions = champions.map(champ => {
+    const updatedChampions = localChampions.map(champ => {
       if (champ.name === championName) {
         return {
           ...champ,
@@ -114,13 +124,17 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       return champ;
     });
     
+    setLocalChampions(updatedChampions);
     onUpdatePositions && onUpdatePositions(updatedChampions);
   };
   
+  // Available champions (those not on the board)
+  const availableChampions = localChampions.filter(champ => !champ.position);
+  
   return (
     <div className="space-y-4">
-      <div className="tft-board-container">
-        <div className="tft-board grid grid-cols-7 gap-1 bg-tft-dark/70 p-2 rounded-lg">
+      <div className="tft-board-container mb-6">
+        <div className="tft-board grid grid-cols-7 gap-1 bg-secondary/30 p-2 rounded-lg border border-primary/20">
           {board.map((row, rowIndex) => (
             <React.Fragment key={`row-${rowIndex}`}>
               {row.map((cell, colIndex) => (
@@ -128,22 +142,23 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   key={`cell-${rowIndex}-${colIndex}`}
                   className={`
                     w-12 h-12 rounded-md flex items-center justify-center
-                    ${editable ? 'border border-dashed border-gray-500 hover:border-primary cursor-pointer' : ''}
-                    ${cell ? 'bg-secondary/20' : 'bg-secondary/5'}
+                    ${editable ? 'border border-dashed border-primary/40 hover:border-primary cursor-pointer' : 'border border-border/30'}
+                    ${cell ? 'bg-secondary/40' : 'bg-secondary/10'}
+                    transition-all duration-200 hover:bg-secondary/60
                   `}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, rowIndex, colIndex)}
                 >
                   {cell && (
                     <div
-                      className="relative"
+                      className="relative group"
                       draggable={editable}
                       onDragStart={(e) => handleDragStart(e, cell)}
                       onDoubleClick={() => editable && handleRemoveFromBoard(cell.name)}
                     >
                       <ChampionIcon name={cell.name} cost={cell.cost} size="md" />
                       {cell.isCarry && (
-                        <div className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5">
+                        <div className="absolute -top-1 -right-1 bg-primary rounded-full p-0.5 glow-border">
                           <span className="h-3 w-3 text-black text-xs flex items-center justify-center">★</span>
                         </div>
                       )}
@@ -158,19 +173,27 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       
       {editable && (
         <div className="mt-4">
-          <h4 className="text-sm font-medium mb-2">Available Champions</h4>
-          <div className="flex flex-wrap gap-2 p-2 bg-secondary/10 rounded-md">
-            {champions.filter(champ => !champ.position).map((champion) => (
-              <div
-                key={champion.name}
-                className="cursor-move"
-                draggable
-                onDragStart={(e) => handleDragStart(e, champion)}
-              >
-                <ChampionIcon name={champion.name} cost={champion.cost} size="sm" />
-              </div>
-            ))}
-            {champions.filter(champ => !champ.position).length === 0 && (
+          <h4 className="text-sm font-medium mb-2 flex items-center">
+            <ArrowDown className="h-4 w-4 mr-1 text-primary" />
+            Available Champions
+          </h4>
+          <div className="flex flex-wrap gap-2 p-3 bg-secondary/20 rounded-md border border-border/50">
+            {availableChampions.length > 0 ? (
+              availableChampions.map((champion) => (
+                <div
+                  key={champion.name}
+                  className="cursor-move hover:scale-105 transition-transform"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, champion)}
+                >
+                  <ChampionIcon 
+                    name={champion.name} 
+                    cost={champion.cost} 
+                    size="sm" 
+                  />
+                </div>
+              ))
+            ) : (
               <p className="text-sm text-muted-foreground p-2">
                 All champions have been placed on the board. Double-click a champion to remove it.
               </p>

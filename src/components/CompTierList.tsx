@@ -1,9 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CompCard from './CompCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SearchX, Trash2 } from 'lucide-react';
+import { SearchX, Trash2, Filter, Sparkles } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import { 
   AlertDialog,
@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from '@/components/ui/use-toast';
+import { TFTComp } from '@/data/comps';
 
 const CompTierList: React.FC = () => {
   const { comps, removeComp } = useComps();
@@ -25,6 +26,20 @@ const CompTierList: React.FC = () => {
     playstyle: 'all',
   });
   const [compToDelete, setCompToDelete] = useState<string | null>(null);
+  const [groupedComps, setGroupedComps] = useState<Record<string, TFTComp[]>>({});
+  const [activeTab, setActiveTab] = useState('S');
+  
+  // Group comps by tier
+  useEffect(() => {
+    const tierOrder = ['S', 'A', 'B', 'C'];
+    const grouped: Record<string, TFTComp[]> = {};
+    
+    tierOrder.forEach(tier => {
+      grouped[tier] = comps.filter(comp => comp.tier === tier);
+    });
+    
+    setGroupedComps(grouped);
+  }, [comps]);
   
   // Filter comps based on search and filters
   const filteredComps = comps.filter((comp) => {
@@ -58,23 +73,18 @@ const CompTierList: React.FC = () => {
     });
   };
   
-  // Group comps by tier if not filtering
-  const tierOrder = ['S', 'A', 'B', 'C'];
-  const groupedComps: Record<string, typeof comps> = {};
-  
-  if (filters.tier === 'all' && filters.playstyle === 'all' && searchTerm === '') {
-    // Organize by tier
-    tierOrder.forEach(tier => {
-      groupedComps[tier] = comps.filter(comp => comp.tier === tier);
-    });
-  }
+  // Determine what to display based on filters
+  const shouldShowFilteredView = !(filters.tier === 'all' && filters.playstyle === 'all' && searchTerm === '');
   
   return (
     <section className="py-12">
       <div className="container">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-bold mb-2">Top TFT Comps</h2>
+            <h2 className="text-3xl font-bold mb-2 flex items-center">
+              <Sparkles className="h-6 w-6 text-primary mr-2" />
+              <span>Top TFT Comps</span>
+            </h2>
             <p className="text-muted-foreground">Discover the strongest team compositions for climbing the ranked ladder.</p>
           </div>
           
@@ -93,22 +103,26 @@ const CompTierList: React.FC = () => {
         
         <div className="flex flex-wrap gap-3 mb-6">
           <div>
-            <span className="text-sm font-medium mr-2">Tier:</span>
+            <span className="text-sm font-medium mr-2 flex items-center">
+              <Filter className="h-4 w-4 mr-1" />
+              Tier:
+            </span>
             <div className="flex flex-wrap gap-1">
               <Button 
                 variant={filters.tier === 'all' ? 'default' : 'outline'} 
                 size="sm"
                 onClick={() => handleFilterChange('tier', 'all')}
+                className={filters.tier === 'all' ? 'gaming-button' : ''}
               >
                 All
               </Button>
-              {tierOrder.map(tier => (
+              {['S', 'A', 'B', 'C'].map(tier => (
                 <Button 
                   key={tier}
                   variant={filters.tier === tier ? 'default' : 'outline'} 
                   size="sm"
                   onClick={() => handleFilterChange('tier', tier)}
-                  className={`${filters.tier === tier ? '' : 'opacity-80'}`}
+                  className={`${filters.tier === tier ? 'gaming-button' : 'opacity-80'}`}
                 >
                   {tier}
                 </Button>
@@ -117,12 +131,16 @@ const CompTierList: React.FC = () => {
           </div>
           
           <div>
-            <span className="text-sm font-medium mr-2">Playstyle:</span>
+            <span className="text-sm font-medium mr-2 flex items-center">
+              <Filter className="h-4 w-4 mr-1" />
+              Playstyle:
+            </span>
             <div className="flex flex-wrap gap-1">
               <Button 
                 variant={filters.playstyle === 'all' ? 'default' : 'outline'} 
                 size="sm"
                 onClick={() => handleFilterChange('playstyle', 'all')}
+                className={filters.playstyle === 'all' ? 'gaming-button' : ''}
               >
                 All
               </Button>
@@ -132,6 +150,7 @@ const CompTierList: React.FC = () => {
                   variant={filters.playstyle === style ? 'default' : 'outline'} 
                   size="sm"
                   onClick={() => handleFilterChange('playstyle', style)}
+                  className={filters.playstyle === style ? 'gaming-button' : ''}
                 >
                   {style}
                 </Button>
@@ -141,44 +160,7 @@ const CompTierList: React.FC = () => {
         </div>
         
         {/* Show comps */}
-        {filters.tier === 'all' && filters.playstyle === 'all' && searchTerm === '' ? (
-          // Organized by tier
-          <Tabs defaultValue="S">
-            <TabsList className="mb-6">
-              {tierOrder.map(tier => (
-                <TabsTrigger key={tier} value={tier} className="flex-1">
-                  Tier {tier}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            
-            {tierOrder.map(tier => (
-              <TabsContent key={tier} value={tier} className="space-y-4">
-                {groupedComps[tier]?.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupedComps[tier]?.map(comp => (
-                      <div key={comp.id} className="relative group">
-                        <CompCard comp={comp} />
-                        <Button 
-                          variant="destructive" 
-                          size="icon" 
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => setCompToDelete(comp.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">No compositions in Tier {tier}</p>
-                  </div>
-                )}
-              </TabsContent>
-            ))}
-          </Tabs>
-        ) : (
+        {shouldShowFilteredView ? (
           // Filtered view
           <>
             {filteredComps.length > 0 ? (
@@ -214,6 +196,43 @@ const CompTierList: React.FC = () => {
               </div>
             )}
           </>
+        ) : (
+          // Organized by tier
+          <Tabs defaultValue="S" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-6">
+              {['S', 'A', 'B', 'C'].map(tier => (
+                <TabsTrigger key={tier} value={tier} className="flex-1">
+                  Tier {tier}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {['S', 'A', 'B', 'C'].map(tier => (
+              <TabsContent key={tier} value={tier} className="space-y-4">
+                {groupedComps[tier]?.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {groupedComps[tier]?.map(comp => (
+                      <div key={comp.id} className="relative group">
+                        <CompCard comp={comp} />
+                        <Button 
+                          variant="destructive" 
+                          size="icon" 
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => setCompToDelete(comp.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No compositions in Tier {tier}</p>
+                  </div>
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
         )}
       </div>
 

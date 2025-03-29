@@ -2,15 +2,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { PenSquare } from 'lucide-react';
+import { PenSquare, Sparkles } from 'lucide-react';
 
 const Header = () => {
   return (
     <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-primary">TFT</span>
-          <span className="text-xl font-bold">Meta Wizard</span>
+          <span className="text-xl font-bold text-primary flex items-center">
+            <Sparkles className="h-5 w-5 mr-1" />
+            TFT
+          </span>
+          <span className="text-xl font-bold glow-text">Genie</span>
         </Link>
         
         <nav className="hidden md:flex items-center gap-6">
@@ -24,7 +27,7 @@ const Header = () => {
         
         <div className="flex items-center gap-2">
           <Link to="/editor">
-            <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
+            <Button variant="default" size="sm" className="gaming-button hidden sm:flex items-center gap-2">
               <PenSquare className="h-4 w-4" />
               <span>Create Comp</span>
             </Button>

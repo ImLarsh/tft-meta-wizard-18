@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import CompForm from '@/components/CompForm';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { TFTComp } from '@/data/comps';
 import { toast } from '@/components/ui/use-toast';
 import { useComps } from '@/contexts/CompsContext';
@@ -49,11 +49,14 @@ const CompEditor: React.FC = () => {
       <Header />
       <main className="flex-1 container py-8">
         <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="hover:bg-primary/10">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold">Create New Composition</h1>
+          <h1 className="text-3xl font-bold flex items-center">
+            <Sparkles className="h-6 w-6 text-primary mr-2" />
+            Create New Composition
+          </h1>
         </div>
         
         <div className="bg-card border border-border/40 rounded-lg shadow-sm p-6">
@@ -65,12 +68,13 @@ const CompEditor: React.FC = () => {
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
               <span className="text-xl font-bold text-primary">TFT</span>
-              <span className="text-xl font-bold">Meta Wizard</span>
+              <span className="text-xl font-bold">Genie</span>
             </div>
             
             <div className="text-sm text-muted-foreground">
-              TFT Meta Wizard is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends.
+              TFT Genie is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends.
             </div>
           </div>
         </div>

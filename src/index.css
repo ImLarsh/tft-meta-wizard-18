@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 215 62% 5%;
+    --background: 240 24% 6%;
     --foreground: 210 20% 98%;
 
     --card: 224 71% 8%;
@@ -14,16 +14,16 @@
     --popover: 224 71% 8%;
     --popover-foreground: 210 20% 98%;
 
-    --primary: 47 73% 61%;
-    --primary-foreground: 224 71% 4%;
+    --primary: 286 70% 67%;
+    --primary-foreground: 240 24% 4%;
 
-    --secondary: 240 21% 22%;
+    --secondary: 240 21% 15%;
     --secondary-foreground: 210 20% 98%;
 
-    --muted: 240 21% 20%;
+    --muted: 240 21% 12%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 270 50% 38%;
+    --accent: 256 54% 56%;
     --accent-foreground: 210 20% 98%;
 
     --destructive: 0 62% 57%;
@@ -31,9 +31,9 @@
 
     --border: 240 21% 18%;
     --input: 240 21% 18%;
-    --ring: 47 73% 61%;
+    --ring: 286 70% 67%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -53,7 +53,11 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Exo 2', sans-serif;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(76, 29, 149, 0.15) 0%, transparent 45%),
+      radial-gradient(circle at 75% 75%, rgba(192, 132, 252, 0.1) 0%, transparent 45%);
+    background-attachment: fixed;
   }
   
   /* Custom scrollbar */
@@ -63,29 +67,37 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-muted/30;
+    @apply bg-muted/30 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted rounded-full;
+    @apply bg-primary/40 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted/80;
+    @apply bg-primary/60;
   }
 }
 
 @layer components {
   .tft-gradient {
-    background: linear-gradient(to right, #0A1428, #091428);
+    background: linear-gradient(to bottom, rgba(10, 20, 40, 0.8), rgba(9, 20, 40, 0.95));
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
   }
   
   .tft-card {
-    @apply bg-card border border-border/50 rounded-lg shadow-lg backdrop-blur-sm transition-all duration-300;
+    @apply bg-card/90 border border-border/50 rounded-lg shadow-lg backdrop-blur-sm transition-all duration-300;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), 
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
   
   .tft-card:hover {
     @apply border-primary/50 shadow-xl;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                0 0 15px rgba(192, 132, 252, 0.2);
+    transform: translateY(-2px);
   }
   
   .champion-border-1 {
@@ -129,5 +141,44 @@
     50% {
       opacity: 0.8;
     }
+  }
+  
+  /* Gaming style button */
+  .gaming-button {
+    @apply relative overflow-hidden bg-gradient-to-r from-primary/80 to-accent/80 
+           hover:from-primary hover:to-accent
+           text-white font-medium rounded-lg shadow-lg 
+           transition-all duration-300 ease-in-out;
+  }
+  
+  .gaming-button::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 
+           transition-opacity duration-300 ease-in-out;
+  }
+  
+  .gaming-button:hover::before {
+    @apply opacity-100;
+    animation: shine 1.5s infinite;
+  }
+  
+  @keyframes shine {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  
+  /* Glow effects */
+  .glow-text {
+    text-shadow: 0 0 10px rgba(192, 132, 252, 0.5), 
+                 0 0 20px rgba(192, 132, 252, 0.3);
+  }
+  
+  .glow-border {
+    box-shadow: 0 0 5px rgba(192, 132, 252, 0.5), 
+                0 0 10px rgba(192, 132, 252, 0.3);
   }
 }

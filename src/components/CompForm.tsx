@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -101,13 +100,10 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
 
-  // Update filtered champions whenever the TFT version changes
   useEffect(() => {
-    // Get all champions for the current set
     const championsInCurrentSet = Object.keys(currentTraitMap);
     setFilteredChampions(championsInCurrentSet);
     
-    // Clear the champion name if it's not in the current set
     if (newChampName && !championsInCurrentSet.includes(newChampName)) {
       setNewChampName("");
     }
@@ -427,7 +423,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                       <SelectContent>
                         {availableSets.map((setName) => (
                           <SelectItem key={setName} value={setName}>
-                            {setName} - {traitMappings[setName]?.name || ''}
+                            {traitMappings[setName]?.name || setName}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -734,10 +730,9 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 </Button>
               </div>
               
-              {/* Display info about current set champions */}
               {filteredChampions.length > 0 && (
                 <div className="bg-secondary/20 p-4 rounded-md">
-                  <h4 className="text-sm font-medium mb-2">Champions in {currentTftVersion} - {traitMappings[currentTftVersion]?.name || ''}</h4>
+                  <h4 className="text-sm font-medium mb-2">Champions in {traitMappings[currentTftVersion]?.name || currentTftVersion}</h4>
                   <p className="text-xs text-muted-foreground mb-2">
                     {filteredChampions.length} champions available in this set
                   </p>
@@ -824,7 +819,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               </div>
               
               <div className="bg-secondary/20 p-4 rounded-md">
-                <h4 className="text-sm font-medium mb-2">Available Traits for {currentTftVersion} - {traitMappings[currentTftVersion]?.name || ''}</h4>
+                <h4 className="text-sm font-medium mb-2">Available Traits for {traitMappings[currentTftVersion]?.name || currentTftVersion}</h4>
                 <div className="flex flex-wrap gap-2">
                   {availableTraits.length > 0 ? (
                     availableTraits.map((trait) => (

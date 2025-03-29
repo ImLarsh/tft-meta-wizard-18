@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CompCard from './CompCard';
@@ -204,7 +205,7 @@ const CompTierList: React.FC = () => {
                   <SelectItem value="all">All Sets</SelectItem>
                   {availableVersions.map((version) => (
                     <SelectItem key={version} value={version}>
-                      {version} - {traitMappings[version]?.name || ''}
+                      {traitMappings[version]?.name || version}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TFTComp } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
@@ -7,6 +6,7 @@ import BoardPositioning from './BoardPositioning';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronDown, ChevronRight, Star, Trophy, BarChart, Brain, MapPin } from 'lucide-react';
+import { useComps } from '@/contexts/CompsContext';
 
 interface CompCardProps {
   comp: TFTComp;
@@ -16,6 +16,7 @@ interface CompCardProps {
 
 const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
+  const { traitMappings } = useComps();
   
   const getTierColor = (tier: string) => {
     switch (tier) {
@@ -25,6 +26,12 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
       case 'C': return 'bg-tft-red text-white';
       default: return 'bg-muted text-muted-foreground';
     }
+  };
+  
+  // Get the set name from tftVersion
+  const getSetName = () => {
+    if (!comp.tftVersion) return null;
+    return traitMappings[comp.tftVersion]?.name || comp.tftVersion;
   };
   
   // Check if any champions have position data
@@ -43,10 +50,9 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
         <div className="flex items-center gap-3">
           {comp.tftVersion && (
             <span className="text-xs bg-secondary/70 px-2 py-1 rounded">
-              {comp.tftVersion}
+              {getSetName()}
             </span>
           )}
-          {/* Moved to separate action bar */}
         </div>
       </div>
       
@@ -60,7 +66,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
               <span className="ml-1 text-primary">({trait.count})</span>
               {trait.version && (
                 <span className="ml-1 text-[10px] text-muted-foreground">
-                  {trait.version}
+                  {traitMappings[trait.version]?.name || trait.version}
                 </span>
               )}
             </div>
@@ -97,7 +103,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
         </div>
       </div>
       
-      {/* Action Bar - Separate section for buttons */}
+      {/* Action Bar */}
       <div className="border-t border-border/40 px-4 py-2 flex justify-between items-center">
         <Button 
           variant="ghost" 
@@ -148,7 +154,6 @@ const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
         )}
       </div>
       
-      {/* Expanded Content */}
       {expanded && (
         <div className="border-t border-border/40 p-4">
           <Tabs defaultValue="composition">

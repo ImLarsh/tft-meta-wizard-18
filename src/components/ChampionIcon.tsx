@@ -18,31 +18,34 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   const [imgError, setImgError] = useState(false);
   
   // Normalize the champion name for different API formats
-  // Fix for double names (e.g., "MissFortune") and ensure proper normalization
   let normalizedName;
   
   // Special case handling for champions with known naming issues
-  if (name === "MissFortune") {
+  if (name === "MissFortune" || name === "Miss Fortune") {
     normalizedName = "missfortune";
-  } else if (name === "AurelionSol") {
+  } else if (name === "AurelionSol" || name === "Aurelion Sol") {
     normalizedName = "aurelionsol";
-  } else if (name === "TahmKench") {
+  } else if (name === "TahmKench" || name === "Tahm Kench") {
     normalizedName = "tahmkench";
-  } else if (name === "XinZhao") {
+  } else if (name === "XinZhao" || name === "Xin Zhao") {
     normalizedName = "xinzhao";
-  } else if (name === "MasterYi") {
+  } else if (name === "MasterYi" || name === "Master Yi") {
     normalizedName = "masteryi";
-  } else if (name === "TwistedFate") {
+  } else if (name === "TwistedFate" || name === "Twisted Fate") {
     normalizedName = "twistedfate";
-  } else if (name === "KSante" || name === "KSante") {
+  } else if (name === "KSante" || name === "K'Sante") {
     normalizedName = "ksante";
-  } else if (name === "JarvanIV") {
+  } else if (name === "JarvanIV" || name === "Jarvan IV") {
     normalizedName = "jarvaniv";
+  } else if (name === "LeBlanc" || name === "Le Blanc") {
+    normalizedName = "leblanc";
   } else {
     // Standard normalization for other champions
+    // Remove spaces and special characters, convert to lowercase
     normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
   }
   
+  // For display in fallback
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
   // New and more reliable image sources
@@ -51,16 +54,20 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     
-    // Riot Data Dragon
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name}_0.jpg`,
+    // Riot Data Dragon - First try with normalized name
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    
+    // Then try with original name (for Data Dragon which sometimes uses spaces)
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name.replace(/\s+/g, '')}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name.replace(/\s+/g, '')}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name.replace(/\s+/g, '')}_0.jpg`,
     
     // Community Dragon
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName}/${normalizedName}_0.jpg`,
     
-    // Mobalytics
+    // Mobalytics - try multiple format approaches
     `https://cdn.mobalytics.gg/assets/tft/images/champions/thumbnails/${normalizedName}.png`,
     `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName}.png`,
     

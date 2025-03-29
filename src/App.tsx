@@ -7,6 +7,7 @@ import CompEditExisting from './pages/CompEditExisting';
 import SetManager from './pages/SetManager';
 import NotFound from './pages/NotFound';
 import { CompsProvider } from './contexts/CompsContext';
+import { Toaster } from './components/ui/toaster';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      <Toaster />
     </CompsProvider>
   );
 }

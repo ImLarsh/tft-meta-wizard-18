@@ -17,7 +17,6 @@ import BoardPositioning from './BoardPositioning';
 import { useComps } from '@/contexts/CompsContext';
 import { ChampionTraitMap } from '@/types/champion';
 
-// Common TFT items for autocomplete
 const commonItems = [
   "Infinity Edge", "Giant Slayer", "Rapid Firecannon", "Runaan's Hurricane", 
   "Guinsoo's Rageblade", "Bloodthirster", "Titan's Resolve", "Blue Buff", 
@@ -105,10 +104,8 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
 
   const currentTftVersion = form.watch("tftVersion") || "Set 10";
   
-  // Get traits for the current version
   const availableTraits = traitMappings[currentTftVersion]?.traits || [];
   
-  // Get champion trait mapping for the current version
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
 
   const handleUpdatePositions = (updatedChampions: Champion[]) => {
@@ -891,7 +888,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               
               <div className="bg-card/50 border border-border rounded-lg p-6">
                 <BoardPositioning
-                  champions={finalComp}
+                  champions={finalComp as PositionedChampion[]}
                   editable={true}
                   onUpdatePositions={handleUpdatePositions}
                 />

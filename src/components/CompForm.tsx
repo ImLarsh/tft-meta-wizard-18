@@ -17,6 +17,17 @@ import BoardPositioning from './BoardPositioning';
 import { useComps } from '@/contexts/CompsContext';
 import { ChampionTraitMap } from '@/types/champion';
 
+// Common TFT items for autocomplete
+const commonItems = [
+  "Infinity Edge", "Giant Slayer", "Rapid Firecannon", "Runaan's Hurricane", 
+  "Guinsoo's Rageblade", "Bloodthirster", "Titan's Resolve", "Blue Buff", 
+  "Spear of Shojin", "Archangel's Staff", "Morellonomicon", "Sunfire Cape",
+  "Warmog's Armor", "Dragon's Claw", "Gargoyle Stoneplate", "Redemption",
+  "Hand of Justice", "Guardian Angel", "Jeweled Gauntlet", "Rabadon's Deathcap",
+  "Zeke's Herald", "Ionic Spark", "Zz'Rot Portal", "Chalice of Power",
+  "Thieves' Gloves", "Shroud of Stillness", "Banshee's Claw", "Last Whisper"
+];
+
 const formSchema = z.object({
   id: z.string().min(3, { message: "ID must be at least 3 characters" }),
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
@@ -924,3 +935,71 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   <Button 
                     type="button" 
                     onClick={handleAddStrength}
+                    disabled={!newStrength || strengths.includes(newStrength)}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Weaknesses</h3>
+                
+                <div className="flex flex-wrap gap-2">
+                  {weaknesses.map((weakness, index) => (
+                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                      <span className="text-sm">{weakness}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 p-0"
+                        onClick={() => removeWeakness(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Input 
+                    value={newWeakness} 
+                    onChange={(e) => setNewWeakness(e.target.value)}
+                    placeholder="Weakness"
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleAddWeakness}
+                    disabled={!newWeakness || weaknesses.includes(newWeakness)}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+        
+        <div className="flex justify-between pt-6 border-t border-border">
+          <Button type="button" variant="outline">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>Save Composition</>
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
+
+export default CompForm;

@@ -1,19 +1,21 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { TFTComp, Champion, Trait } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
 import { useSupabase } from '@/hooks/use-supabase';
-import { fetchTraitMappingsFromSupabase, saveTraitMappingsToSupabase } from '@/utils/supabaseUtils';
+import { 
+  fetchTraitMappingsFromSupabase, 
+  saveTraitMappingsToSupabase,
+  fetchCompsFromSupabase,
+  saveCompsToSupabase
+} from '@/utils/supabaseUtils';
 import { toast } from '@/components/ui/use-toast';
 
-// Define the ChampionSet interface that was missing
 interface ChampionSet {
   name: string;
   traits: string[];
   championTraits: Record<string, string[]>;
 }
 
-// Define the context type
 interface CompsContextType {
   comps: TFTComp[];
   addComp: (comp: TFTComp) => void;
@@ -28,10 +30,8 @@ interface CompsContextType {
   loading: boolean;
 }
 
-// Create the context
 const CompsContext = createContext<CompsContextType | undefined>(undefined);
 
-// Define the provider props
 interface CompsProviderProps {
   children: React.ReactNode;
 }
@@ -42,39 +42,44 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const { supabase } = useSupabase();
 
-  // Fetch trait mappings from Supabase on component mount
   useEffect(() => {
-    const loadTraitMappings = async () => {
+    const loadData = async () => {
       setLoading(true);
       try {
-        // Try to load from Supabase first
         const mappingsFromSupabase = await fetchTraitMappingsFromSupabase();
         
         if (Object.keys(mappingsFromSupabase).length > 0) {
           setTraitMappings(mappingsFromSupabase);
           console.log('Trait mappings loaded from Supabase:', mappingsFromSupabase);
         } else {
-          // If nothing in Supabase, try localStorage as fallback
           const savedMappings = localStorage.getItem('tftTraitMappings');
           if (savedMappings) {
             const parsedMappings = JSON.parse(savedMappings);
             setTraitMappings(parsedMappings);
             
-            // Save to Supabase in background
             await saveTraitMappingsToSupabase(parsedMappings);
             console.log('Trait mappings loaded from localStorage and saved to Supabase');
           }
         }
         
-        // Load comps from localStorage
-        const savedComps = localStorage.getItem('tftComps');
-        if (savedComps) {
-          setComps(JSON.parse(savedComps));
+        const compsFromSupabase = await fetchCompsFromSupabase();
+        
+        if (compsFromSupabase.length > 0) {
+          setComps(compsFromSupabase);
+          console.log('Comps loaded from Supabase:', compsFromSupabase);
+        } else {
+          const savedComps = localStorage.getItem('tftComps');
+          if (savedComps) {
+            const parsedComps = JSON.parse(savedComps);
+            setComps(parsedComps);
+            
+            await saveCompsToSupabase(parsedComps);
+            console.log('Comps loaded from localStorage and saved to Supabase');
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);
         
-        // Fallback to localStorage for both
         try {
           const savedMappings = localStorage.getItem('tftTraitMappings');
           if (savedMappings) {
@@ -93,26 +98,30 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
       }
     };
 
-    loadTraitMappings();
+    loadData();
   }, []);
 
-  // Save comps to localStorage whenever they change
   useEffect(() => {
-    try {
-      localStorage.setItem('tftComps', JSON.stringify(comps));
-    } catch (error) {
-      console.error('Error saving comps to localStorage:', error);
+    if (!loading && comps.length > 0) {
+      try {
+        localStorage.setItem('tftComps', JSON.stringify(comps));
+        
+        saveCompsToSupabase(comps).then(success => {
+          if (!success) {
+            console.warn('Failed to save comps to Supabase, but saved to localStorage');
+          }
+        });
+      } catch (error) {
+        console.error('Error saving comps:', error);
+      }
     }
-  }, [comps]);
+  }, [comps, loading]);
 
-  // Save trait mappings to both localStorage and Supabase whenever they change
   useEffect(() => {
     if (Object.keys(traitMappings).length > 0 && !loading) {
       try {
-        // Save to localStorage
         localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
         
-        // Save to Supabase asynchronously
         saveTraitMappingsToSupabase(traitMappings).then(success => {
           if (!success) {
             console.warn('Failed to save trait mappings to Supabase, but saved to localStorage');
@@ -126,14 +135,12 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
 
   const addComp = (comp: TFTComp) => {
     setComps(prevComps => {
-      // Check if this is an update to an existing comp
       const existingIndex = prevComps.findIndex(c => c.id === comp.id);
       if (existingIndex >= 0) {
         const updatedComps = [...prevComps];
         updatedComps[existingIndex] = comp;
         return updatedComps;
       } else {
-        // It's a new comp
         return [...prevComps, comp];
       }
     });
@@ -164,7 +171,6 @@ export const CompsProvider: React.FC<CompsProviderProps> = ({ children }) => {
     });
   };
 
-  // Add the missing methods
   const addTraitMapping = (setKey: string, setName: string, traits: string[], championTraits: Record<string, string[]>) => {
     setTraitMappings(prev => {
       const newMappings = {

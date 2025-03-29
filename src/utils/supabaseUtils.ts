@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { TFTComp } from '@/data/comps';
 
 /**
  * Checks if the application is using the default Supabase credentials
@@ -82,6 +83,80 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
     return true;
   } catch (error) {
     console.error('Error in saveTraitMappingsToSupabase:', error);
+    return false;
+  }
+};
+
+/**
+ * Fetches comps from Supabase
+ * @returns {Promise<TFTComp[]>} The comps from the database
+ */
+export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('tft_comps')
+      .select('*')
+      .single();
+    
+    if (error) {
+      console.error('Error fetching comps:', error);
+      return [];
+    }
+    
+    // Check if data.comps is an array
+    if (data?.comps && Array.isArray(data.comps)) {
+      return data.comps as TFTComp[];
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error in fetchCompsFromSupabase:', error);
+    return [];
+  }
+};
+
+/**
+ * Saves comps to Supabase
+ * @param {TFTComp[]} comps The comps to save
+ * @returns {Promise<boolean>} Whether the save was successful
+ */
+export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> => {
+  try {
+    // First check if we have an existing record
+    const { data: existingRecord } = await supabase
+      .from('tft_comps')
+      .select('id')
+      .limit(1);
+    
+    if (existingRecord && existingRecord.length > 0) {
+      // Update existing record
+      const { error } = await supabase
+        .from('tft_comps')
+        .update({ 
+          comps, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', existingRecord[0].id);
+      
+      if (error) {
+        console.error('Error updating comps:', error);
+        return false;
+      }
+    } else {
+      // Insert new record
+      const { error } = await supabase
+        .from('tft_comps')
+        .insert({ comps });
+      
+      if (error) {
+        console.error('Error inserting comps:', error);
+        return false;
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error in saveCompsToSupabase:', error);
     return false;
   }
 };

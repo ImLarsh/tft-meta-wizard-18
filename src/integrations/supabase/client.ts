@@ -9,7 +9,14 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    storage: localStorage, // Use localStorage for session persistence
+    persistSession: true, // Enable session persistence
+    autoRefreshToken: true, // Enable automatic token refresh
+    detectSessionInUrl: true, // Detect auth tokens in URL
+  }
+});
 
 // Helper function to check if default credentials are being used
 export const isUsingDefaultCredentials = (): boolean => {

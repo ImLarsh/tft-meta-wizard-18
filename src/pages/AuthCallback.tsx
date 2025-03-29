@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase, isUsingDefaultCredentials } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 
@@ -12,19 +12,6 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Check if we're using default credentials
-        if (isUsingDefaultCredentials()) {
-          console.warn('Using default Supabase credentials. Authentication will not work correctly.');
-          setMessage('Configuration issue detected');
-          toast({
-            title: "Configuration warning",
-            description: "Supabase credentials are not set. Please configure the application with valid credentials.",
-            variant: "destructive",
-          });
-          setTimeout(() => navigate('/', { replace: true }), 3000);
-          return;
-        }
-
         // Get the current URL hash and query parameters
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const queryParams = new URLSearchParams(window.location.search);
@@ -35,51 +22,60 @@ const AuthCallback = () => {
         console.log('Query params:', Object.fromEntries(queryParams.entries()));
         
         // Handle the auth callback
+        const { data, error } = await supabase.auth.getSession();
+
+        console.log('Session after callback:', data);
+        
+        if (error) {
+          throw error;
+        }
+        
+        if (data?.session) {
+          setMessage('Authentication successful!');
+          toast({
+            title: "Authentication successful",
+            description: "You are now logged in.",
+          });
+
+          // Wait a brief moment to ensure session is properly stored
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          navigate('/', { replace: true });
+          return;
+        }
+        
+        // If there's no session but we have auth parameters, process them
         if (hashParams.has('access_token') || queryParams.has('code')) {
           setMessage('Processing authentication...');
           
           try {
-            // Explicitly handle the authentication callback
-            // This ensures the API key is properly included in the request
-            let authResponse;
+            // The token will be automatically handled by Supabase
+            // Just wait for it to process
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
-            // Handle token in hash (implicit grant)
-            if (hashParams.has('access_token')) {
-              const accessToken = hashParams.get('access_token');
-              const refreshToken = hashParams.get('refresh_token');
-              
-              if (accessToken && refreshToken) {
-                authResponse = await supabase.auth.setSession({
-                  access_token: accessToken,
-                  refresh_token: refreshToken,
-                });
-              }
-            } 
-            // Handle authorization code in query params
-            else if (queryParams.has('code')) {
-              // Let Supabase automatically handle the code exchange
-              console.log('Processing authorization code flow');
-            }
+            // Check the session again after a delay
+            const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
             
-            // After processing the callback, check the session
-            const { data, error } = await supabase.auth.getSession();
+            if (sessionError) throw sessionError;
             
-            console.log('Session data after callback:', data);
-            
-            if (error) {
-              throw error;
-            } else if (data?.session) {
+            if (sessionData?.session) {
               console.log('Auth callback successful, session established');
-              setMessage('Email verified successfully!');
+              setMessage('Authentication successful!');
               toast({
-                title: "Email verified successfully",
+                title: "Authentication successful",
                 description: "You are now logged in.",
               });
-
-              // Explicitly set the session to ensure it's persisted
-              await supabase.auth.setSession({
-                access_token: data.session.access_token,
-                refresh_token: data.session.refresh_token,
+              
+              // Navigate to home page with a small delay to ensure session is stored
+              setTimeout(() => navigate('/', { replace: true }), 500);
+              return;
+            } else {
+              console.log('No session after processing auth parameters');
+              setMessage('Authentication failed');
+              toast({
+                title: "Authentication error",
+                description: "Could not establish a session.",
+                variant: "destructive",
               });
             }
           } catch (authError: any) {
@@ -87,21 +83,20 @@ const AuthCallback = () => {
             setMessage('Authentication error');
             toast({
               title: "Authentication error",
-              description: authError.message || "There was a problem verifying your email.",
+              description: authError.message || "There was a problem with authentication.",
               variant: "destructive",
             });
           }
         } else {
           console.log('No authentication parameters found in URL');
-          setMessage('No verification parameters found');
+          setMessage('No authentication parameters found');
         }
       } catch (err) {
         console.error('Error in auth callback:', err);
-        setMessage('An error occurred during verification');
+        setMessage('An error occurred during authentication');
       } finally {
-        // Give a short delay so user can see the success message
+        // Redirect to home page after a delay if not already redirected
         setTimeout(() => {
-          // Redirect to home page regardless of outcome
           navigate('/', { replace: true });
         }, 3000);
       }

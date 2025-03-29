@@ -162,22 +162,20 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         // Try to get data from Supabase first
         const { data: compsData, error: compsError } = await supabase
           .from('tft_comps')
-          .select('*')
-          .single();
+          .select('*');
           
         const { data: mappingsData, error: mappingsError } = await supabase
           .from('tft_trait_mappings')
-          .select('*')
-          .single();
+          .select('*');
           
-        let loadedComps = [];
+        let loadedComps: TFTComp[] = [];
         let loadedMappings = { ...defaultTraitMappings };
         
         // If Supabase data exists, use it
-        if (compsData && !compsError) {
+        if (compsData && compsData.length > 0 && !compsError) {
           // Ensure we're getting an array from the comps field
-          if (compsData.comps && Array.isArray(compsData.comps)) {
-            loadedComps = compsData.comps;
+          if (compsData[0].comps && Array.isArray(compsData[0].comps)) {
+            loadedComps = compsData[0].comps as TFTComp[];
           }
         } else {
           // Try localStorage as fallback
@@ -207,13 +205,39 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         }
         
         // If Supabase trait mappings exist, use it
-        if (mappingsData && !mappingsError) {
+        if (mappingsData && mappingsData.length > 0 && !mappingsError) {
           // Ensure we're getting an object from the mappings field
-          if (mappingsData.mappings && typeof mappingsData.mappings === 'object') {
-            loadedMappings = {
-              ...defaultTraitMappings,
-              ...mappingsData.mappings as Record<string, TraitMapping>
-            };
+          if (mappingsData[0].mappings && typeof mappingsData[0].mappings === 'object') {
+            try {
+              // Need to carefully cast this to ensure type safety
+              const mappingsObj = mappingsData[0].mappings as Record<string, any>;
+              
+              // Convert safely to our expected format
+              const typedMappings: Record<string, TraitMapping> = {};
+              
+              // Iterate through the keys and validate each one
+              Object.keys(mappingsObj).forEach(key => {
+                const mapping = mappingsObj[key];
+                
+                if (mapping && typeof mapping === 'object' && 
+                    'name' in mapping && 
+                    'traits' in mapping && 
+                    'championTraits' in mapping) {
+                  typedMappings[key] = {
+                    name: String(mapping.name),
+                    traits: Array.isArray(mapping.traits) ? mapping.traits.map(String) : [],
+                    championTraits: mapping.championTraits as ChampionTraitMap
+                  };
+                }
+              });
+              
+              loadedMappings = {
+                ...defaultTraitMappings,
+                ...typedMappings
+              };
+            } catch (e) {
+              console.error('Failed to parse trait mappings from Supabase', e);
+            }
           }
         } else {
           // Try localStorage as fallback
@@ -264,13 +288,13 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         // Save to Supabase
         const { data: existingComps, error: checkError } = await supabase
           .from('tft_comps')
-          .select('id, comps');
+          .select('id');
           
         if (existingComps && existingComps.length > 0) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_comps')
-            .update({ comps: comps as any })
+            .update({ comps })
             .eq('id', existingComps[0].id);
             
           if (updateError) {
@@ -280,7 +304,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_comps')
-            .insert([{ comps: comps as any }]);
+            .insert([{ comps }]);
             
           if (insertError) {
             console.error('Error inserting comps:', insertError);
@@ -290,26 +314,43 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         // Save trait mappings
         const { data: existingMappings, error: checkMappingsError } = await supabase
           .from('tft_trait_mappings')
-          .select('id, mappings');
+          .select('id');
           
         if (existingMappings && existingMappings.length > 0) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_trait_mappings')
-            .update({ mappings: traitMappings as any })
+            .update({ mappings: traitMappings })
             .eq('id', existingMappings[0].id);
             
           if (updateError) {
             console.error('Error updating trait mappings:', updateError);
+            // Show error toast
+            toast({
+              title: "Error",
+              description: "Failed to save trait mappings to database. Changes may not persist.",
+              variant: "destructive",
+            });
+          } else {
+            // Show success toast only when adding/updating sets
+            console.log('Successfully saved trait mappings');
           }
         } else {
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_trait_mappings')
-            .insert([{ mappings: traitMappings as any }]);
+            .insert([{ mappings: traitMappings }]);
             
           if (insertError) {
             console.error('Error inserting trait mappings:', insertError);
+            // Show error toast
+            toast({
+              title: "Error",
+              description: "Failed to save trait mappings to database. Changes may not persist.",
+              variant: "destructive",
+            });
+          } else {
+            console.log('Successfully created trait mappings');
           }
         }
       } catch (error) {

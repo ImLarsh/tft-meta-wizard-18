@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useComps } from '@/contexts/CompsContext';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { Plus, Save, Trash, ChevronDown, ChevronUp, Settings, RefreshCw } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

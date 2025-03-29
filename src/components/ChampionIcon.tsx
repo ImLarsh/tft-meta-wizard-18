@@ -34,12 +34,30 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     lg: 'w-16 h-16'
   };
   
+  // Cost-specific classes
+  const costClasses = {
+    1: 'border-cost-1/70',
+    2: 'border-cost-2/70',
+    3: 'border-cost-3/70',
+    4: 'border-cost-4/70',
+    5: 'border-cost-5/70'
+  };
+  
+  const costBgClasses = {
+    1: 'bg-cost-1',
+    2: 'bg-cost-2',
+    3: 'bg-cost-3',
+    4: 'bg-cost-4',
+    5: 'bg-cost-5'
+  };
+  
   return (
     <div 
       className={cn(
         sizeClasses[size],
         `champion-border-${cost}`,
-        'rounded-md overflow-hidden relative border border-cost-${cost}/70',
+        'rounded-md overflow-hidden relative border',
+        costClasses[cost],
         className
       )}
     >
@@ -58,7 +76,10 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
           }
         }}
       />
-      <div className={`absolute bottom-0 right-0 w-3 h-3 bg-cost-${cost} rounded-tl-md flex items-center justify-center text-[8px] font-bold text-white`}>
+      <div className={cn(
+        "absolute bottom-0 right-0 w-3 h-3 rounded-tl-md flex items-center justify-center text-[8px] font-bold text-white",
+        costBgClasses[cost]
+      )}>
         {cost}
       </div>
     </div>

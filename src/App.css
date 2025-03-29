@@ -65,13 +65,13 @@
 
 /* Modern purple gradients */
 .purple-gradient-light {
-  background: linear-gradient(135deg, #1a1f2c 0%, #5b3b85 100%);
+  background: linear-gradient(135deg, #252a3a 0%, #6b4a9a 100%);
   background-size: 200% 200%;
   animation: gradient-shift 15s ease infinite;
 }
 
 .purple-gradient-dark {
-  background: linear-gradient(135deg, #0d101a 0%, #3a2459 100%);
+  background: linear-gradient(135deg, #080a12 0%, #2c1b45 100%);
   background-size: 200% 200%;
   animation: gradient-shift 15s ease infinite;
 }
@@ -105,23 +105,23 @@
 /* Glass effect for components */
 .glass-effect {
   backdrop-filter: blur(12px);
-  background-color: rgba(25, 25, 35, 0.15);
+  background-color: rgba(20, 20, 30, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.05);
   transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 .glass-effect:hover {
   backdrop-filter: blur(16px);
-  background-color: rgba(25, 25, 35, 0.2);
+  background-color: rgba(20, 20, 30, 0.25);
 }
 
 .dark .glass-effect {
-  background-color: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.02);
 }
 
 .dark .glass-effect:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 /* Animated border */

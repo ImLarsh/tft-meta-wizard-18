@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -93,6 +94,7 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
   };
   
   const addItem = (item: string) => {
+    // Only check if we've reached the maximum item count (3), allow duplicates
     if (items.length < 3) {
       onUpdate({
         ...champion,

@@ -45,6 +45,7 @@ const ItemSearchBar: React.FC<ItemSearchBarProps> = ({
   }, [searchQuery]);
 
   const handleSelectItem = (item: string) => {
+    // Only check if we've reached the maximum item count
     if (currentItemCount < maxItems) {
       onSelectItem(item);
       setSearchQuery('');

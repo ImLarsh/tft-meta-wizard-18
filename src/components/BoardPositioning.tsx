@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
-import { MapPin } from 'lucide-react';
+import { MapPin, FlipHorizontal } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface BoardPositioningProps {
@@ -115,7 +115,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     
     for (let row = rows - 1; row >= 0; row--) {
       const rowCells = [];
-      for (let col = 0; col < cols; col++) {
+      // Loop through columns in reverse order to flip horizontally
+      for (let col = cols - 1; col >= 0; col--) {
         const championAtPosition = positionedChampions.find(
           champ => champ.position && champ.position.row === row && champ.position.col === col
         );

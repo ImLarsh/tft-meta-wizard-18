@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, Plus, Trash2, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +13,7 @@ import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ChampionTraitMap } from '@/types/champion';
 
 const setSchema = z.object({
   name: z.string().min(3, { message: "Set name must be at least 3 characters" }),
@@ -385,21 +385,20 @@ const SetManager: React.FC = () => {
                             <FormLabel>Champion</FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
-                                <Input 
-                                  value={championName} 
-                                  onChange={(e) => setChampionName(e.target.value)}
-                                  placeholder="Select champion"
-                                />
+                                <Button variant="outline" className="w-full justify-between">
+                                  {championName || "Select champion"}
+                                  <ChevronDown className="h-4 w-4 opacity-50" />
+                                </Button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-full p-0" align="start">
-                                <div className="max-h-[200px] overflow-y-auto">
+                              <PopoverContent className="w-[200px] p-0" align="start">
+                                <div className="max-h-[200px] overflow-y-auto p-1">
                                   {commonChampions
-                                    .filter(name => name.toLowerCase().includes(championName.toLowerCase()))
-                                    .map((name, index) => (
+                                    .filter(name => !championName || name.toLowerCase().includes(championName.toLowerCase()))
+                                    .map((name) => (
                                       <Button
-                                        key={index}
+                                        key={name}
                                         variant="ghost"
-                                        className="w-full justify-start rounded-none text-left font-normal"
+                                        className="w-full justify-start rounded-sm text-left font-normal"
                                         onClick={() => setChampionName(name)}
                                       >
                                         {name}

@@ -15,7 +15,7 @@ import { Plus, Trash, X, Loader2, MapPin } from 'lucide-react';
 import ChampionIcon from './ChampionIcon';
 import BoardPositioning from './BoardPositioning';
 import { useComps } from '@/contexts/CompsContext';
-import { ChampionTraitMap } from '@/types/champion';
+import { ChampionTraitMap, PositionedChampion } from '@/types/champion';
 
 const commonItems = [
   "Infinity Edge", "Giant Slayer", "Rapid Firecannon", "Runaan's Hurricane", 

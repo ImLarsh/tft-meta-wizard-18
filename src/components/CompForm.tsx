@@ -439,6 +439,85 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 </FormItem>
               )}
             />
+            
+            {/* MOVED: Strengths and Weaknesses section from Strategy tab */}
+            <div className="space-y-6 border border-border/40 rounded-lg p-6 bg-card/50">
+              <h3 className="text-lg font-semibold">Strengths & Weaknesses</h3>
+              
+              <div className="space-y-4">
+                <h4 className="text-md font-medium">Strengths</h4>
+                
+                <div className="flex flex-wrap gap-2">
+                  {strengths.map((strength, index) => (
+                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                      <span className="text-sm">{strength}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 p-0"
+                        onClick={() => removeStrength(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Input 
+                    value={newStrength} 
+                    onChange={(e) => setNewStrength(e.target.value)}
+                    placeholder="Add a strength"
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleAddStrength}
+                    disabled={!newStrength || strengths.includes(newStrength)}
+                  >
+                    Add Strength
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-md font-medium">Weaknesses</h4>
+                
+                <div className="flex flex-wrap gap-2">
+                  {weaknesses.map((weakness, index) => (
+                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                      <span className="text-sm">{weakness}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 p-0"
+                        onClick={() => removeWeakness(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Input 
+                    value={newWeakness} 
+                    onChange={(e) => setNewWeakness(e.target.value)}
+                    placeholder="Add a weakness"
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleAddWeakness}
+                    disabled={!newWeakness || weaknesses.includes(newWeakness)}
+                  >
+                    Add Weakness
+                  </Button>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="champions" className="space-y-6">
@@ -954,78 +1033,12 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsContent>
 
           <TabsContent value="strategy" className="space-y-6">
+            {/* REMOVED: Strengths and Weaknesses section moved to General Info tab */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Strengths</h3>
-              
-              <div className="flex flex-wrap gap-2">
-                {strengths.map((strength, index) => (
-                  <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
-                    <span className="text-sm">{strength}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 p-0"
-                      onClick={() => removeStrength(index)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="flex gap-2">
-                <Input 
-                  value={newStrength} 
-                  onChange={(e) => setNewStrength(e.target.value)}
-                  placeholder="Add a strength"
-                  className="flex-1"
-                />
-                <Button 
-                  type="button" 
-                  onClick={handleAddStrength}
-                  disabled={!newStrength || strengths.includes(newStrength)}
-                >
-                  Add Strength
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Weaknesses</h3>
-              
-              <div className="flex flex-wrap gap-2">
-                {weaknesses.map((weakness, index) => (
-                  <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
-                    <span className="text-sm">{weakness}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 p-0"
-                      onClick={() => removeWeakness(index)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="flex gap-2">
-                <Input 
-                  value={newWeakness} 
-                  onChange={(e) => setNewWeakness(e.target.value)}
-                  placeholder="Add a weakness"
-                  className="flex-1"
-                />
-                <Button 
-                  type="button" 
-                  onClick={handleAddWeakness}
-                  disabled={!newWeakness || weaknesses.includes(newWeakness)}
-                >
-                  Add Weakness
-                </Button>
-              </div>
+              <h3 className="text-lg font-semibold">Strategy Notes</h3>
+              <p className="text-sm text-muted-foreground">
+                This tab is for additional strategy notes in future updates. Strengths and weaknesses have been moved to the General Info tab.
+              </p>
             </div>
           </TabsContent>
         </Tabs>

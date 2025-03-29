@@ -1,422 +1,184 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import defaultComps, { TFTComp } from '@/data/comps';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { TFTComp } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
 
+// Define the structure for trait mappings
 interface TraitMapping {
   name: string;
   traits: string[];
   championTraits: ChampionTraitMap;
 }
 
+interface TraitMappingsState {
+  [key: string]: TraitMapping;
+}
+
 interface CompsContextType {
   comps: TFTComp[];
   addComp: (comp: TFTComp) => void;
+  updateComp: (compId: string, updatedComp: TFTComp) => void;
   removeComp: (compId: string) => void;
-  traitMappings: Record<string, TraitMapping>;
-  setTraitMappings: (mappings: Record<string, TraitMapping>) => void;
-  addTraitMapping: (version: string, mapping: TraitMapping) => void;
+  getCompById: (compId: string) => TFTComp | undefined;
+  traitMappings: TraitMappingsState;
+  updateTraitMappings: (tftVersion: string, mapping: TraitMapping) => void;
+  removeSet: (tftVersion: string) => void;
 }
-
-// Default trait mappings for current sets
-const defaultTraitMappings: Record<string, TraitMapping> = {
-  "Set 9": {
-    name: "Ruination",
-    traits: [
-      "8-Bit", "Disco", "Superfan", "Guardian", "Bruiser", "Crowd Diver", 
-      "Big Shot", "Edgelord", "Renegade", "Bastion", "Strategist", "Multicaster"
-    ],
-    championTraits: {
-      "Ahri": ["Ionia", "Sorcerer"],
-      "Akali": ["Ionia", "Assassin"],
-      "Amumu": ["Guardian", "Empath"],
-      "Annie": ["Fiddle", "Sorcerer"],
-      "Aphelios": ["Deadeye", "Targon"],
-      "Bard": ["Wanderer", "Support"],
-      "Caitlyn": ["Deadeye", "Piltover"],
-      "Corki": ["Big Shot", "Yordle"],
-      "Ekko": ["Piltover", "Rogue"],
-      "Garen": ["Demacia", "Juggernaut"],
-      "Gragas": ["Freljord", "Bruiser"],
-      "Illaoi": ["Illaoi", "Bruiser"],
-      "Jax": ["Wanderer", "Juggernaut"],
-      "Jinx": ["Zaun", "Gunner"],
-      "Kayle": ["Demacia", "Slayer"],
-      "Kennen": ["Ionia", "Ninja"],
-      "Lux": ["Demacia", "Sorcerer"],
-      "Mordekaiser": ["Shadow Isles", "Juggernaut"],
-      "Olaf": ["Freljord", "Berserker"],
-      "Pantheon": ["Shurima", "Guardian"],
-      "Sett": ["Ionia", "Juggernaut"]
-    }
-  },
-  "Set 10": {
-    name: "Remix Rumble",
-    traits: [
-      "K/DA", "True Damage", "Heartsteel", "Hyperpop", "Pentakill", "Country", 
-      "EDM", "Punk", "Jazz", "Emo", "Illbeats", "Maestro", "Guardian", "Bruiser", 
-      "Crowd Diver", "Big Shot", "Superfan", "Edgelord"
-    ],
-    championTraits: {
-      "Ahri": ["K/DA", "Spellweaver"],
-      "Akali": ["K/DA", "Assassin"],
-      "Amumu": ["Pentakill", "Guardian"],
-      "Annie": ["Hyperpop", "Spellweaver"],
-      "Aphelios": ["Heartsteel", "Deadeye"],
-      "Bard": ["Jazz", "Support"],
-      "Caitlyn": ["True Damage", "Deadeye"],
-      "Corki": ["8-Bit", "Big Shot"],
-      "Ekko": ["True Damage", "Superfan"],
-      "Evelynn": ["K/DA", "Crowd Diver"],
-      "Garen": ["Pentakill", "Juggernaut"],
-      "Gragas": ["Disco", "Bruiser"],
-      "Illaoi": ["Pentakill", "Bruiser"],
-      "Jax": ["EDM", "Mosher"],
-      "Jhin": ["Maestro", "Big Shot"],
-      "Jinx": ["Punk", "Rapidfire"],
-      "Kayle": ["Pentakill", "Slayer"],
-      "Kayn": ["Heartsteel", "Edgelord"],
-      "Kennen": ["True Damage", "Superfan"],
-      "Karthus": ["Pentakill", "Executioner"],
-      "Lillia": ["K/DA", "Guardian"],
-      "Lucian": ["Jazz", "Deadeye"],
-      "Lulu": ["Hyperpop", "Support"],
-      "Lux": ["EDM", "Spellweaver"],
-      "Miss Fortune": ["Jazz", "Big Shot"],
-      "Mordekaiser": ["Pentakill", "Sentinel"],
-      "Neeko": ["K/DA", "Guardian"],
-      "Olaf": ["Pentakill", "Bruiser"],
-      "Pantheon": ["Punk", "Guardian"],
-      "Poppy": ["Emo", "Guardian"],
-      "Qiyana": ["True Damage", "Crowd Diver"],
-      "Samira": ["Country", "Challenger"],
-      "Senna": ["True Damage", "Rapidfire"],
-      "Seraphine": ["K/DA", "Spellweaver"],
-      "Sett": ["Heartsteel", "Bruiser"],
-      "Sona": ["Mixer", "Spellweaver"],
-      "Tahm Kench": ["Country", "Bruiser"],
-      "Taric": ["Disco", "Guardian"],
-      "Thresh": ["Country", "Guardian"],
-      "Twisted Fate": ["Disco", "Spellweaver"],
-      "Twitch": ["Punk", "Executioner"],
-      "Urgot": ["Country", "Mosher"],
-      "Vex": ["Emo", "Executioner"],
-      "Vi": ["Punk", "Mosher"],
-      "Viego": ["Pentakill", "Edgelord"],
-      "Yasuo": ["True Damage", "Edgelord"],
-      "Yone": ["Heartsteel", "Challenger"],
-      "Yorick": ["Pentakill", "Guardian"],
-      "Zac": ["EDM", "Bruiser"],
-      "Ziggs": ["Hyperpop", "Spellweaver"]
-    }
-  },
-  "Set 11": {
-    name: "Inkborn Fables",
-    traits: [
-      "Darkin", "Slayer", "Empress", "Void", "Deadeye", "Juggernaut", 
-      "Duskwalker", "Quickdraw", "Tactician", "Gunner", "Armored", "Mythic"
-    ],
-    championTraits: {
-      "Ahri": ["Mythic", "Spellweaver"],
-      "Akali": ["Empress", "Assassin"],
-      "Amumu": ["Darkin", "Guardian"],
-      "Annie": ["Void", "Sorcerer"],
-      "Aphelios": ["Darkin", "Deadeye"],
-      "Caitlyn": ["Quickdraw", "Deadeye"],
-      "Ekko": ["Slayer", "Tactician"],
-      "Garen": ["Juggernaut", "Slayer"],
-      "Illaoi": ["Void", "Juggernaut"],
-      "Jax": ["Darkin", "Slayer"],
-      "Jhin": ["Mythic", "Deadeye"],
-      "Jinx": ["Gunner", "Duskwalker"],
-      "Kayle": ["Empress", "Slayer"],
-      "Kayn": ["Slayer", "Assassin"],
-      "Karthus": ["Void", "Sorcerer"],
-      "Lux": ["Mythic", "Sorcerer"],
-      "Mordekaiser": ["Darkin", "Juggernaut"],
-      "Olaf": ["Juggernaut", "Berserker"],
-      "Pantheon": ["Mythic", "Guardian"],
-      "Samira": ["Empress", "Gunner"],
-      "Sett": ["Juggernaut", "Brawler"],
-      "Vi": ["Armored", "Brawler"],
-      "Viego": ["Slayer", "Assassin"],
-      "Yasuo": ["Empress", "Duskwalker"],
-      "Zac": ["Void", "Guardian"]
-    }
-  }
-};
 
 const CompsContext = createContext<CompsContextType | undefined>(undefined);
 
-export function CompsProvider({ children }: { children: React.ReactNode }) {
-  const [comps, setComps] = useState<TFTComp[]>([]);
-  const [traitMappings, setTraitMappings] = useState<Record<string, TraitMapping>>(defaultTraitMappings);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  // Initialize data from Supabase, fallback to localStorage
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Try to get data from Supabase first
-        const { data: compsData, error: compsError } = await supabase
-          .from('tft_comps')
-          .select('*');
-          
-        const { data: mappingsData, error: mappingsError } = await supabase
-          .from('tft_trait_mappings')
-          .select('*');
-          
-        let loadedComps: TFTComp[] = [];
-        let loadedMappings = { ...defaultTraitMappings };
-        
-        // If Supabase data exists, use it
-        if (compsData && compsData.length > 0 && !compsError) {
-          // Ensure we're getting an array from the comps field
-          if (compsData[0].comps && Array.isArray(compsData[0].comps)) {
-            loadedComps = compsData[0].comps as TFTComp[];
-          }
-        } else {
-          // Try localStorage as fallback
-          const savedComps = localStorage.getItem('tftComps');
-          if (savedComps) {
-            try {
-              const parsedComps = JSON.parse(savedComps);
-              
-              // Check for boardPositions property and add it if it doesn't exist
-              loadedComps = parsedComps.map((comp: TFTComp) => {
-                if (!('boardPositions' in comp)) {
-                  return {
-                    ...comp,
-                    boardPositions: comp.finalComp.some(champ => champ.position !== null),
-                    tftVersion: comp.tftVersion || "Set 10"
-                  };
-                }
-                return comp;
-              });
-            } catch (e) {
-              console.error('Failed to parse saved comps', e);
-              loadedComps = defaultComps;
-            }
-          } else {
-            loadedComps = defaultComps;
-          }
-        }
-        
-        // If Supabase trait mappings exist, use it
-        if (mappingsData && mappingsData.length > 0 && !mappingsError) {
-          // Ensure we're getting an object from the mappings field
-          if (mappingsData[0].mappings && typeof mappingsData[0].mappings === 'object') {
-            try {
-              // Need to carefully cast this to ensure type safety
-              const mappingsObj = mappingsData[0].mappings as Record<string, any>;
-              
-              // Convert safely to our expected format
-              const typedMappings: Record<string, TraitMapping> = {};
-              
-              // Iterate through the keys and validate each one
-              Object.keys(mappingsObj).forEach(key => {
-                const mapping = mappingsObj[key];
-                
-                if (mapping && typeof mapping === 'object' && 
-                    'name' in mapping && 
-                    'traits' in mapping && 
-                    'championTraits' in mapping) {
-                  typedMappings[key] = {
-                    name: String(mapping.name),
-                    traits: Array.isArray(mapping.traits) ? mapping.traits.map(String) : [],
-                    championTraits: mapping.championTraits as ChampionTraitMap
-                  };
-                }
-              });
-              
-              loadedMappings = {
-                ...defaultTraitMappings,
-                ...typedMappings
-              };
-            } catch (e) {
-              console.error('Failed to parse trait mappings from Supabase', e);
-            }
-          }
-        } else {
-          // Try localStorage as fallback
-          const savedTraitMappings = localStorage.getItem('tftTraitMappings');
-          if (savedTraitMappings) {
-            try {
-              loadedMappings = {
-                ...defaultTraitMappings,
-                ...JSON.parse(savedTraitMappings)
-              };
-            } catch (e) {
-              console.error('Failed to parse saved trait mappings', e);
-            }
-          }
-        }
-        
-        setComps(loadedComps);
-        setTraitMappings(loadedMappings);
-        setIsInitialized(true);
-      } catch (error) {
-        console.error('Error initializing data:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load data. Using default values.",
-          variant: "destructive",
-        });
-        
-        // Fallback to defaults if all else fails
-        setComps(defaultComps);
-        setTraitMappings(defaultTraitMappings);
-        setIsInitialized(true);
-      }
-    };
-    
-    loadData();
-  }, []);
-  
-  // When data changes and after initialization, save to Supabase
-  useEffect(() => {
-    if (!isInitialized) return;
-    
-    const saveData = async () => {
-      try {
-        // Save to localStorage as backup
-        localStorage.setItem('tftComps', JSON.stringify(comps));
-        localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
-        
-        // Save to Supabase
-        const { data: existingComps, error: checkError } = await supabase
-          .from('tft_comps')
-          .select('id');
-          
-        if (existingComps && existingComps.length > 0) {
-          // Update existing record
-          const { error: updateError } = await supabase
-            .from('tft_comps')
-            .update({ comps })
-            .eq('id', existingComps[0].id);
-            
-          if (updateError) {
-            console.error('Error updating comps:', updateError);
-          }
-        } else {
-          // Insert new record
-          const { error: insertError } = await supabase
-            .from('tft_comps')
-            .insert([{ comps }]);
-            
-          if (insertError) {
-            console.error('Error inserting comps:', insertError);
-          }
-        }
-        
-        // Save trait mappings
-        const { data: existingMappings, error: checkMappingsError } = await supabase
-          .from('tft_trait_mappings')
-          .select('id');
-          
-        if (existingMappings && existingMappings.length > 0) {
-          // Update existing record
-          const { error: updateError } = await supabase
-            .from('tft_trait_mappings')
-            .update({ mappings: traitMappings })
-            .eq('id', existingMappings[0].id);
-            
-          if (updateError) {
-            console.error('Error updating trait mappings:', updateError);
-            // Show error toast
-            toast({
-              title: "Error",
-              description: "Failed to save trait mappings to database. Changes may not persist.",
-              variant: "destructive",
-            });
-          } else {
-            // Show success toast only when adding/updating sets
-            console.log('Successfully saved trait mappings');
-          }
-        } else {
-          // Insert new record
-          const { error: insertError } = await supabase
-            .from('tft_trait_mappings')
-            .insert([{ mappings: traitMappings }]);
-            
-          if (insertError) {
-            console.error('Error inserting trait mappings:', insertError);
-            // Show error toast
-            toast({
-              title: "Error",
-              description: "Failed to save trait mappings to database. Changes may not persist.",
-              variant: "destructive",
-            });
-          } else {
-            console.log('Successfully created trait mappings');
-          }
-        }
-      } catch (error) {
-        console.error('Error saving data:', error);
-      }
-    };
-    
-    saveData();
-  }, [comps, traitMappings, isInitialized]);
-
-  // Add a new comp
-  const addComp = (comp: TFTComp) => {
-    // Check if the comp already exists (by ID)
-    const exists = comps.some(c => c.id === comp.id);
-    
-    let updatedComps;
-    if (exists) {
-      // Replace the existing comp
-      updatedComps = comps.map(c => c.id === comp.id ? comp : c);
-    } else {
-      // Add the new comp
-      updatedComps = [...comps, comp];
-    }
-    
-    setComps(updatedComps);
-  };
-
-  // Remove a comp
-  const removeComp = (compId: string) => {
-    const updatedComps = comps.filter(comp => comp.id !== compId);
-    setComps(updatedComps);
-  };
-  
-  // Add or update a trait mapping
-  const addTraitMapping = (version: string, mapping: TraitMapping) => {
-    const updatedMappings = {
-      ...traitMappings,
-      [version]: mapping
-    };
-    
-    setTraitMappings(updatedMappings);
-  };
-
-  // Update all trait mappings
-  const updateTraitMappings = (mappings: Record<string, TraitMapping>) => {
-    setTraitMappings(mappings);
-  };
-
-  return (
-    <CompsContext.Provider value={{ 
-      comps, 
-      addComp, 
-      removeComp, 
-      traitMappings, 
-      setTraitMappings: updateTraitMappings,
-      addTraitMapping
-    }}>
-      {children}
-    </CompsContext.Provider>
-  );
-}
-
-export function useComps() {
+export const useComps = () => {
   const context = useContext(CompsContext);
   if (context === undefined) {
     throw new Error('useComps must be used within a CompsProvider');
   }
   return context;
-}
+};
+
+export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [comps, setComps] = useState<TFTComp[]>([]);
+  const [traitMappings, setTraitMappings] = useState<TraitMappingsState>({
+    "Set 10": {
+      name: "Remix Rumble",
+      traits: ["8-bit", "Big Shot", "Breakout", "Country", "Disco", "EDM", "Emo", "Funk", "Heartsteel", "Hyperpop", "Illbeats", "Jazz", "K/DA", "Metal", "Mixmaster", "Pentakill", "Pop", "Punk", "True Damage", "Wildcard"],
+      championTraits: {
+        "Ahri": ["K/DA", "Wildcard"],
+        "Akali": ["K/DA", "True Damage"],
+        "Amumu": ["Emo", "Punk"],
+        "Annie": ["Emo", "Hyperpop"],
+        "Bard": ["Jazz"],
+        "Blitzcrank": ["Disco", "Punk"],
+        "Caitlyn": ["Heartsteel", "True Damage"],
+        "Corki": ["Big Shot", "8-bit"],
+        "Evelynn": ["K/DA", "Funk"],
+        "Ekko": ["True Damage"],
+        "Garen": ["Pentakill", "8-bit"],
+        "Gnar": ["EDM", "Wildcard"],
+        "Gragas": ["Disco", "Country"],
+        "Illaoi": ["Illbeats", "Country"],
+        "Jax": ["EDM", "Punk"],
+        "Jhin": ["Maestro", "Country"],
+        "Jinx": ["Punk", "Pentakill"],
+        "Kai'Sa": ["K/DA", "Big Shot"],
+        "Karthus": ["Pentakill", "Disco"],
+        "Katarina": ["Country", "K/DA"],
+        "Kayle": ["Pentakill", "Big Shot"],
+        "Kayn": ["Heartsteel", "Wildcard"],
+        "Kennen": ["Disco", "True Damage"],
+        "Lillia": ["K/DA", "EDM"],
+        "Lucian": ["Jazz", "Big Shot"],
+        "Lulu": ["Hyperpop", "EDM"],
+        "Lux": ["Pop", "EDM"],
+        "Miss Fortune": ["Jazz", "Big Shot"],
+        "Mordekaiser": ["Pentakill"],
+        "Nami": ["Jazz", "Disco"],
+        "Neeko": ["Hyperpop", "K/DA"],
+        "Olaf": ["Pentakill", "Punk"],
+        "Pantheon": ["Punk", "Pentakill"],
+        "Poppy": ["Emo", "Heartsteel"],
+        "Qiyana": ["True Damage"],
+        "Riven": ["8-bit", "Heartsteel"],
+        "Samira": ["Country", "Jazz"],
+        "Senna": ["True Damage", "Heartsteel"],
+        "Seraphine": ["K/DA", "Heartsteel"],
+        "Sett": ["Heartsteel", "Mosher"],
+        "Sona": ["Mixmaster", "Jazz"],
+        "Tahm Kench": ["Country", "Jazz"],
+        "Taric": ["Disco", "Pop"],
+        "Thresh": ["Pentakill", "Country"],
+        "Twitch": ["Punk", "Jazz"],
+        "Twisted Fate": ["Disco", "Heartsteel"],
+        "Urgot": ["Country", "Metal"],
+        "Vex": ["Emo", "Pentakill"],
+        "Vi": ["Punk", "Funk"],
+        "Viego": ["Pentakill", "EDM"],
+        "Yasuo": ["True Damage", "Heartsteel"],
+        "Yone": ["Heartsteel", "EDM"],
+        "Yorick": ["Pentakill", "Disco"],
+        "Zac": ["EDM", "Pop"],
+        "Zed": ["EDM", "Heartsteel"],
+        "Ziggs": ["Hyperpop", "8-bit"],
+        "Zilean": ["Funk", "Disco"]
+      }
+    }
+  });
+
+  // Load previously saved comps from localStorage on component mount
+  useEffect(() => {
+    const savedComps = localStorage.getItem('tftComps');
+    if (savedComps) {
+      setComps(JSON.parse(savedComps));
+    }
+
+    const savedTraitMappings = localStorage.getItem('tftTraitMappings');
+    if (savedTraitMappings) {
+      setTraitMappings(JSON.parse(savedTraitMappings));
+    }
+  }, []);
+
+  // Save comps to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('tftComps', JSON.stringify(comps));
+  }, [comps]);
+
+  // Save trait mappings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
+    console.info('Successfully saved trait mappings');
+  }, [traitMappings]);
+
+  const addComp = (comp: TFTComp) => {
+    setComps((prevComps) => [...prevComps, comp]);
+  };
+
+  const updateComp = (compId: string, updatedComp: TFTComp) => {
+    setComps((prevComps) => 
+      prevComps.map((comp) => 
+        comp.id === compId ? updatedComp : comp
+      )
+    );
+  };
+
+  const removeComp = (compId: string) => {
+    setComps((prevComps) => prevComps.filter((comp) => comp.id !== compId));
+  };
+
+  const getCompById = (compId: string) => {
+    return comps.find((comp) => comp.id === compId);
+  };
+
+  const updateTraitMappings = (tftVersion: string, mapping: TraitMapping) => {
+    setTraitMappings((prev) => ({
+      ...prev,
+      [tftVersion]: mapping
+    }));
+  };
+
+  const removeSet = (tftVersion: string) => {
+    setTraitMappings((prev) => {
+      const updated = { ...prev };
+      delete updated[tftVersion];
+      return updated;
+    });
+
+    // Also remove comps associated with the deleted set
+    setComps((prevComps) => prevComps.filter((comp) => comp.tftVersion !== tftVersion));
+  };
+
+  return (
+    <CompsContext.Provider 
+      value={{ 
+        comps, 
+        addComp, 
+        updateComp, 
+        removeComp, 
+        getCompById,
+        traitMappings,
+        updateTraitMappings,
+        removeSet
+      }}
+    >
+      {children}
+    </CompsContext.Provider>
+  );
+};

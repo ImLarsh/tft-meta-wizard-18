@@ -29,104 +29,101 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     setImgError(false);
   }, [name]);
   
-  // Normalize the item name for URL usage
+  // Format the item name for LoL Fandom wiki URL
+  const formatNameForFandom = (itemName: string) => {
+    // Replace spaces with underscores and handle special characters
+    return itemName
+      .replace(/'/g, '%27')  // Replace apostrophes with URL encoding
+      .replace(/\s+/g, '_'); // Replace spaces with underscores
+  };
+  
+  // Format for other sources as fallback
   const normalizedName = name
     .toLowerCase()
     .replace(/[']/g, '') // Remove apostrophes
-    .replace(/\s+/g, '-') // Replace spaces with dashes
-    .replace(/[^a-z0-9-]/g, ''); // Remove other special characters
+    .replace(/\s+/g, '-'); // Replace spaces with dashes
   
-  // Alternative without dashes
+  // For fallback sources that don't use dashes
   const normalizedNameNoDashes = name
     .toLowerCase()
     .replace(/[']/g, '')
     .replace(/\s+/g, '')
     .replace(/[^a-z0-9]/g, '');
   
-  // Basic display name formatting
+  // Display name for fallback text
   const displayName = name.replace(/([A-Z])/g, ' $1').trim();
   
-  // Special case mapping (exact matches that might have different image names)
+  // Common item name mappings for consistent URL formatting
   const specialCaseMap: Record<string, string> = {
-    "Blue Buff": "bluebuff",
-    "Jeweled Gauntlet": "jeweled-gauntlet",
-    "Giant Slayer": "giant-slayer",
-    "Spear of Shojin": "spear-of-shojin",
-    "Guinsoo's Rageblade": "guinsoos-rageblade",
-    "Infinity Edge": "infinity-edge",
-    "Rapid Firecannon": "rapid-firecannon",
-    "Runaan's Hurricane": "runaans-hurricane",
-    "Titan's Resolve": "titans-resolve",
-    "Hand of Justice": "hand-of-justice",
-    "Bloodthirster": "bloodthirster",
-    "Quicksilver": "quicksilver",
-    "Ionic Spark": "ionic-spark",
-    "Last Whisper": "last-whisper",
-    "Sunfire Cape": "sunfire-cape",
-    "Warmog's Armor": "warmogs-armor",
-    "Death's Defiance": "deaths-defiance",
-    "Hextech Gunblade": "hextech-gunblade",
-    "Bramble Vest": "bramble-vest",
-    "Dragon's Claw": "dragons-claw",
-    "Zeke's Herald": "zekes-herald",
-    "Zz'Rot Portal": "zzrot-portal",
-    "Gargoyle Stoneplate": "gargoyle-stoneplate",
-    "Chalice of Power": "chalice-of-power",
-    "Locket of the Iron Solari": "locket-of-the-iron-solari",
-    "Statikk Shiv": "statikk-shiv",
-    "Redemption": "redemption",
-    "Shroud of Stillness": "shroud-of-stillness",
-    "Banshee's Claw": "banshees-claw",
-    "Thief's Gloves": "thiefs-gloves",
-    "Archangel's Staff": "archangels-staff",
-    "Morellonomicon": "morellonomicon",
-    "Deathblade": "deathblade",
-    "Frozen Heart": "frozen-heart",
-    "Spirit Visage": "spirit-visage",
-    "Edge of Night": "edge-of-night",
+    "Blue Buff": "Blue_Buff",
+    "Jeweled Gauntlet": "Jeweled_Gauntlet",
+    "Giant Slayer": "Giant_Slayer",
+    "Spear of Shojin": "Spear_of_Shojin",
+    "Guinsoo's Rageblade": "Guinsoo%27s_Rageblade",
+    "Infinity Edge": "Infinity_Edge",
+    "Rapid Firecannon": "Rapid_Firecannon",
+    "Runaan's Hurricane": "Runaan%27s_Hurricane",
+    "Titan's Resolve": "Titan%27s_Resolve",
+    "Hand of Justice": "Hand_of_Justice",
+    "Bloodthirster": "Bloodthirster",
+    "Quicksilver": "Quicksilver_Sash", // Note: Full name might be needed
+    "Ionic Spark": "Ionic_Spark",
+    "Last Whisper": "Last_Whisper",
+    "Sunfire Cape": "Sunfire_Cape",
+    "Warmog's Armor": "Warmog%27s_Armor",
+    "Death's Defiance": "Death%27s_Defiance",
+    "Hextech Gunblade": "Hextech_Gunblade",
+    "Bramble Vest": "Bramble_Vest",
+    "Dragon's Claw": "Dragon%27s_Claw",
+    "Zeke's Herald": "Zeke%27s_Herald",
+    "Zz'Rot Portal": "Zz%27Rot_Portal",
+    "Gargoyle Stoneplate": "Gargoyle_Stoneplate",
+    "Chalice of Power": "Chalice_of_Power",
+    "Locket of the Iron Solari": "Locket_of_the_Iron_Solari",
+    "Statikk Shiv": "Statikk_Shiv",
+    "Redemption": "Redemption",
+    "Shroud of Stillness": "Shroud_of_Stillness",
+    "Banshee's Claw": "Banshee%27s_Claw",
+    "Thief's Gloves": "Thief%27s_Gloves",
+    "Archangel's Staff": "Archangel%27s_Staff",
+    "Morellonomicon": "Morellonomicon",
+    "Deathblade": "Deathblade",
+    "Frozen Heart": "Frozen_Heart",
+    "Spirit Visage": "Spirit_Visage",
+    "Edge of Night": "Edge_of_Night",
   };
   
-  // Use the special case mapping if available
-  const specialCaseName = specialCaseMap[name] || normalizedName;
+  // Get the formatted name for wiki URL
+  const wikiName = specialCaseMap[name] || formatNameForFandom(name);
   
-  // Add more reliable image sources
+  // Image sources in priority order
   const sources = [
-    // TFT Set 10 specific sources
-    `https://raw.communitydragon.org/latest/game/assets/items/icons/${specialCaseName.toLowerCase()}.png`,
+    // LoL Fandom TFT item icons - primary source
+    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/${wikiName}_TFT_item.png/64px-${wikiName}_TFT_item.png`,
+    `https://static.wikia.nocookie.net/leagueoflegends/images/5/55/${wikiName}_TFT_item.png`,
     
-    // Riot Community Dragon
-    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/${specialCaseName.toLowerCase()}.png`,
+    // Try with different resolutions
+    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/${wikiName}_TFT_item.png/120px-${wikiName}_TFT_item.png`,
     
-    // TFTactics.gg
-    `https://tftactics.gg/cdn-cgi/image/width=160,height=160/itemicons/${specialCaseName.toLowerCase()}.png`,
+    // Try with slightly different naming patterns
+    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/${wikiName}_TFT.png/64px-${wikiName}_TFT.png`,
+    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/TFT_${wikiName}.png/64px-TFT_${wikiName}.png`,
     
-    // Mobafire sources
-    `https://www.mobafire.com/images/tft/item/${specialCaseName}.png`,
+    // Try standard image name without specifying thumbnail
+    `https://static.wikia.nocookie.net/leagueoflegends/images/5/55/${wikiName}_TFT_item.png`,
+    
+    // Fallback to older reliable sources
+    `https://raw.communitydragon.org/latest/game/assets/items/icons/${normalizedName.toLowerCase()}.png`,
+    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/${normalizedName.toLowerCase()}.png`,
+    `https://tftactics.gg/cdn-cgi/image/width=160,height=160/itemicons/${normalizedName.toLowerCase()}.png`,
     `https://www.mobafire.com/images/tft/item/${normalizedName}.png`,
-    `https://www.mobafire.com/images/tft/item/${normalizedNameNoDashes}.png`,
-    
-    // Alternate sources
-    `https://cdn.metatft.com/file/metatft/items/${specialCaseName}.png`,
     `https://cdn.metatft.com/file/metatft/items/${normalizedName}.png`,
-    `https://cdn.metatft.com/file/metatft/items/${normalizedNameNoDashes}.png`,
-    
-    // More fallback sources  
-    `https://cdn.tft.tools/items/${specialCaseName}.png`,
-    `https://cdn.tft.tools/items/${normalizedName}.png`,
-    `https://cdn.tft.tools/items/${normalizedNameNoDashes}.png`,
-    
-    // Tactics.tools
-    `https://tactics.tools/img/items/${specialCaseName}.png`,
     `https://tactics.tools/img/items/${normalizedName}.png`,
-    `https://tactics.tools/img/items/${normalizedNameNoDashes}.png`,
-    
-    // Lolchess
-    `https://lolchess.gg/images/tft/items/${specialCaseName}.png`,
     `https://lolchess.gg/images/tft/items/${normalizedName}.png`,
   ];
   
-  // Use a common item as fallback that's likely to exist
-  const fallbackUrl = 'https://raw.communitydragon.org/latest/game/assets/items/icons/deathblade.png';
+  // Fallback item image that's likely to exist
+  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/Deathblade_TFT_item.png/64px-Deathblade_TFT_item.png';
   
   const sizeClasses = {
     sm: 'w-6 h-6',
@@ -135,10 +132,12 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   };
   
   const handleImageError = () => {
+    console.log(`Image source failed for ${name} at index ${currentSourceIndex}: ${sources[currentSourceIndex]}`);
     const nextIndex = currentSourceIndex + 1;
     if (nextIndex < sources.length) {
       setCurrentSourceIndex(nextIndex);
     } else {
+      console.log(`All image sources failed for ${name}, using fallback text`);
       setImgError(true);
     }
   };
@@ -166,6 +165,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
           onError={handleImageError}
           loading="lazy"
           title={name}
+          crossOrigin="anonymous"
         />
       )}
     </div>

@@ -11,6 +11,7 @@ import { CompsProvider } from './contexts/CompsContext';
 import { Toaster } from './components/ui/toaster';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { AuthProvider } from './providers/AuthProvider';
+import { ImageToggleProvider } from './contexts/ImageToggleContext';
 import ParticlesBackground from './components/ParticlesBackground';
 import './App.css';
 import './index.css';
@@ -20,18 +21,20 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <CompsProvider>
-          <ParticlesBackground />
-          <Router>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/create" element={<CompEditor />} />
-              <Route path="/edit/:compId" element={<CompEditExisting />} />
-              <Route path="/sets" element={<SetManager />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Router>
-          <Toaster />
+          <ImageToggleProvider>
+            <ParticlesBackground />
+            <Router>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/create" element={<CompEditor />} />
+                <Route path="/edit/:compId" element={<CompEditExisting />} />
+                <Route path="/sets" element={<SetManager />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Router>
+            <Toaster />
+          </ImageToggleProvider>
         </CompsProvider>
       </AuthProvider>
     </ThemeProvider>

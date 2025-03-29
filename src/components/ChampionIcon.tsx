@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
+import { useImageToggle } from '@/contexts/ImageToggleContext';
 
 interface ChampionIconProps {
   name: string;
@@ -20,6 +21,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   isCarry,
   onClick
 }) => {
+  const { useTftImages } = useImageToggle();
   const [imgError, setImgError] = useState(false);
   
   // Normalize the champion name for different API formats
@@ -66,19 +68,21 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   // For display in fallback
   const displayName = name ? name.replace(/([A-Z])/g, ' $1').trim() : 'Unknown'; // Add spaces before capital letters
   
-  // New and more reliable image sources
-  const sources = [
+  // TFT-specific image sources
+  const tftSources = [
     // TFT set 10 & 14 specific sources
-    `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
-    `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
-
+    `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
+    `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     // TFT general sources
     `https://cdn.metatft.com/file/metatft/champions/${normalizedName}.png`,
     `https://rerollcdn.com/characters/${normalizedName}.png`,
     `https://cdn.tft.tools/champions/${normalizedName}.png`,
-    
+  ];
+  
+  // League of Legends summoner icon images
+  const lolSources = [
     // Riot Data Dragon - First try with normalized name
     `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
@@ -94,14 +98,16 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName}/${normalizedName}_0.jpg`,
     
-    // Mobalytics - try multiple format approaches
-    `https://cdn.mobalytics.gg/assets/tft/images/champions/thumbnails/${normalizedName}.png`,
+    // Mobalytics
     `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName}.png`,
     
     // League of Legends asset links
     `https://static.wikia.nocookie.net/leagueoflegends/images/latest/scale-to-width-down/123?cb=20200412015006&path-prefix=${normalizedName}`,
     `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName}.png`
   ];
+  
+  // Select the image sources based on the toggle
+  const sources = useTftImages ? tftSources : lolSources;
   
   // Fallback image - use a more reliable placeholder
   const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Ryze_0.jpg';

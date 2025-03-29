@@ -37,10 +37,21 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     lg: 'w-10 h-10'
   };
   
-  // Format the item name for URL usage
+  // Enhanced mapping of TFT item names to their correct IDs
   const formatItemId = (itemName: string): string => {
-    // Map of common TFT item names to their item IDs
+    // More comprehensive map of TFT item names to their item IDs
     const itemIdMap: Record<string, string> = {
+      "B.F. Sword": "1038",
+      "Needlessly Large Rod": "1058",
+      "Recurve Bow": "1043",
+      "Tear of the Goddess": "3070",
+      "Chain Vest": "1031",
+      "Negatron Cloak": "1057",
+      "Giant's Belt": "1011",
+      "Spatula": "3311",
+      "Sparring Gloves": "3177",
+      
+      // Combined items
       "Infinity Edge": "3031",
       "Giant Slayer": "3036",
       "Rapid Firecannon": "3094",
@@ -73,12 +84,26 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       "Bramble Vest": "3075",
       "Quicksilver": "3139",
       "Locket of the Iron Solari": "3190",
+      "Deathblade": "3026",
+      "Hextech Gunblade": "3146",
+      "Protector's Vow": "3109",
+      "Zephyr": "3172",
+      "Frozen Heart": "3110",
+      "Trap Claw": "3110",
+      "Edge of Night": "3147",
+      "Titan's Resolve": "3053",
+      "Runaan's Hurricane": "3085",
+      "Volatile Spellblade": "3151",
+      "Jeweled Gauntlet": "3177",
+      "Bloodthirster": "3072",
+      "Chalice of Power": "3222",
+      "Redemption": "3107",
     };
 
     return itemIdMap[itemName] || "";
   };
   
-  // Clean item name for URL paths
+  // Improved function to clean item name for URL paths
   const getCleanItemName = (itemName: string): string => {
     return itemName
       .replace(/'/g, '')
@@ -86,54 +111,61 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       .toLowerCase();
   };
   
-  // Get item sources in order of reliability
+  // Get TFT-specific CDNs for the various sites
+  const getTFTSpecificUrl = (itemName: string): string => {
+    const cleanName = getCleanItemName(itemName);
+    
+    return `https://cdn.metatft.com/file/metatft/items/${cleanName}.png`;
+  };
+  
+  // Get item sources in priority order of reliability
   const getItemSources = (itemName: string): string[] => {
     const cleanName = getCleanItemName(itemName);
     const itemId = formatItemId(itemName);
-    const displayName = itemName.replace(/'/g, '');
+    const tftSpecificUrl = getTFTSpecificUrl(itemName);
     
-    return [
-      // Riot Data Dragon - current patch (if item ID available)
+    const sources = [
+      // TFT-specific sources first (most reliable)
+      tftSpecificUrl,
+      `https://rerollcdn.com/items/${cleanName.replace(/_/g, '')}.png`,
+      
+      // Riot Data Dragon sources
       ...(itemId ? [
         `https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/${itemId}.png`,
         `https://ddragon.leagueoflegends.com/cdn/latest/img/item/${itemId}.png`,
       ] : []),
       
-      // TFT-specific sources
-      `https://rerollcdn.com/items/${cleanName.replace(/_/g, '')}.png`,
-      `https://cdn.metatft.com/file/metatft/items/${cleanName}.png`,
-      
-      // Community Dragon and Wiki sources
-      `https://raw.communitydragon.org/latest/game/assets/items/icons/${cleanName}.png`,
-      `https://raw.communitydragon.org/latest/game/assets/items/icons/${cleanName.replace(/_/g, '')}.png`,
-      
       // Mobalytics
       `https://cdn.mobalytics.gg/assets/tft/images/items/${cleanName}.png`,
       `https://cdn.mobalytics.gg/assets/tft/images/items/${cleanName.replace(/_/g, '')}.png`,
       
-      // League Wiki specific pattern
-      `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/9/9d/${displayName.replace(/\s+/g, '_')}_TFT_item.png/revision/latest/scale-to-width-down/42?cb=20190708222736`,
+      // Alternative Community sources
+      `https://raw.communitydragon.org/latest/game/assets/items/icons/${cleanName}.png`,
+      `https://raw.communitydragon.org/latest/game/assets/items/icons/${cleanName.replace(/_/g, '')}.png`,
       
       // TFT Tactics
       `https://cdn.tft.tools/items/${cleanName.replace(/_/g, '')}.png`,
       
-      // General Pattern
-      `https://rerollcdn.com/items/${cleanName.replace(/_/g, '')}.png`
+      // League Wiki specific pattern (less reliable)
+      `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/9/9d/${itemName.replace(/'/g, '').replace(/\s+/g, '_')}_TFT_item.png/revision/latest/scale-to-width-down/42?cb=20190708222736`,
     ];
+    
+    // Filter out empty strings
+    return sources.filter(source => source);
   };
 
   const sources = getItemSources(name);
   
-  // Fallback (always use a reliable default image)
+  // Fallback (use a reliable default image)
   const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/3089.png';
   
   const handleImageError = () => {
     const nextIndex = currentSourceIndex + 1;
     if (nextIndex < sources.length) {
-      console.log(`Source ${currentSourceIndex} failed for item ${name}, trying source ${nextIndex}`);
+      console.log(`Source ${currentSourceIndex} failed for item "${name}", trying source ${nextIndex}`);
       setCurrentSourceIndex(nextIndex);
     } else {
-      console.log(`All image sources failed for item ${name}, using fallback`);
+      console.log(`All image sources failed for item "${name}", using fallback`);
       setImgError(true);
     }
   };

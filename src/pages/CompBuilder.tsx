@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import TFTBoardBuilder from '@/components/TFTBoardBuilder';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, HelpCircle, Save, Crown, Plus } from 'lucide-react';
+import { ArrowLeft, Sparkles, HelpCircle, Save, Crown, Plus, Search } from 'lucide-react';
 import { Champion, TFTComp } from '@/data/comps';
 import { toast } from '@/components/ui/use-toast';
 import { useComps } from '@/contexts/CompsContext';
@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import ChampionDetailCard from '@/components/ChampionDetailCard';
+import ItemSearchBar from '@/components/ItemSearchBar';
+import ItemIcon from '@/components/ItemIcon';
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
@@ -55,6 +57,14 @@ const CompBuilder: React.FC = () => {
   const [boardChampions, setBoardChampions] = useState<Champion[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('board');
+  
+  // New state for champion selection and item management
+  const [selectedChampionName, setSelectedChampionName] = useState('');
+  const [selectedChampionCost, setSelectedChampionCost] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const [isCarry, setIsCarry] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [showChampionSelector, setShowChampionSelector] = useState(false);
+  const [championSearchQuery, setChampionSearchQuery] = useState('');
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -116,6 +126,59 @@ const CompBuilder: React.FC = () => {
     newChampions.splice(index, 1);
     setBoardChampions(newChampions);
   };
+
+  // Add selected item to the champion before adding to board
+  const addItemToSelection = (item: string) => {
+    if (selectedItems.length < 3) {
+      setSelectedItems([...selectedItems, item]);
+    }
+  };
+
+  // Remove item from selection
+  const removeItemFromSelection = (index: number) => {
+    const newItems = [...selectedItems];
+    newItems.splice(index, 1);
+    setSelectedItems(newItems);
+  };
+
+  // Select champion from the available list
+  const selectChampion = (champion: Champion) => {
+    setSelectedChampionName(champion.name);
+    setSelectedChampionCost(champion.cost);
+    setShowChampionSelector(false);
+  };
+
+  // Add champion with selected items to the board
+  const addChampionToBoard = () => {
+    if (!selectedChampionName) return;
+    
+    const newChampion: Champion = {
+      name: selectedChampionName,
+      cost: selectedChampionCost,
+      isCarry: isCarry,
+      position: null,
+      items: selectedItems.length > 0 ? [...selectedItems] : undefined,
+    };
+    
+    // Add to the board champions
+    setBoardChampions([...boardChampions, newChampion]);
+    
+    // Reset the selection
+    setSelectedChampionName('');
+    setSelectedChampionCost(1);
+    setIsCarry(false);
+    setSelectedItems([]);
+    
+    toast({
+      title: "Champion Added",
+      description: `${newChampion.name} added to your composition.`,
+    });
+  };
+
+  // Filter champions based on search query
+  const filteredChampions = availableChampions.filter(champion => 
+    champion.name.toLowerCase().includes(championSearchQuery.toLowerCase())
+  );
 
   // Handle form submission
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -221,9 +284,10 @@ const CompBuilder: React.FC = () => {
             <Card className="border border-primary/20 shadow-md backdrop-blur-sm">
               <CardHeader className="pb-2">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid grid-cols-2">
+                  <TabsList className="grid grid-cols-3">
                     <TabsTrigger value="board">Board Builder</TabsTrigger>
                     <TabsTrigger value="champions">Champion Details</TabsTrigger>
+                    <TabsTrigger value="add">Add Champion</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </CardHeader>
@@ -255,13 +319,130 @@ const CompBuilder: React.FC = () => {
                         <p className="text-muted-foreground mt-2 mb-4">
                           Use the Board Builder tab to add champions to your composition.
                         </p>
-                        <Button variant="default" onClick={() => setActiveTab('board')}>
+                        <Button variant="default" onClick={() => setActiveTab('add')}>
                           <Plus className="h-4 w-4 mr-2" />
                           Add Champions
                         </Button>
                       </div>
                     </div>
                   )}
+                </TabsContent>
+                <TabsContent value="add" className="mt-0">
+                  <div className="space-y-6">
+                    {/* Champion selection */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Select Champion</h3>
+                      
+                      <div className="relative">
+                        <div className="flex gap-3 mb-3">
+                          <div className="flex-1">
+                            <Input
+                              type="text"
+                              placeholder="Search champions..."
+                              value={championSearchQuery}
+                              onChange={(e) => setChampionSearchQuery(e.target.value)}
+                              className="w-full"
+                              onClick={() => setShowChampionSelector(true)}
+                            />
+                            {showChampionSelector && (
+                              <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-md shadow-md max-h-80 overflow-y-auto">
+                                {filteredChampions.length > 0 ? (
+                                  filteredChampions.map((champion, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-center gap-2 p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
+                                      onClick={() => selectChampion(champion)}
+                                    >
+                                      <div className="flex-shrink-0">
+                                        <ChampionIcon name={champion.name} cost={champion.cost} size="sm" />
+                                      </div>
+                                      <div>
+                                        <div className="font-medium">{champion.name}</div>
+                                        <div className="text-xs text-muted-foreground">Cost: {champion.cost}</div>
+                                      </div>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div className="p-3 text-center text-muted-foreground">
+                                    No champions found
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {selectedChampionName && (
+                            <div className="flex items-center">
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={isCarry}
+                                  onChange={(e) => setIsCarry(e.target.checked)}
+                                  className="rounded text-primary"
+                                />
+                                <span className="text-sm">Carry</span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {selectedChampionName && (
+                          <div className="bg-card/50 border border-border p-4 rounded-md mb-4">
+                            <div className="flex items-center gap-3">
+                              <ChampionIcon
+                                name={selectedChampionName}
+                                cost={selectedChampionCost}
+                                isCarry={isCarry}
+                                size="md"
+                              />
+                              <div>
+                                <h4 className="font-medium">{selectedChampionName}</h4>
+                                <p className="text-sm text-muted-foreground">Cost: {selectedChampionCost}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Item selection */}
+                    {selectedChampionName && (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">Select Items (Max 3)</h3>
+                        
+                        <ItemSearchBar
+                          onSelectItem={addItemToSelection}
+                          currentItemCount={selectedItems.length}
+                          placeholder="Search for items..."
+                        />
+                        
+                        {selectedItems.length > 0 && (
+                          <div className="flex flex-wrap gap-3 mt-3">
+                            {selectedItems.map((item, index) => (
+                              <div key={index} className="relative group">
+                                <ItemIcon name={item} />
+                                <button
+                                  className="absolute -top-1 -right-1 h-4 w-4 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => removeItemFromSelection(index)}
+                                >
+                                  <X className="h-2.5 w-2.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <Button
+                          onClick={addChampionToBoard}
+                          disabled={!selectedChampionName}
+                          className="w-full mt-4"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Champion to Board
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </TabsContent>
               </CardContent>
             </Card>

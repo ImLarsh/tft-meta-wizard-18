@@ -47,7 +47,7 @@ const ChampionDetailCard: React.FC<ChampionDetailCardProps> = ({
   };
   
   return (
-    <Card className="relative border border-border">
+    <Card className="relative border border-border group">
       <Button 
         variant="ghost" 
         size="icon" 

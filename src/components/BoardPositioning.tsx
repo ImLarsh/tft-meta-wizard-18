@@ -106,7 +106,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       for (let col = 0; col < cols; col++) {
         const championAtPosition = positionedChampions.find(champ => champ.position && champ.position.row === row && champ.position.col === col);
         rowCells.push(<div key={`${row}-${col}`} onClick={() => handleCellClick(row, col)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, row, col)} className="hexagon-cell py-0 px-0 mx-[9px] my-[21px]">
-            {championAtPosition?.isCarry && <div className="carry-stars">
+            {championAtPosition?.isCarry && <div className="carry-stars my-[10px]">
                 <Star size={10} fill="#FFD700" color="#FFD700" />
                 <Star size={10} fill="#FFD700" color="#FFD700" />
                 <Star size={10} fill="#FFD700" color="#FFD700" />
@@ -129,7 +129,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   </div>
                 </div>}
             </div>
-            {championAtPosition?.items && championAtPosition.items.length > 0 && <div className="items-container">
+            {championAtPosition?.items && championAtPosition.items.length > 0 && <div className="items-container my-[4px] py-0 mx-0 px-0">
                 {championAtPosition.items.map((item, idx) => <ItemIcon key={idx} name={item} size="xs" />)}
               </div>}
           </div>);

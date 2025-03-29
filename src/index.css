@@ -121,6 +121,41 @@
 .champion-border-4 { @apply border-cost-4; }
 .champion-border-5 { @apply border-cost-5; }
 
+/* TFT Board Styling */
+.border-champion-glow {
+  @apply border border-blue-400/30;
+  box-shadow: 0 0 6px 1px rgba(78, 168, 222, 0.5);
+}
+
+.border-champion-glow-1 {
+  @apply border border-slate-400/40;
+  box-shadow: 0 0 6px 1px rgba(192, 192, 192, 0.5);
+}
+
+.border-champion-glow-2 {
+  @apply border border-green-400/40;
+  box-shadow: 0 0 6px 1px rgba(0, 128, 0, 0.5);
+}
+
+.border-champion-glow-3 {
+  @apply border border-blue-400/40;
+  box-shadow: 0 0 6px 1px rgba(0, 0, 255, 0.5);
+}
+
+.border-champion-glow-4 {
+  @apply border border-purple-400/40;
+  box-shadow: 0 0 6px 1px rgba(128, 0, 128, 0.5);
+}
+
+.border-champion-glow-5 {
+  @apply border border-yellow-400/40;
+  box-shadow: 0 0 6px 1px rgba(255, 215, 0, 0.5);
+}
+
+.text-shadow-sm {
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8), 0 0 1px rgba(0, 0, 0, 1);
+}
+
 /* Background Particles */
 .particles-container {
   position: fixed;
@@ -535,3 +570,317 @@
     transform: rotate(30deg) translate(200%, 100%);
   }
 }
+
+/* Hexagon styles for TFT board */
+.hexagon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.hexagon-cell {
+  margin: 0 -2px; /* Adjust spacing between hexagons horizontally */
+}
+
+.hexagon-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding-bottom: 8px; /* Add space for champion name */
+}
+
+.hexagon-icon {
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
+}
+
+.hexagon-icon:hover {
+  transform: scale(1.3);
+}
+
+/* Adjust row spacing for hexagonal grid */
+.board-wrapper {
+  padding: 8px;
+}
+
+.board-wrapper > div {
+  margin-top: -5px; /* Pull rows closer for honeycomb pattern */
+}
+
+.board-wrapper > div:first-child {
+  margin-top: 0;
+}
+
+/* TFT board specific layout */
+.tft-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #0a1428; /* Dark blue for TFT theme */
+}
+
+.tft-board-row {
+  display: flex;
+  justify-content: center;
+}
+
+/* Compact board styles */
+.board-compact .hexagon-cell {
+  margin: 0 -2px;
+}
+
+.board-compact .board-wrapper > div {
+  margin-top: -4px;
+}
+
+.board-compact .board-wrapper > div:nth-child(odd) {
+  margin-left: 4px;
+}
+
+/* Additional styling for App.css continues below */
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em rgba(155, 135, 245, 0.7));
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em rgba(155, 135, 245, 0.7));
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+  border-radius: var(--radius);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(8px);
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 15px 30px -5px rgba(155, 135, 245, 0.3);
+}
+
+.read-the-docs {
+  color: rgba(155, 135, 245, 0.8);
+}
+
+/* Modern purple gradients */
+.purple-gradient-light {
+  background: linear-gradient(135deg, #f0e6ff 0%, #d6bcfa 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.purple-gradient-dark {
+  background: linear-gradient(135deg, #1a1f2c 0%, #5b3b85 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Modern UI elements with purple theme */
+.accent-border {
+  border: 1px solid rgba(155, 135, 245, 0.3);
+  transition: border-color 0.3s ease;
+}
+
+.accent-border:hover {
+  border-color: rgba(155, 135, 245, 0.7);
+}
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              box-shadow 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(155, 135, 245, 0.3);
+}
+
+/* Glass effect for components to work with particles background */
+.glass-effect {
+  backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.glass-effect:hover {
+  backdrop-filter: blur(16px);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .glass-effect {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark .glass-effect:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Animated background gradients */
+.animated-gradient {
+  background: linear-gradient(-45deg, 
+    rgba(155, 135, 245, 0.3), 
+    rgba(155, 135, 245, 0.1), 
+    rgba(138, 43, 226, 0.2), 
+    rgba(186, 85, 211, 0.1));
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Animated borders */
+.animated-border {
+  position: relative;
+  border-radius: var(--radius);
+}
+
+.animated-border::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius) + 2px);
+  padding: 2px;
+  background: linear-gradient(45deg, 
+    rgba(155, 135, 245, 0.6), 
+    rgba(138, 43, 226, 0.6), 
+    rgba(186, 85, 211, 0.6), 
+    rgba(155, 135, 245, 0.6));
+  background-size: 300% 300%;
+  animation: border-animation 8s linear infinite;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes border-animation {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Interactive element animations */
+.interactive-element {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.interactive-element:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Typing effect */
+.typing-effect {
+  overflow: hidden;
+  border-right: 0.15em solid rgba(155, 135, 245, 0.8);
+  white-space: nowrap;
+  margin: 0 auto;
+  letter-spacing: 0.1em;
+  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: rgba(155, 135, 245, 0.8) }
+}
+
+/* Pulse rings effect */
+.pulse-rings {
+  position: relative;
+}
+
+.pulse-rings::before,
+.pulse-rings::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(155, 135, 245, 0.5);
+  animation: pulse-ring 2s linear infinite;
+  pointer-events: none;
+}
+
+.pulse-rings::after {
+  animation-delay: 1s;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0 }
+  50% { opacity: 0.5 }
+  100% { transform: scale(1.2); opacity: 0 }
+}
+
+/* Shine effect on hover */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right, 
+    rgba(255, 255, 255, 0) 0%, 
+    rgba(255, 255, 255, 0.3) 5

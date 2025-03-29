@@ -123,7 +123,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
         
         const isEvenRow = row % 2 === 0;
         
-        const cellSize = compact ? 10 : 14;
+        const cellSize = compact ? 10 : 16;
         const hexSpacing = compact ? 1 : 2;
         
         rowCells.push(
@@ -138,12 +138,12 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
             style={{
-              transform: isEvenRow ? 'translateX(8px)' : '',
+              transform: isEvenRow ? `translateX(${compact ? 10 : 16}px)` : '',
               margin: `0 ${hexSpacing}px` // Add consistent horizontal spacing
             }}
           >
             <div className={`hexagon ${
-              (row + col) % 2 === 0 ? 'bg-secondary/30' : 'bg-secondary/10'
+              championAtPosition ? 'bg-black/70 border-champion-glow' : 'bg-black/50'
             } ${
               !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
             } w-full h-full`}>
@@ -167,6 +167,11 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                             onClick={() => !readonly && handleChampionClick(championAtPosition)}
                             className="hexagon-icon"
                           />
+                          {!compact && (
+                            <div className="absolute bottom-1 left-0 right-0 text-center text-white text-xs font-bold text-shadow-sm">
+                              {championAtPosition.name}
+                            </div>
+                          )}
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -192,7 +197,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
 
   return (
     <div className={`space-y-4 ${compact ? 'scale-75 origin-top-left' : ''}`}>
-      <div className={`flex flex-col items-center bg-card/30 p-4 rounded-md border border-border/30 ${compact ? 'p-2' : ''}`}>
+      <div className={`flex flex-col items-center bg-blue-950/95 p-4 rounded-md border border-blue-900/80 ${compact ? 'p-2' : ''}`}>
         {!readonly && !compact && (
           <div className="flex items-center mb-4 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4 mr-1" />
@@ -208,7 +213,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           </div>
         )}
         
-        <div className={`board-container ${compact ? 'p-1' : 'p-2'} bg-card/50 rounded-md`}>
+        <div className={`board-container ${compact ? 'p-1' : 'p-2'} bg-blue-950/90 rounded-md`}>
           <div className="board-wrapper">
             {renderBoard()}
           </div>

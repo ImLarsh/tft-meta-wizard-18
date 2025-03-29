@@ -15,6 +15,7 @@ import { useComps } from '@/contexts/CompsContext';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import BoardPositioning from './BoardPositioning';
+
 const commonItems = ["B.F. Sword", "Recurve Bow", "Needlessly Large Rod", "Tear of the Goddess", "Chain Vest", "Negatron Cloak", "Giant's Belt", "Spatula", "Sparring Gloves", "Infinity Edge", "Giant Slayer", "Bloodthirster", "Deathblade", "Rapid Firecannon", "Guinsoo's Rageblade", "Runaan's Hurricane", "Statikk Shiv", "Hextech Gunblade", "Archangel's Staff", "Rabadon's Deathcap", "Morellonomicon", "Jeweled Gauntlet", "Blue Buff", "Frozen Heart", "Chalice of Power", "Spear of Shojin", "Bramble Vest", "Gargoyle Stoneplate", "Sunfire Cape", "Locket of the Iron Solari", "Dragon's Claw", "Quicksilver", "Zephyr", "Ionic Spark", "Warmog's Armor", "Redemption", "Zz'Rot Portal", "Banshee's Claw", "Thief's Gloves", "Hand of Justice", "Titan's Resolve", "Last Whisper"];
 const formSchema = z.object({
   id: z.string().optional(),
@@ -36,11 +37,13 @@ const championFormSchema = z.object({
   }),
   isCarry: z.boolean().default(false)
 });
+
 interface SimpleCompFormProps {
   initialData?: TFTComp;
   onSubmit: (data: TFTComp) => void;
   isSubmitting?: boolean;
 }
+
 const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
   initialData,
   onSubmit,
@@ -52,9 +55,15 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
   const [newChampIsCarry, setNewChampIsCarry] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [strengths, setStrengths] = useState<string[]>(initialData?.strengthsWeaknesses?.strengths || []);
+  const [weaknesses, setWeaknesses] = useState<string[]>(initialData?.strengthsWeaknesses?.weaknesses || []);
+  const [newStrength, setNewStrength] = useState("");
+  const [newWeakness, setNewWeakness] = useState("");
+  
   const {
     traitMappings
   } = useComps();
+  
   const availableSets = Object.keys(traitMappings);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -81,11 +90,13 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
   const currentTftVersion = form.watch("tftVersion") || availableSets[0] || "Set 10";
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
   const currentCostMap = traitMappings[currentTftVersion]?.championCosts || {};
+
   useEffect(() => {
     if (initialData?.finalComp) {
       setFinalComp(initialData.finalComp);
     }
   }, [initialData]);
+
   const handleAddChampion = () => {
     if (!newChampName) return;
     const cost = currentCostMap[newChampName] || 1;
@@ -101,11 +112,13 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
     setNewChampIsCarry(false);
     setSelectedItems([]);
   };
+
   const addItemToChampion = () => {
     if (!selectedItem || selectedItems.length >= 3) return;
     setSelectedItems(prevItems => [...prevItems, selectedItem]);
     setSelectedItem("");
   };
+
   const removeItemFromSelection = (index: number) => {
     setSelectedItems(prevItems => {
       const newItems = [...prevItems];
@@ -113,12 +126,35 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
       return newItems;
     });
   };
+
   const removeChampion = (index: number) => {
     setFinalComp(prevComp => prevComp.filter((_, i) => i !== index));
   };
+
   const handleUpdatePositions = (champions: Champion[]) => {
     setFinalComp(champions);
   };
+
+  const handleAddStrength = () => {
+    if (!newStrength || strengths.includes(newStrength)) return;
+    setStrengths([...strengths, newStrength]);
+    setNewStrength("");
+  };
+
+  const handleAddWeakness = () => {
+    if (!newWeakness || weaknesses.includes(newWeakness)) return;
+    setWeaknesses([...weaknesses, newWeakness]);
+    setNewWeakness("");
+  };
+
+  const removeStrength = (index: number) => {
+    setStrengths(strengths.filter((_, i) => i !== index));
+  };
+
+  const removeWeakness = (index: number) => {
+    setWeaknesses(weaknesses.filter((_, i) => i !== index));
+  };
+
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
     if (finalComp.length === 0) {
       return;
@@ -152,12 +188,13 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
       earlyGame: [],
       keyItems: [],
       strengthsWeaknesses: {
-        strengths: [],
-        weaknesses: []
+        strengths,
+        weaknesses
       }
     };
     onSubmit(newComp);
   };
+
   return <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -283,6 +320,84 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
                   </FormControl>
                   <FormMessage />
                 </FormItem>} />
+                
+            <div className="space-y-4 border border-border/40 rounded-lg p-6 bg-card/50">
+              <h3 className="text-lg font-semibold mb-4">Strengths & Weaknesses</h3>
+              
+              <div className="space-y-4 mb-6">
+                <h4 className="text-md font-medium">Strengths</h4>
+                
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {strengths.map((strength, index) => (
+                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                      <span className="text-sm">{strength}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 p-0"
+                        onClick={() => removeStrength(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Input 
+                    value={newStrength} 
+                    onChange={(e) => setNewStrength(e.target.value)}
+                    placeholder="Add a strength"
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleAddStrength}
+                    disabled={!newStrength || strengths.includes(newStrength)}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-md font-medium">Weaknesses</h4>
+                
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {weaknesses.map((weakness, index) => (
+                    <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                      <span className="text-sm">{weakness}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-5 w-5 p-0"
+                        onClick={() => removeWeakness(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex gap-2">
+                  <Input 
+                    value={newWeakness} 
+                    onChange={(e) => setNewWeakness(e.target.value)}
+                    placeholder="Add a weakness"
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button" 
+                    onClick={handleAddWeakness}
+                    disabled={!newWeakness || weaknesses.includes(newWeakness)}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="champions" className="space-y-6">

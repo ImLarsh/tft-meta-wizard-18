@@ -140,6 +140,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
         costBorderClasses[cost], // Apply cost-specific border color
         className
       )}
+      style={{boxShadow: `0 0 3px var(--cost-${cost})`}} // Add shadow with cost-specific color
       onClick={onClick}
     >
       {isCarry && (

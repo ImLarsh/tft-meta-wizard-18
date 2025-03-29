@@ -18,11 +18,14 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   // Convert champion name to normalized format for image URLs
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
   
-  // Base URL for TFT champion images (this uses the League of Legends Data Dragon)
-  const imageUrl = `https://raw.communitydragon.org/latest/game/assets/ux/tft/championsplashes/${normalizedName}.tft_set10.png`;
+  // Use ddragon CDN for champion images (this is more reliable)
+  const imageUrl = `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName}.png`;
+  
+  // Alternative URL using Community Dragon for TFT-specific images
+  const alternativeUrl = `https://raw.communitydragon.org/latest/game/assets/characters/${normalizedName.toLowerCase()}/hud/${normalizedName.toLowerCase()}_square.png`;
   
   // Fallback image in case the champion image is not found
-  const fallbackImageUrl = 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/tft/champions-unknown.png';
+  const fallbackImageUrl = '/placeholder.svg';
   
   // Size classes
   const sizeClasses = {
@@ -36,7 +39,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       className={cn(
         sizeClasses[size],
         `champion-border-${cost}`,
-        'rounded-md overflow-hidden relative',
+        'rounded-md overflow-hidden relative border border-cost-${cost}/70',
         className
       )}
     >
@@ -45,8 +48,14 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
         alt={name}
         className="w-full h-full object-cover"
         onError={(e) => {
-          // Fallback if image fails to load
-          (e.target as HTMLImageElement).src = fallbackImageUrl;
+          const target = e.target as HTMLImageElement;
+          if (target.src !== alternativeUrl) {
+            // Try the alternative URL first
+            target.src = alternativeUrl;
+          } else if (target.src !== fallbackImageUrl) {
+            // If alternative also fails, use fallback
+            target.src = fallbackImageUrl;
+          }
         }}
       />
       <div className={`absolute bottom-0 right-0 w-3 h-3 bg-cost-${cost} rounded-tl-md flex items-center justify-center text-[8px] font-bold text-white`}>

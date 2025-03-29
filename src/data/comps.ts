@@ -1,4 +1,3 @@
-
 export interface Champion {
   name: string;
   cost: 1 | 2 | 3 | 4 | 5;
@@ -199,6 +198,216 @@ const tftComps: TFTComp[] = [
       weaknesses: ['Squishy carries', 'Weak against assassins', 'Item dependent']
     },
     description: 'A composition that focuses on Jinx as the main carry with Jazz and Punk synergies. This comp requires good positioning to protect Jinx while she ramps up her attack speed.',
+    patch: '13.24',
+  },
+  {
+    id: 'true-damage-kda',
+    name: 'True Damage + K/DA',
+    tier: 'S',
+    playstyle: 'Fast 8',
+    difficulty: 'Medium',
+    earlyGame: [
+      { name: 'Evelynn', cost: 1 },
+      { name: 'Kennen', cost: 1 },
+      { name: 'Yasuo', cost: 2 },
+      { name: 'Senna', cost: 3 },
+    ],
+    finalComp: [
+      { name: 'Kennen', cost: 1 },
+      { name: 'Evelynn', cost: 1 },
+      { name: 'Yasuo', cost: 2 },
+      { name: 'Senna', cost: 3, items: ['Giant Slayer', 'Infinity Edge', 'Last Whisper'] },
+      { name: 'Ekko', cost: 3, items: ['Sunfire Cape', 'Warmog\'s Armor'] },
+      { name: 'Akali', cost: 4, items: ['Blue Buff', 'Jeweled Gauntlet', 'Infinity Edge'], isCarry: true },
+      { name: 'Qiyana', cost: 4 },
+      { name: 'Kayn', cost: 4 },
+    ],
+    keyItems: ['Blue Buff', 'Jeweled Gauntlet', 'Infinity Edge', 'Giant Slayer'],
+    traits: [
+      { name: 'True Damage', count: 4 },
+      { name: 'K/DA', count: 3 },
+      { name: 'Crowd Diver', count: 2 },
+    ],
+    strengthsWeaknesses: {
+      strengths: ['High burst damage', 'Strong mid-game', 'Good against backline comps'],
+      weaknesses: ['Struggles against tanky comps', 'Akali dependent', 'Contested units']
+    },
+    description: 'This comp focuses on Akali as your primary carry with True Damage and K/DA synergies. Look to 3-star Akali if possible, but a 2-star with the right items is still very powerful.',
+    patch: '13.24',
+  },
+  {
+    id: 'hyperpop-8bit',
+    name: 'Hyperpop 8-Bit',
+    tier: 'A',
+    playstyle: 'Standard',
+    difficulty: 'Medium',
+    earlyGame: [
+      { name: 'Corki', cost: 1 },
+      { name: 'Kennen', cost: 1 },
+      { name: 'Lulu', cost: 2 },
+      { name: 'Neeko', cost: 3 },
+    ],
+    finalComp: [
+      { name: 'Corki', cost: 1 },
+      { name: 'Kennen', cost: 1 },
+      { name: 'Lulu', cost: 2, items: ['Redemption', 'Chalice of Power'] },
+      { name: 'Neeko', cost: 3, items: ['Warmog\'s Armor', 'Dragon\'s Claw'] },
+      { name: 'Ziggs', cost: 3, items: ['Spear of Shojin', 'Jeweled Gauntlet', 'Infinity Edge'], isCarry: true },
+      { name: 'Lux', cost: 3 },
+      { name: 'Bard', cost: 5 },
+      { name: 'Ahri', cost: 4 },
+    ],
+    keyItems: ['Spear of Shojin', 'Jeweled Gauntlet', 'Infinity Edge', 'Redemption'],
+    traits: [
+      { name: '8-Bit', count: 4 },
+      { name: 'Hyperpop', count: 3 },
+      { name: 'Superfan', count: 2 },
+    ],
+    strengthsWeaknesses: {
+      strengths: ['Strong AoE damage', 'Good frontline with Neeko', 'Scales well into late game'],
+      weaknesses: ['Item dependent', 'Weak early game', 'Vulnerable to assassins']
+    },
+    description: 'This comp utilizes Ziggs as the main carry with 8-Bit and Hyperpop synergies for massive AoE damage. Focus on positioning to protect Ziggs and let him cast multiple times.',
+    patch: '13.24',
+  },
+  {
+    id: 'country-maestro',
+    name: 'Country Maestro',
+    tier: 'A',
+    playstyle: 'Slow Roll',
+    difficulty: 'Easy',
+    earlyGame: [
+      { name: 'Tahm Kench', cost: 1 },
+      { name: 'Twisted Fate', cost: 1 },
+      { name: 'Taric', cost: 1 },
+      { name: 'Senna', cost: 3 },
+    ],
+    finalComp: [
+      { name: 'Tahm Kench', cost: 1 },
+      { name: 'Twisted Fate', cost: 1, items: ['Spear of Shojin', 'Jeweled Gauntlet', 'Giant Slayer'], isCarry: true },
+      { name: 'Taric', cost: 1, items: ['Warmog\'s Armor', 'Redemption'] },
+      { name: 'Senna', cost: 3 },
+      { name: 'Lucian', cost: 3 },
+      { name: 'Thresh', cost: 3 },
+      { name: 'Caitlyn', cost: 4 },
+      { name: 'Jhin', cost: 4 },
+    ],
+    keyItems: ['Spear of Shojin', 'Jeweled Gauntlet', 'Giant Slayer', 'Warmog\'s Armor'],
+    traits: [
+      { name: 'Country', count: 4 },
+      { name: 'Maestro', count: 2 },
+      { name: 'Guardian', count: 2 },
+    ],
+    strengthsWeaknesses: {
+      strengths: ['Strong frontline', 'Consistent damage', 'Easy to play'],
+      weaknesses: ['3-star TF dependent', 'Falls off late game', 'Weak against high burst']
+    },
+    description: 'A powerful mid-game composition that focuses on 3-starring Twisted Fate as your main carry. The Country trait provides good utility and sustain while Maestro enhances your spellcasting.',
+    patch: '13.24',
+  },
+  {
+    id: 'pentakill-edm',
+    name: 'Pentakill EDM',
+    tier: 'S',
+    playstyle: 'Fast 8',
+    difficulty: 'Hard',
+    earlyGame: [
+      { name: 'Olaf', cost: 1 },
+      { name: 'Jax', cost: 2 },
+      { name: 'Karthus', cost: 2 },
+      { name: 'Viego', cost: 3 },
+    ],
+    finalComp: [
+      { name: 'Olaf', cost: 1 },
+      { name: 'Jax', cost: 2, items: ['Titan\'s Resolve', 'Bloodthirster', 'Quicksilver'] },
+      { name: 'Karthus', cost: 2 },
+      { name: 'Viego', cost: 3 },
+      { name: 'Mordekaiser', cost: 4, items: ['Archangel\'s Staff', 'Jeweled Gauntlet', 'Hextech Gunblade'], isCarry: true },
+      { name: 'Kayn', cost: 4 },
+      { name: 'Yorick', cost: 5 },
+      { name: 'Zac', cost: 4, items: ['Warmog\'s Armor', 'Dragon\'s Claw'] },
+    ],
+    keyItems: ['Archangel\'s Staff', 'Jeweled Gauntlet', 'Hextech Gunblade', 'Titan\'s Resolve'],
+    traits: [
+      { name: 'Pentakill', count: 6 },
+      { name: 'EDM', count: 2 },
+      { name: 'Bruiser', count: 2 },
+    ],
+    strengthsWeaknesses: {
+      strengths: ['Massive AoE damage', 'Strong frontline', 'Excellent late game'],
+      weaknesses: ['Expensive composition', 'Weak early game', 'Hard to position correctly']
+    },
+    description: 'This comp revolves around Mordekaiser as your main carry with Pentakill synergy. The 6 Pentakill bonus grants massive damage boosts, making Mordekaiser an unstoppable force in the late game.',
+    patch: '13.24',
+  },
+  {
+    id: 'disco-punk',
+    name: 'Disco Punk',
+    tier: 'B',
+    playstyle: 'Hyper Roll',
+    difficulty: 'Medium',
+    earlyGame: [
+      { name: 'Jinx', cost: 1 },
+      { name: 'Twitch', cost: 2 },
+      { name: 'Urgot', cost: 2 },
+      { name: 'Miss Fortune', cost: 3 },
+    ],
+    finalComp: [
+      { name: 'Jinx', cost: 1, items: ['Guinsoo\'s Rageblade', 'Runaan\'s Hurricane', 'Infinity Edge'], isCarry: true },
+      { name: 'Twitch', cost: 2 },
+      { name: 'Urgot', cost: 2 },
+      { name: 'Miss Fortune', cost: 3, items: ['Spear of Shojin', 'Blue Buff'] },
+      { name: 'Vex', cost: 2 },
+      { name: 'Garen', cost: 2 },
+      { name: 'Sona', cost: 3 },
+      { name: 'Ekko', cost: 3 },
+    ],
+    keyItems: ['Guinsoo\'s Rageblade', 'Runaan\'s Hurricane', 'Infinity Edge', 'Spear of Shojin'],
+    traits: [
+      { name: 'Disco', count: 4 },
+      { name: 'Punk', count: 4 },
+      { name: 'Big Shot', count: 2 },
+    ],
+    strengthsWeaknesses: {
+      strengths: ['Strong early game', 'Good transition options', 'High attack speed'],
+      weaknesses: ['Falls off late game', 'Squishy carries', 'Positioning dependent']
+    },
+    description: 'A strong early to mid-game composition focused on 3-star Jinx as your main carry. This comp can snowball hard if you hit your 3-stars early, but has options to transition if you don\'t.',
+    patch: '13.24',
+  },
+  {
+    id: 'heartsteel-emo',
+    name: 'Heartsteel Emo',
+    tier: 'S',
+    playstyle: 'Standard',
+    difficulty: 'Medium',
+    earlyGame: [
+      { name: 'Annie', cost: 1 },
+      { name: 'Evelynn', cost: 1 },
+      { name: 'Lillia', cost: 2 },
+      { name: 'Sett', cost: 2 },
+    ],
+    finalComp: [
+      { name: 'Annie', cost: 1 },
+      { name: 'Evelynn', cost: 1 },
+      { name: 'Lillia', cost: 2, items: ['Warmog\'s Armor', 'Gargoyle Stoneplate'] },
+      { name: 'Sett', cost: 2 },
+      { name: 'Amumu', cost: 3, items: ['Sunfire Cape', 'Bramble Vest'] },
+      { name: 'Yone', cost: 4, items: ['Bloodthirster', 'Giant Slayer', 'Infinity Edge'], isCarry: true },
+      { name: 'Aphelios', cost: 4 },
+      { name: 'Kayle', cost: 1 },
+    ],
+    keyItems: ['Bloodthirster', 'Giant Slayer', 'Infinity Edge', 'Warmog\'s Armor'],
+    traits: [
+      { name: 'Heartsteel', count: 5 },
+      { name: 'Emo', count: 3 },
+      { name: 'Edgelord', count: 2 },
+    ],
+    strengthsWeaknesses: {
+      strengths: ['Excellent sustain', 'Strong frontline', 'Consistent damage'],
+      weaknesses: ['Yone dependent', 'Contested units', 'Weak against heavy CC']
+    },
+    description: 'This comp builds around Yone as your main carry with Heartsteel and Emo synergies. The combination provides excellent sustain and damage, making it a strong all-around composition.',
     patch: '13.24',
   },
 ];

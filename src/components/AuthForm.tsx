@@ -30,8 +30,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
           throw new Error('Username and email are required');
         }
         
-        // Get the current site URL for proper redirection
-        const siteUrl = window.location.origin;
+        // Get the proper origin for redirection
+        // This ensures we use the correct domain where the app is hosted
+        const origin = window.location.origin;
+        const redirectUrl = `${origin}/auth/callback`;
+        
+        console.log(`Signup with redirect to: ${redirectUrl}`);
         
         // For signup, create the account with proper redirection
         const { data, error: signUpError } = await supabase.auth.signUp({
@@ -41,7 +45,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
             data: {
               username,
             },
-            emailRedirectTo: `${siteUrl}/auth/callback`,
+            emailRedirectTo: redirectUrl,
           },
         });
 

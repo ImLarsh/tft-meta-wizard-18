@@ -40,6 +40,12 @@ import ChampionDetailCard from '@/components/ChampionDetailCard';
 import ItemSearchBar from '@/components/ItemSearchBar';
 import ItemIcon from '@/components/ItemIcon';
 import ChampionIcon from '@/components/ChampionIcon';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
@@ -64,6 +70,7 @@ const CompBuilder: React.FC = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [showChampionSelector, setShowChampionSelector] = useState(false);
   const [championSearchQuery, setChampionSearchQuery] = useState('');
+  const [currentItemToAdd, setCurrentItemToAdd] = useState<string>("");
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -76,6 +83,15 @@ const CompBuilder: React.FC = () => {
       tftVersion: Object.keys(traitMappings)[0] || "",
     },
   });
+
+  const tftItems = [
+    "B.F. Sword", "Recurve Bow", "Needlessly Large Rod", "Tear of the Goddess", 
+    "Chain Vest", "Negatron Cloak", "Giant's Belt", "Spatula", "Sparring Gloves",
+    "Infinity Edge", "Rapid Firecannon", "Rabadon's Deathcap", "Seraph's Embrace",
+    "Thornmail", "Dragon's Claw", "Warmog's Armor", "Force of Nature", "Thief's Gloves",
+    "Bloodthirster", "Guinsoo's Rageblade", "Jeweled Gauntlet", "Spear of Shojin",
+    "Sunfire Cape", "Quicksilver", "Morellonomicon", "Zeke's Herald", "Titan's Resolve"
+  ];
 
   useEffect(() => {
     const tftVersion = form.watch("tftVersion");
@@ -386,10 +402,43 @@ const CompBuilder: React.FC = () => {
                       <div className="space-y-4">
                         <h3 className="text-lg font-medium">Select Items (Max 3)</h3>
                         
+                        <div className="flex gap-2 mb-3">
+                          <Select
+                            value={currentItemToAdd}
+                            onValueChange={setCurrentItemToAdd}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select Item" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover">
+                              {tftItems.map((item) => (
+                                <SelectItem key={item} value={item}>
+                                  <div className="flex items-center gap-2">
+                                    <span>{item}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          
+                          <Button 
+                            size="sm" 
+                            disabled={!currentItemToAdd || selectedItems.length >= 3}
+                            onClick={() => {
+                              if (currentItemToAdd) {
+                                addItemToSelection(currentItemToAdd);
+                                setCurrentItemToAdd("");
+                              }
+                            }}
+                          >
+                            Add
+                          </Button>
+                        </div>
+                        
                         <ItemSearchBar
                           onSelectItem={addItemToSelection}
                           currentItemCount={selectedItems.length}
-                          placeholder="Search for items..."
+                          placeholder="Or search for items..."
                         />
                         
                         {selectedItems.length > 0 && (

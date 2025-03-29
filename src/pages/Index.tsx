@@ -29,8 +29,8 @@ const Index = () => {
               
               <div className="rounded-lg overflow-hidden shadow-xl border border-border/40">
                 <img 
-                  src="https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt9a2616eca3a3a659/62069156f731423017fa0a60/021422_TFTNews_Article_Banner.jpg" 
-                  alt="TFT Gameplay" 
+                  src="https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt493aca2f3aecea48/66077f26e4bc39c8f0c487b2/TFT_Set14_CyberCity_Header.jpg" 
+                  alt="TFT Cyber City Set 14" 
                   className="w-full h-auto"
                 />
               </div>

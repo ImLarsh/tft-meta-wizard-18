@@ -7,7 +7,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "@/hooks/use-toast";
 
 interface ItemIconProps {
   name: string;
@@ -30,20 +29,24 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     setImgError(false);
   }, [name]);
   
+  // Standard format (no spaces, lowercase)
   const normalizedName = name
     .replace(/\s+/g, '') // Remove spaces
     .toLowerCase() // Convert to lowercase
     .replace(/[^a-z0-9]/g, ''); // Remove special characters
   
+  // Kebab case format (spaces to dashes, lowercase)
   const normalizedNameKebab = name
     .toLowerCase()
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '');
     
+  // Camel case format
   const normalizedNameCamelCase = name
     .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => index === 0 ? letter.toLowerCase() : letter.toUpperCase())
     .replace(/\s+/g, '');
   
+  // Simple normalized (lowercase, no spaces or special chars, remove trailing 's')
   const normalizedNameSimple = name
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '')
@@ -93,54 +96,47 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   
   const specialCaseVariations = specialCaseNames[name] || [];
   
-  // Expanded sources list with more CDNs and variations
+  // Prioritize Mobafire and reorder the sources list
   const sources = [
-    // Main sources with normalized names
-    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${normalizedName}.png`,
-    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${normalizedNameKebab}.png`,
+    // Mobafire sources (prioritized)
+    `https://www.mobafire.com/images/tft/item/${normalizedNameKebab}.png`,
+    `https://www.mobafire.com/images/tft/item/${normalizedName}.png`,
     
     // TFT Tools variations
-    `https://cdn.tft.tools/items/${normalizedName}.png`,
     `https://cdn.tft.tools/items/${normalizedNameKebab}.png`,
+    `https://cdn.tft.tools/items/${normalizedName}.png`,
     
-    // Special case variations
+    // Special case variations for TFT Tools
     ...specialCaseVariations.map(variant => `https://cdn.tft.tools/items/${variant}.png`),
     
     // TFT Tactics variations
-    `https://tactics.tools/img/items/${normalizedName}.png`, 
-    `https://tactics.tools/img/items/${normalizedNameKebab}.png`,
-    `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${normalizedName}.png`,
+    `https://tactics.tools/img/items/${normalizedNameKebab}.png`, 
+    `https://tactics.tools/img/items/${normalizedName}.png`,
     `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${normalizedNameKebab}.png`,
-    ...specialCaseVariations.map(variant => `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${variant}.png`),
+    `https://www.tftactics.gg/cdn-cgi/image/width=86,height=86,fit=cover,gravity=0.5x0.5/tft/items/${normalizedName}.png`,
     
     // Mobalytics variations
-    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedName}.png`,
-    `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedName}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedNameKebab}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedNameKebab}.png`,
     `https://cdn.mobalytics.gg/assets/tft/images/items/set10/${normalizedNameCamelCase}.png`,
     `https://cdn.mobalytics.gg/assets/tft/images/items/${normalizedNameCamelCase}.png`,
     
-    // Additional Mobalytics prefixed variations
-    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/tft10_${normalizedName}.png`,
-    `https://cdn.mobalytics.gg/assets/tft/images/items/tft_${normalizedName}.png`,
-    
-    // MetaTFT and Reroll variations
-    `https://cdn.metatft.com/file/metatft/items/${normalizedName}.png`,
-    `https://cdn.metatft.com/file/metatft/items/${normalizedNameSimple}.png`,
-    `https://rerollcdn.com/items/${normalizedName}.png`,
-    `https://rerollcdn.com/items/${normalizedNameKebab}.png`,
-    
-    // League of Legends variations
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/${normalizedName}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/${normalizedName}.png`,
-    
     // Community Dragon variations
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${normalizedName}.png`,
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/standard/${normalizedName}.png`,
-    `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/maps/particles/tft/item_icons/set10/${normalizedName}.png`,
-    `https://raw.communitydragon.org/pbe/game/assets/items/icons2d/tft_item_${normalizedName}.tft_set10.png`,
+    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${normalizedNameKebab}.png`,
+    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${normalizedName}.png`,
     
     // Additional variations with special cases
     ...specialCaseVariations.map(variant => `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/standard/${variant}.png`),
+    
+    // Additional Mobalytics prefixed variations
+    `https://cdn.mobalytics.gg/assets/tft/images/items/set10/tft10_${normalizedNameKebab}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/items/tft_${normalizedNameKebab}.png`,
+    
+    // MetaTFT and Reroll variations
+    `https://cdn.metatft.com/file/metatft/items/${normalizedNameKebab}.png`,
+    `https://cdn.metatft.com/file/metatft/items/${normalizedNameSimple}.png`,
+    `https://rerollcdn.com/items/${normalizedNameKebab}.png`,
+    `https://rerollcdn.com/items/${normalizedName}.png`,
   ];
   
   const fallbackUrl = 'https://cdn.tft.tools/items/deathblade.png';
@@ -156,7 +152,13 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     if (nextIndex < sources.length) {
       setCurrentSourceIndex(nextIndex);
     } else {
-      console.log(`All sources failed for ${name}`);
+      console.log(`All sources failed for ${name}. Tried these variations:`, { 
+        original: name,
+        kebab: normalizedNameKebab,
+        standard: normalizedName,
+        camelCase: normalizedNameCamelCase,
+        simple: normalizedNameSimple
+      });
       setImgError(true);
     }
   };

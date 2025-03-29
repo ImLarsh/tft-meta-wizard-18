@@ -15,6 +15,7 @@ interface AuthFormProps {
 const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -25,24 +26,34 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
 
     try {
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        if (!username.trim()) {
+          throw new Error('Username is required');
+        }
+        
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              username,
+            },
+            emailRedirectTo: window.location.origin,
+          },
         });
 
-        if (error) throw error;
+        if (signUpError) throw signUpError;
 
         toast({
-          title: "Success!",
-          description: "Account created successfully. Check your email for confirmation.",
+          title: "Account created successfully",
+          description: "Please check your email for a confirmation link.",
         });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
-        if (error) throw error;
+        if (signInError) throw signInError;
 
         toast({
           title: "Welcome back!",
@@ -67,6 +78,21 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      {mode === 'signup' && (
+        <div className="space-y-2">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            id="username"
+            type="text"
+            placeholder="your_username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            autoComplete="username"
+          />
+        </div>
+      )}
+      
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

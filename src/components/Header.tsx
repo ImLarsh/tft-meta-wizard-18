@@ -2,10 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, List, Sparkles, Settings, Moon, Sun, LogIn, UserPlus } from 'lucide-react';
+import { Home, List, Sparkles, Settings, Moon, Sun, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/providers/AuthProvider';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import AuthForm from '@/components/AuthForm';
 
 const Header: React.FC = () => {
@@ -22,9 +31,10 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
+  
+  const { user, username } = useAuth();
   
   // Handle scroll effects
   useEffect(() => {
@@ -44,23 +54,6 @@ const Header: React.FC = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
-  
-  // Check authentication status
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-    });
-
-    // Set up listener for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const handleSignOut = async () => {
@@ -208,15 +201,29 @@ const Header: React.FC = () => {
                 </Dialog>
               </>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignOut}
-                className={`hover:bg-primary/10 transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-                style={{ transitionDelay: '400ms' }}
-              >
-                Sign Out
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                    style={{ transitionDelay: '400ms' }}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    <span className="font-medium">{username || 'Account'}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>
+                    Welcome, {username || 'User'}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </nav>
         </div>

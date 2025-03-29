@@ -144,11 +144,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             </span> : isDragging ? <span>Drag champion to a position on the board</span> : <span>Select a champion to position or drag directly onto the board</span>}
         </div>}
       
-      <div className="board-container">
-        <div className="hex-grid">
-          {renderBoard()}
-        </div>
-      </div>
+      
       
       {!readonly && !compact && <>
           <h3 className="champions-title">Available Champions</h3>

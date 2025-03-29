@@ -35,6 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    console.log('AuthProvider initializing');
+    
     // Set up auth state change listener FIRST (to prevent missing auth events)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
@@ -71,13 +73,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // THEN check for existing session
     const getInitialSession = async () => {
       try {
+        console.log('Checking for existing session');
         const { data, error } = await supabase.auth.getSession();
-        console.info('Initial session check:', data);
         
         if (error) {
           console.error('Session error:', error);
           return;
         }
+        
+        console.log('Initial session check result:', data?.session ? 'Session found' : 'No session found');
         
         if (data?.session) {
           setSession(data.session);
@@ -95,12 +99,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Cleanup subscription on unmount
     return () => {
+      console.log('AuthProvider cleaning up');
       subscription.unsubscribe();
     };
   }, []);
 
   const signOut = async () => {
     try {
+      console.log('Signing out');
       await supabase.auth.signOut();
       // The onAuthStateChange listener will handle state updates
     } catch (error) {

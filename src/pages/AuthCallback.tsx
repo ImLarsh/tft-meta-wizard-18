@@ -15,9 +15,9 @@ const AuthCallback = () => {
       try {
         // Log the full URL to debug
         console.log('Auth callback URL:', window.location.href);
+        console.log('Current origin:', window.location.origin);
         
-        // The PKCE flow will automatically handle the code exchange
-        // Just check if we have a session
+        // Allow time for the PKCE flow to complete automatically
         const { data, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -40,37 +40,66 @@ const AuthCallback = () => {
             description: "You are now logged in.",
           });
           
-          // Wait a brief moment to ensure session is properly stored
+          // Wait a moment to ensure session is properly stored
           setTimeout(() => navigate('/', { replace: true }), 1000);
           return;
         }
         
-        // If there's no session but we have hash or query parameters, log them for debugging
+        // Parse hash and query params for debugging
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const queryParams = new URLSearchParams(window.location.search);
         
         console.log('Hash params:', Object.fromEntries(hashParams.entries()));
         console.log('Query params:', Object.fromEntries(queryParams.entries()));
         
-        // Special case: we might have the "error" parameter if something went wrong
-        if (queryParams.has('error') || hashParams.has('error')) {
-          const errorMsg = queryParams.get('error') || hashParams.get('error') || 'Unknown auth error';
-          const errorDescription = queryParams.get('error_description') || hashParams.get('error_description') || '';
-          
-          console.error('Auth error from params:', errorMsg, errorDescription);
-          setError(`${errorMsg}: ${errorDescription}`);
+        // Handle error cases
+        if (hashParams.has('error_description') || queryParams.has('error_description')) {
+          const errorMsg = hashParams.get('error_description') || queryParams.get('error_description') || 'Unknown error';
+          console.error('Auth error from params:', errorMsg);
+          setError(errorMsg);
           setMessage('Authentication error');
           toast({
             title: "Authentication error",
-            description: errorDescription || errorMsg,
+            description: errorMsg,
             variant: "destructive",
           });
           return;
         }
         
+        if (hashParams.has('access_token')) {
+          // If we have a token in the URL but no session yet, try to establish it
+          console.log('Found access token in URL, attempting to set session');
+          const { error: setSessionError } = await supabase.auth.setSession({
+            access_token: hashParams.get('access_token') || '',
+            refresh_token: hashParams.get('refresh_token') || '',
+          });
+          
+          if (setSessionError) {
+            console.error('Error setting session:', setSessionError);
+            setError(setSessionError.message);
+            setMessage('Failed to establish session');
+            toast({
+              title: "Authentication error",
+              description: setSessionError.message,
+              variant: "destructive",
+            });
+          } else {
+            console.log('Session set successfully from URL parameters');
+            setMessage('Authentication successful!');
+            toast({
+              title: "Authentication successful",
+              description: "You are now logged in.",
+            });
+            setTimeout(() => navigate('/', { replace: true }), 1000);
+            return;
+          }
+        }
+        
         // If we reached here, we don't have enough information to proceed
-        console.log('No authentication parameters or session found');
-        setMessage('No authentication data found');
+        if (!error) {
+          console.log('No authentication parameters or session found');
+          setMessage('No authentication data found');
+        }
         
       } catch (err) {
         console.error('Error in auth callback:', err);

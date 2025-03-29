@@ -14,8 +14,8 @@ const getRedirectURL = () => {
   try {
     // In browser environments
     if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      return `${url.protocol}//${url.host}/auth/callback`;
+      // Get the origin (protocol + host) only
+      return `${window.location.origin}/auth/callback`;
     }
   } catch (error) {
     console.error('Error creating redirect URL:', error);
@@ -42,4 +42,3 @@ export const isUsingDefaultCredentials = (): boolean => {
   // In a real application, you might want a more robust check
   return false; // Since we have actual credentials from your Supabase project, this is false
 };
-

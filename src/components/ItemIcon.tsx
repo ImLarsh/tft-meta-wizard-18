@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
@@ -97,29 +96,28 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   
   // Image sources in priority order
   const sources = [
-    // Direct link to Fandom wiki image for Bloodthirster and other items
-    `https://static.wikia.nocookie.net/leagueoflegends/images/6/66/${formattedName}_TFT_item.png`,
+    // Direct link to Bloodthirster specifically
+    name === "Bloodthirster" ? 
+      "https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Bloodthirster_TFT_item.png/revision/latest" : null,
     
-    // League of Legends Fandom wiki - more reliable transparent images
-    `https://static.wikia.nocookie.net/leagueoflegends/images/6/66/${formattedName}_TFT_item.png/revision/latest?cb=20190925202641`,
+    // Direct links to Fandom wiki images
+    `https://static.wikia.nocookie.net/leagueoflegends/images/6/66/${formattedName}_TFT_item.png/revision/latest`,
     
-    // TFT specific sites
+    // Fixed paths for common TFT databases
+    `https://tftactics.gg/img/items/${dashedName}.png`,
     `https://cdn.metatft.com/file/metatft/items/${dashedName}.png`,
-    `https://tftactics.gg/itemicons/${simplifiedName}.png`,
     `https://rerollcdn.com/items/${simplifiedName}.png`,
-    `https://tactics.tools/img/items/${dashedName}.png`,
     
     // Community Dragon source - reliable for some items
     `https://raw.communitydragon.org/latest/game/assets/items/icons/${dashedName}.png`,
     
-    // Try with various patterns from external sites
+    // Additional sources
     `https://tft.mobalytics.gg/images/items/${simplifiedName}.png`,
-    `https://lolchess.gg/images/tft/items/${dashedName}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/12.23.1/img/item/${compactName}.png`,
-  ];
+    `https://lolchess.gg/images/tft/items/${dashedName}.png`
+  ].filter(Boolean) as string[];
   
   // Fallback item image that's very likely to exist
-  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Deathblade_TFT_item.png';
+  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Deathblade_TFT_item.png/revision/latest';
   
   const sizeClasses = {
     sm: 'w-6 h-6',
@@ -155,7 +153,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
         </div>
       ) : (
         <img
-          src={sources[currentSourceIndex]}
+          src={sources[currentSourceIndex] || fallbackUrl}
           alt={name}
           className="w-full h-full object-cover"
           onError={handleImageError}

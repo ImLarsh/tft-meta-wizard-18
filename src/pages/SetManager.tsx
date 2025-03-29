@@ -7,9 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Save, Trash, ChevronDown, ChevronUp, Settings, RefreshCw } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ChampionTraitMap } from '@/types/champion';
 
 const SetManager: React.FC = () => {
-  const { traitMappings, setTraitMappings, addTraitMapping } = useComps();
+  const { traitMappings, setTraitMappings, addTraitMapping, updateTraitMapping, removeTraitMapping } = useComps();
   
   const [activeTab, setActiveTab] = useState<string>("manage");
   const [activeSetTab, setActiveSetTab] = useState<string | null>(null);
@@ -33,8 +34,13 @@ const SetManager: React.FC = () => {
   // When the active set tab changes, update the traits and champion mappings
   useEffect(() => {
     if (activeSetTab && traitMappings[activeSetTab]) {
-      setNewSetTraits([...traitMappings[activeSetTab].traits]);
-      setChampionTraitMapping({ ...traitMappings[activeSetTab].championTraits });
+      // Safely access traits with a fallback to empty array if it doesn't exist
+      const traits = traitMappings[activeSetTab].traits || [];
+      setNewSetTraits([...traits]);
+      
+      // Safely access championTraits with a fallback to empty object if it doesn't exist
+      const champTraits = traitMappings[activeSetTab].championTraits || {};
+      setChampionTraitMapping({ ...champTraits });
     }
   }, [activeSetTab, traitMappings]);
   
@@ -58,11 +64,7 @@ const SetManager: React.FC = () => {
       return;
     }
     
-    addTraitMapping(newSetVersion, {
-      name: newSetName,
-      traits: newSetTraits,
-      championTraits: {}
-    });
+    addTraitMapping(newSetVersion, newSetName, newSetTraits, {});
     
     toast({
       title: "Set Created",
@@ -95,15 +97,12 @@ const SetManager: React.FC = () => {
   const handleUpdateSet = (setKey: string) => {
     if (!traitMappings[setKey]) return;
     
-    const updatedMappings = { ...traitMappings };
-    updatedMappings[setKey].traits = newSetTraits;
-    updatedMappings[setKey].championTraits = championTraitMapping;
-    
-    setTraitMappings(updatedMappings);
+    const setName = traitMappings[setKey].name;
+    updateTraitMapping(setKey, setName, newSetTraits, championTraitMapping);
     
     toast({
       title: "Set Updated",
-      description: `${traitMappings[setKey].name} has been updated successfully`,
+      description: `${setName} has been updated successfully`,
     });
   };
   
@@ -111,18 +110,10 @@ const SetManager: React.FC = () => {
   const handleDeleteSet = (setKey: string) => {
     if (!traitMappings[setKey]) return;
     
-    const updatedMappings = { ...traitMappings };
-    delete updatedMappings[setKey];
-    
-    setTraitMappings(updatedMappings);
-    
-    toast({
-      title: "Set Deleted",
-      description: `${traitMappings[setKey].name} has been deleted`,
-    });
+    removeTraitMapping(setKey);
     
     if (setKey === activeSetTab) {
-      const remainingSets = Object.keys(updatedMappings);
+      const remainingSets = Object.keys(traitMappings).filter(key => key !== setKey);
       setActiveSetTab(remainingSets.length > 0 ? remainingSets[0] : null);
     }
   };
@@ -131,8 +122,13 @@ const SetManager: React.FC = () => {
   const handleSelectSet = (setKey: string) => {
     setActiveSetTab(setKey);
     if (traitMappings[setKey]) {
-      setNewSetTraits([...traitMappings[setKey].traits]);
-      setChampionTraitMapping({ ...traitMappings[setKey].championTraits });
+      // Safely access traits with a fallback to empty array
+      const traits = traitMappings[setKey].traits || [];
+      setNewSetTraits([...traits]);
+      
+      // Safely access championTraits with a fallback to empty object
+      const champTraits = traitMappings[setKey].championTraits || {};
+      setChampionTraitMapping({ ...champTraits });
     }
   };
   

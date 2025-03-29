@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { TFTComp } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
@@ -17,6 +16,7 @@ interface TraitMappings {
 interface CompsContextType {
   comps: TFTComp[];
   traitMappings: TraitMappings;
+  setTraitMappings: React.Dispatch<React.SetStateAction<TraitMappings>>;
   addComp: (comp: TFTComp) => void;
   updateComp: (comp: TFTComp) => void;
   removeComp: (id: string) => void;
@@ -151,6 +151,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       value={{
         comps,
         traitMappings,
+        setTraitMappings,
         addComp,
         updateComp,
         removeComp,

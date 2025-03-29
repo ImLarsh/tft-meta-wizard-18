@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CompCard from './CompCard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SearchX, Trash2, Filter, Sparkles, Edit } from 'lucide-react';
+import { SearchX, Filter, Sparkles } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import { 
   AlertDialog,
@@ -219,29 +218,12 @@ const CompTierList: React.FC = () => {
             {filteredComps.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredComps.map(comp => (
-                  <div key={comp.id} className="relative">
-                    <div className="absolute top-3 right-3 flex gap-2 z-10">
-                      <Button 
-                        variant="secondary" 
-                        size="icon" 
-                        className="bg-primary/20 hover:bg-primary/40 shadow-sm"
-                        onClick={() => handleEditComp(comp.id)}
-                        aria-label="Edit composition"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="icon"
-                        className="shadow-sm"
-                        onClick={() => setCompToDelete(comp.id)}
-                        aria-label="Delete composition"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <CompCard comp={comp} />
-                  </div>
+                  <CompCard 
+                    key={comp.id}
+                    comp={comp}
+                    onEdit={handleEditComp}
+                    onDelete={(compId) => setCompToDelete(compId)}
+                  />
                 ))}
               </div>
             ) : (
@@ -276,29 +258,12 @@ const CompTierList: React.FC = () => {
                 {groupedComps[tier]?.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {groupedComps[tier]?.map(comp => (
-                      <div key={comp.id} className="relative">
-                        <div className="absolute top-3 right-3 flex gap-2 z-10">
-                          <Button 
-                            variant="secondary" 
-                            size="icon" 
-                            className="bg-primary/20 hover:bg-primary/40 shadow-sm"
-                            onClick={() => handleEditComp(comp.id)}
-                            aria-label="Edit composition"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="destructive" 
-                            size="icon"
-                            className="shadow-sm"
-                            onClick={() => setCompToDelete(comp.id)}
-                            aria-label="Delete composition"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <CompCard comp={comp} />
-                      </div>
+                      <CompCard 
+                        key={comp.id}
+                        comp={comp}
+                        onEdit={handleEditComp}
+                        onDelete={(compId) => setCompToDelete(compId)}
+                      />
                     ))}
                   </div>
                 ) : (

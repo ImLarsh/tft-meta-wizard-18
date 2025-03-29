@@ -6,13 +6,15 @@ import ItemIcon from './ItemIcon';
 import BoardPositioning from './BoardPositioning';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronRight, Star, Trophy, BarChart, Brain, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronRight, Star, Trophy, BarChart, Brain, MapPin } from 'lucide-react';
 
 interface CompCardProps {
   comp: TFTComp;
+  onEdit?: (compId: string) => void;
+  onDelete?: (compId: string) => void;
 }
 
-const CompCard: React.FC<CompCardProps> = ({ comp }) => {
+const CompCard: React.FC<CompCardProps> = ({ comp, onEdit, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
   
   const getTierColor = (tier: string) => {
@@ -44,16 +46,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
               {comp.tftVersion}
             </span>
           )}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setExpanded(!expanded)}
-            className="hover:bg-secondary/50"
-            aria-label={expanded ? "Collapse details" : "Expand details"}
-          >
-            {expanded ? 'Collapse' : 'Expand'}
-            <ChevronRight className={`ml-1 h-4 w-4 transform transition-transform ${expanded ? 'rotate-90' : ''}`} />
-          </Button>
+          {/* Moved to separate action bar */}
         </div>
       </div>
       
@@ -102,6 +95,57 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
             </div>
           ))}
         </div>
+      </div>
+      
+      {/* Action Bar - Separate section for buttons */}
+      <div className="border-t border-border/40 px-4 py-2 flex justify-between items-center">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => setExpanded(!expanded)}
+          className="text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+          aria-label={expanded ? "Collapse details" : "Expand details"}
+        >
+          {expanded ? (
+            <>
+              <span>Collapse</span>
+              <ChevronDown className="ml-1 h-4 w-4" />
+            </>
+          ) : (
+            <>
+              <span>Expand</span>
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </>
+          )}
+        </Button>
+
+        {/* Admin buttons - only show if handlers are provided */}
+        {(onEdit || onDelete) && (
+          <div className="flex gap-2">
+            {onEdit && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs"
+                onClick={() => onEdit(comp.id)}
+                aria-label="Edit composition"
+              >
+                Edit
+              </Button>
+            )}
+            {onDelete && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="text-xs border-destructive/30 text-destructive hover:bg-destructive/10"
+                onClick={() => onDelete(comp.id)}
+                aria-label="Delete composition"
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        )}
       </div>
       
       {/* Expanded Content */}

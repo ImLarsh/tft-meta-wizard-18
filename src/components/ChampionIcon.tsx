@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
@@ -24,15 +23,11 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   const { useTftImages } = useImageToggle();
   const [imgError, setImgError] = useState(false);
   
-  // Normalize the champion name for different API formats
   let normalizedName = '';
   
-  // Guard against undefined or null name
   if (!name) {
     console.error('ChampionIcon received undefined or null name');
-  }
-  // Special case handling for champions with known naming issues
-  else if (name === "MissFortune" || name === "Miss Fortune") {
+  } else if (name === "MissFortune" || name === "Miss Fortune") {
     normalizedName = "missfortune";
   } else if (name === "AurelionSol" || name === "Aurelion Sol") {
     normalizedName = "aurelionsol";
@@ -61,71 +56,52 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   } else if (name === "Naafiri") {
     normalizedName = "naafiri";
   } else {
-    // Standard normalization for other champions - safely handle name
     normalizedName = name ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unknown';
   }
   
-  // For display in fallback
-  const displayName = name ? name.replace(/([A-Z])/g, ' $1').trim() : 'Unknown'; // Add spaces before capital letters
+  const displayName = name ? name.replace(/([A-Z])/g, ' $1').trim() : 'Unknown';
   
-  // TFT-specific image sources
   const tftSources = [
-    // TFT set 10 & 14 specific sources
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
-    // TFT general sources
     `https://cdn.metatft.com/file/metatft/champions/${normalizedName}.png`,
     `https://rerollcdn.com/characters/${normalizedName}.png`,
     `https://cdn.tft.tools/champions/${normalizedName}.png`,
   ];
   
-  // League of Legends summoner icon images
   const lolSources = [
-    // Riot Data Dragon - First try with normalized name
     `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
-    
-    // Then try with original name (for Data Dragon which sometimes uses spaces)
     `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
     `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
     `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name ? name.replace(/\s+/g, '') : 'Unknown'}_0.jpg`,
-    
-    // Community Dragon
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName}/${normalizedName}_0.jpg`,
-    
-    // Mobalytics
     `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName}.png`,
-    
-    // League of Legends asset links
     `https://static.wikia.nocookie.net/leagueoflegends/images/latest/scale-to-width-down/123?cb=20200412015006&path-prefix=${normalizedName}`,
     `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName}.png`
   ];
   
-  // Select the image sources based on the toggle
   const sources = useTftImages ? tftSources : lolSources;
   
-  // Fallback image - use a more reliable placeholder
   const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Ryze_0.jpg';
   
-  // Size classes - adjusted for better filling of hexagons
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-11 h-11', 
-    lg: 'w-16 h-16'
+    lg: 'w-full h-full'
   };
   
-  // Cost-specific text colors for the number indicator
   const costTextColors = {
-    1: 'text-cost-1', // white for 1-cost
-    2: 'text-cost-2', // green for 2-cost
-    3: 'text-cost-3', // blue for 3-cost
-    4: 'text-cost-4', // purple for 4-cost
-    5: 'text-cost-5'  // gold for 5-cost
+    1: 'text-cost-1',
+    2: 'text-cost-2',
+    3: 'text-cost-3',
+    4: 'text-cost-4',
+    5: 'text-cost-5'
   };
   
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
@@ -143,7 +119,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   
   return (
     <div className="relative">
-      {/* Stars for carry champion - positioned above the container with enough space */}
       {isCarry && (
         <div className="absolute -top-4 w-full flex justify-center">
           <div className="flex space-x-0.5">
@@ -157,7 +132,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       <div 
         className={cn(
           sizeClasses[size], 
-          'rounded-md overflow-hidden relative',
+          'rounded overflow-hidden relative',
           className
         )}
         onClick={onClick}
@@ -173,14 +148,13 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
             <img
               src={sources[currentSourceIndex]}
               alt={name || 'Unknown Champion'}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               onError={handleImageError}
               loading="lazy"
             />
           </div>
         )}
         
-        {/* Cost indicator number */}
         <div className={cn(
           "absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-[10px] font-bold rounded-full bg-black/70",
           costTextColors[cost]

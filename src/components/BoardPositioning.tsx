@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
@@ -127,7 +126,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     for (let row = 0; row < rows; row++) {
       const rowCells = [];
       for (let col = 0; col < cols; col++) {
-        // In odd rows, we have 6 cells instead of 7 to maintain the honeycomb pattern
         if (row % 2 === 1 && col === cols - 1) continue;
         
         const championAtPosition = positionedChampions.find(
@@ -149,6 +147,14 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   draggable={!readonly} 
                   onDragStart={e => handleDragStart(e, championAtPosition)}
                 >
+                  {championAtPosition.isCarry && (
+                    <div className="carry-stars">
+                      <Star size={12} fill="#FFD700" color="#FFD700" />
+                      <Star size={12} fill="#FFD700" color="#FFD700" />
+                      <Star size={12} fill="#FFD700" color="#FFD700" />
+                    </div>
+                  )}
+                  
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -156,8 +162,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                           <ChampionIcon 
                             name={championAtPosition.name} 
                             cost={championAtPosition.cost} 
-                            size="md" 
-                            isCarry={championAtPosition.isCarry} 
+                            size="lg" 
+                            isCarry={false} 
                             onClick={() => !readonly && handleChampionClick(championAtPosition)} 
                           />
                         </div>

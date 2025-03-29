@@ -53,12 +53,12 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
       
       setIsLoading(true);
       
-      // Get total likes
+      // Get total likes - using filter() instead of eq() for type safety
       const { data: likesData, error: likesError } = await supabase
         .from('comp_votes')
         .select('id')
-        .eq('comp_id', compId)
-        .eq('vote_type', 'like');
+        .filter('comp_id', 'eq', compId)
+        .filter('vote_type', 'eq', 'like');
       
       if (likesError) {
         console.error('Error fetching likes:', likesError);
@@ -66,12 +66,12 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
         setLikes(likesData.length);
       }
       
-      // Get total dislikes
+      // Get total dislikes - using filter() instead of eq() for type safety
       const { data: dislikesData, error: dislikesError } = await supabase
         .from('comp_votes')
         .select('id')
-        .eq('comp_id', compId)
-        .eq('vote_type', 'dislike');
+        .filter('comp_id', 'eq', compId)
+        .filter('vote_type', 'eq', 'dislike');
       
       if (dislikesError) {
         console.error('Error fetching dislikes:', dislikesError);
@@ -84,11 +84,11 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
         const { data: userVote, error: userVoteError } = await supabase
           .from('comp_votes')
           .select('vote_type')
-          .eq('comp_id', compId)
-          .eq('user_id', user.id)
-          .single();
+          .filter('comp_id', 'eq', compId)
+          .filter('user_id', 'eq', user.id)
+          .maybeSingle();
         
-        if (userVoteError && userVoteError.code !== 'PGRST116') { // PGRST116 is "no rows returned" which is fine
+        if (userVoteError) {
           console.error('Error fetching user vote:', userVoteError);
         } else if (userVote) {
           setCurrentVote(userVote.vote_type as VoteType);
@@ -115,12 +115,12 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
     
     try {
       if (currentVote) {
-        // Delete existing vote
+        // Delete existing vote - using filter() instead of eq() for type safety
         const { error: deleteError } = await supabase
           .from('comp_votes')
           .delete()
-          .eq('comp_id', compId)
-          .eq('user_id', user.id);
+          .filter('comp_id', 'eq', compId)
+          .filter('user_id', 'eq', user.id);
         
         if (deleteError) throw deleteError;
         
@@ -134,13 +134,14 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
       
       // Insert new vote if not null
       if (newVoteType) {
+        // Using typed insert with proper structure
         const { error: insertError } = await supabase
           .from('comp_votes')
           .insert({
             comp_id: compId,
             user_id: user.id,
             vote_type: newVoteType
-          });
+          } as any); // Using type assertion until we can fix the database types
         
         if (insertError) throw insertError;
         

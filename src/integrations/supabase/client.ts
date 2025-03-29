@@ -32,7 +32,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     detectSessionInUrl: true,
     flowType: 'pkce',
     debug: true,
-    redirectTo: getRedirectURL(),
+    // Removed redirectTo property as it's being passed directly in auth methods instead
   }
 });
 

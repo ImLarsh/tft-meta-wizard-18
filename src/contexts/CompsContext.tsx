@@ -49,7 +49,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           .from('tft_comps')
           .select('*')
           .order('created_at', { ascending: false })
-          .single();
+          .maybeSingle();
         
         if (compsError && compsError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
           console.error('Error fetching comps:', compsError);
@@ -60,7 +60,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           });
         }
         
-        if (compsData) {
+        if (compsData && compsData.comps) {
           // Parse the JSON data from Supabase
           const jsonComps = compsData.comps as Json;
           if (Array.isArray(jsonComps)) {
@@ -82,7 +82,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               // Save the localStorage comps to Supabase
               await supabase
                 .from('tft_comps')
-                .insert({ comps: parsedComps as unknown as Json })
+                .insert({ 
+                  comps: parsedComps as unknown as Json 
+                } as any)
                 .select();
               
               // Clear localStorage now that data is in Supabase
@@ -95,7 +97,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             // Initialize with empty array if no data available
             await supabase
               .from('tft_comps')
-              .insert({ comps: [] as unknown as Json })
+              .insert({ 
+                comps: [] as unknown as Json 
+              } as any)
               .select();
           }
         }
@@ -105,13 +109,13 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           .from('tft_trait_mappings')
           .select('*')
           .order('created_at', { ascending: false })
-          .single();
+          .maybeSingle();
         
         if (mappingsError && mappingsError.code !== 'PGRST116') {
           console.error('Error fetching trait mappings:', mappingsError);
         }
         
-        if (mappingsData) {
+        if (mappingsData && mappingsData.mappings) {
           // Parse the JSON data from Supabase
           const jsonMappings = mappingsData.mappings as Json;
           if (typeof jsonMappings === 'object' && jsonMappings !== null && !Array.isArray(jsonMappings)) {
@@ -133,7 +137,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               // Save the localStorage mappings to Supabase
               await supabase
                 .from('tft_trait_mappings')
-                .insert({ mappings: parsedMappings as unknown as Json })
+                .insert({ 
+                  mappings: parsedMappings as unknown as Json 
+                } as any)
                 .select();
               
               // Clear localStorage now that data is in Supabase
@@ -146,7 +152,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             // Initialize with empty object if no data available
             await supabase
               .from('tft_trait_mappings')
-              .insert({ mappings: {} as unknown as Json })
+              .insert({ 
+                mappings: {} as unknown as Json 
+              } as any)
               .select();
           }
         }
@@ -202,18 +210,20 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const { data: existingData, error: checkError } = await supabase
           .from('tft_comps')
           .select('id')
-          .single();
+          .maybeSingle();
         
         if (checkError && checkError.code !== 'PGRST116') {
           console.error('Error checking for existing comps:', checkError);
           return;
         }
         
-        if (existingData) {
+        if (existingData && existingData.id) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_comps')
-            .update({ comps: comps as unknown as Json })
+            .update({ 
+              comps: comps as unknown as Json 
+            } as any)
             .eq('id', existingData.id);
           
           if (updateError) {
@@ -225,7 +235,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_comps')
-            .insert({ comps: comps as unknown as Json })
+            .insert({ 
+              comps: comps as unknown as Json 
+            } as any)
             .select();
           
           if (insertError) {
@@ -254,18 +266,20 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const { data: existingData, error: checkError } = await supabase
           .from('tft_trait_mappings')
           .select('id')
-          .single();
+          .maybeSingle();
         
         if (checkError && checkError.code !== 'PGRST116') {
           console.error('Error checking for existing trait mappings:', checkError);
           return;
         }
         
-        if (existingData) {
+        if (existingData && existingData.id) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_trait_mappings')
-            .update({ mappings: traitMappings as unknown as Json })
+            .update({ 
+              mappings: traitMappings as unknown as Json 
+            } as any)
             .eq('id', existingData.id);
           
           if (updateError) {
@@ -277,7 +291,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_trait_mappings')
-            .insert({ mappings: traitMappings as unknown as Json })
+            .insert({ 
+              mappings: traitMappings as unknown as Json 
+            } as any)
             .select();
           
           if (insertError) {

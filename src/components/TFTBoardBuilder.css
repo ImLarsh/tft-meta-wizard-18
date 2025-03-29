@@ -1,31 +1,37 @@
 
+/* TFT Board Builder Styles */
+
 .hex-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  max-width: 840px; /* Increased from 640px for a larger grid */
+  max-width: 1000px; /* Increased from 840px for a larger grid */
+  padding: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
 }
 
 .hex-row {
   display: flex;
   justify-content: center;
-  margin-bottom: -14px; /* Adjusted for better vertical alignment */
+  margin-bottom: -20px; /* Adjusted for better vertical alignment */
 }
 
 .hex-row.offset {
-  margin-left: 38px; /* Adjusted for proper honeycomb staggering */
+  margin-left: 46px; /* Adjusted for proper honeycomb staggering */
 }
 
 .hex-cell {
-  margin: 0 6px; /* Increased spacing between hexagons */
+  margin: 10px; /* Increased spacing between hexagons */
   cursor: pointer;
+  position: relative;
 }
 
 .hex {
   position: relative;
-  width: 70px; /* Increased from 50px */
-  height: 80px; /* Increased from 58px */
+  width: 90px; /* Increased from 70px */
+  height: 104px; /* Increased from 80px to maintain proportions */
   background-color: rgba(128, 128, 128, 0.2);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
@@ -63,48 +69,31 @@
 }
 
 .champion-icon-wrapper {
-  width: 54px; /* Increased from 38px */
-  height: 54px; /* Increased from 38px */
+  width: 60px; /* Increased from 54px */
+  height: 60px; /* Increased from 54px */
   border-radius: 6px;
   overflow: hidden;
   position: relative;
 }
 
-.carry-indicator {
-  position: absolute;
-  top: -16px; /* Adjusted to be above the icon */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
-
 .items-container {
   position: absolute;
-  bottom: -14px; /* Positioned at the bottom but above the hex */
+  bottom: -18px; /* Positioned below but visually still at the bottom of the hex */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 3px; /* Slightly increased gap between items */
+  gap: 4px; /* Slightly increased gap between items */
   z-index: 5;
-}
-
-.board-container {
-  padding: 2rem;
-  margin: 0 auto;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
 }
 
 .board-wrapper {
   width: 100%;
 }
 
-.board-wrapper.compact .board-container {
-  padding: 1.5rem;
-  max-width: 600px; /* Increased from 480px for compact view */
+.board-wrapper.compact .hex-grid {
+  max-width: 700px; /* Increased from 600px for compact view */
 }
 
-/* Keep the rest of the styles the same */
 .board-instructions {
   display: flex;
   align-items: center;
@@ -116,14 +105,14 @@
 }
 
 .champions-title {
-  margin-top: a1.5rem;
+  margin-top: 1.5rem;
   margin-bottom: 0.75rem;
   font-weight: 500;
 }
 
 .champions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Increased from 80px */
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Increased from 90px */
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
@@ -186,4 +175,42 @@
   color: #6b7280;
   text-align: center;
   margin-top: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hex {
+    width: 70px;
+    height: 80px;
+  }
+  
+  .hex-row.offset {
+    margin-left: 35px;
+  }
+  
+  .champion-icon-wrapper {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .champions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .hex {
+    width: 50px;
+    height: 58px;
+  }
+  
+  .hex-row.offset {
+    margin-left: 25px;
+  }
+  
+  .champion-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
 }

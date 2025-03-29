@@ -4,28 +4,28 @@
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  max-width: 640px;
+  max-width: 840px; /* Increased from 640px for a larger grid */
 }
 
 .hex-row {
   display: flex;
   justify-content: center;
-  margin-bottom: -10px;
+  margin-bottom: -14px; /* Adjusted for better vertical alignment */
 }
 
 .hex-row.offset {
-  margin-left: 26px;
+  margin-left: 38px; /* Adjusted for proper honeycomb staggering */
 }
 
 .hex-cell {
-  margin: 0 4px;
+  margin: 0 6px; /* Increased spacing between hexagons */
   cursor: pointer;
 }
 
 .hex {
   position: relative;
-  width: 50px;
-  height: 58px;
+  width: 70px; /* Increased from 50px */
+  height: 80px; /* Increased from 58px */
   background-color: rgba(128, 128, 128, 0.2);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
@@ -63,15 +63,16 @@
 }
 
 .champion-icon-wrapper {
-  width: 38px;
-  height: 38px;
-  border-radius: 4px;
+  width: 54px; /* Increased from 38px */
+  height: 54px; /* Increased from 38px */
+  border-radius: 6px;
   overflow: hidden;
+  position: relative;
 }
 
 .carry-indicator {
   position: absolute;
-  top: -14px;
+  top: -16px; /* Adjusted to be above the icon */
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -79,19 +80,19 @@
 
 .items-container {
   position: absolute;
-  bottom: -10px;
+  bottom: -14px; /* Positioned at the bottom but above the hex */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 2px;
+  gap: 3px; /* Slightly increased gap between items */
   z-index: 5;
 }
 
 .board-container {
-  padding: 1.5rem;
+  padding: 2rem;
   margin: 0 auto;
   background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .board-wrapper {
@@ -99,10 +100,11 @@
 }
 
 .board-wrapper.compact .board-container {
-  padding: 1rem;
-  max-width: 480px;
+  padding: 1.5rem;
+  max-width: 600px; /* Increased from 480px for compact view */
 }
 
+/* Keep the rest of the styles the same */
 .board-instructions {
   display: flex;
   align-items: center;
@@ -114,14 +116,14 @@
 }
 
 .champions-title {
-  margin-top: 1.5rem;
+  margin-top: a1.5rem;
   margin-bottom: 0.75rem;
   font-weight: 500;
 }
 
 .champions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Increased from 80px */
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }

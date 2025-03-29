@@ -127,6 +127,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       const rowCells = [];
       
       for (let col = 0; col < cols; col++) {
+        // Skip the last cell in odd rows to maintain proper hexagon pattern
         if (row % 2 === 1 && col === cols - 1) continue;
         
         const championAtPosition = positionedChampions.find(
@@ -155,7 +156,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                           <ChampionIcon 
                             name={championAtPosition.name} 
                             cost={championAtPosition.cost} 
-                            size="sm" 
+                            size="md" /* Changed from 'sm' to 'md' for larger icons */
                             isCarry={championAtPosition.isCarry} 
                             onClick={() => !readonly && handleChampionClick(championAtPosition)}
                           />

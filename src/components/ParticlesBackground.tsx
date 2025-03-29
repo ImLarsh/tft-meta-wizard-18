@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { useTheme } from '@/providers/ThemeProvider';
 
@@ -36,20 +35,20 @@ const ParticlesBackground: React.FC = () => {
       
       const colors = theme === 'dark' 
         ? [
-            'rgba(155, 135, 245, 0.4)', 
+            'rgba(186, 85, 211, 0.4)', 
             'rgba(138, 43, 226, 0.3)', 
-            'rgba(186, 85, 211, 0.35)',
-            'rgba(123, 104, 238, 0.4)', 
-            'rgba(106, 90, 205, 0.35)',
-            'rgba(147, 112, 219, 0.3)'
+            'rgba(148, 0, 211, 0.35)',
+            'rgba(155, 48, 255, 0.4)', 
+            'rgba(131, 58, 180, 0.35)',
+            'rgba(106, 13, 173, 0.3)'
           ]
         : [
-            'rgba(155, 135, 245, 0.5)', 
-            'rgba(138, 43, 226, 0.4)', 
-            'rgba(186, 85, 211, 0.45)',
-            'rgba(123, 104, 238, 0.5)', 
-            'rgba(106, 90, 205, 0.45)',
-            'rgba(147, 112, 219, 0.4)'
+            'rgba(255, 105, 180, 0.5)', 
+            'rgba(255, 20, 147, 0.4)', 
+            'rgba(219, 112, 147, 0.45)',
+            'rgba(255, 0, 255, 0.35)', 
+            'rgba(255, 0, 128, 0.4)',
+            'rgba(238, 130, 238, 0.45)'
           ];
       
       const shapes = ['circle', 'square', 'triangle', 'diamond', 'hexagon'];
@@ -195,8 +194,8 @@ const ParticlesBackground: React.FC = () => {
         const speedX = (Math.random() - 0.5) * 0.03;
         const animationDuration = Math.random() * 80 + 50; // Very long duration
         const color = theme === 'dark' 
-          ? 'rgba(155, 135, 245, 0.15)'
-          : 'rgba(155, 135, 245, 0.25)';
+          ? 'rgba(186, 85, 211, 0.15)'
+          : 'rgba(255, 105, 180, 0.15)';
         const rotation = Math.random() * 360;
         
         line.style.width = `${width}px`;
@@ -243,7 +242,11 @@ const ParticlesBackground: React.FC = () => {
         ray.style.top = `${y}px`;
         ray.style.setProperty('--base-opacity', opacity.toString());
         ray.style.setProperty('--rotation', `${rotation}deg`);
-        ray.style.backgroundImage = `linear-gradient(to bottom, ${theme === 'dark' ? 'rgba(155, 135, 245, 0.6)' : 'rgba(155, 135, 245, 0.8)'}, transparent)`;
+        ray.style.backgroundImage = `linear-gradient(to bottom, ${
+          theme === 'dark' 
+            ? 'rgba(186, 85, 211, 0.6)' 
+            : 'rgba(255, 105, 180, 0.6)'
+        }, transparent)`;
         ray.style.filter = `blur(${Math.random() * 40 + 30}px)`;
         
         containerRef.current.appendChild(ray);
@@ -287,10 +290,10 @@ const ParticlesBackground: React.FC = () => {
         aria-hidden="true"
       />
       <div className="abstract-background fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-2]">
-        <div className="blur-circle circle-1 absolute rounded-full bg-primary/10 w-[70vw] h-[70vw] blur-[120px] top-[-20vw] left-[-20vw]"></div>
-        <div className="blur-circle circle-2 absolute rounded-full bg-primary/10 w-[50vw] h-[50vw] blur-[100px] bottom-[-10vw] right-[-10vw]"></div>
-        <div className="blur-circle circle-3 absolute rounded-full bg-primary/5 w-[40vw] h-[40vw] blur-[80px] top-[30vh] right-[10vw]"></div>
-        <div className="blur-circle circle-4 absolute rounded-full bg-primary/5 w-[60vw] h-[60vw] blur-[100px] bottom-[10vh] left-[20vw]"></div>
+        <div className={`blur-circle circle-1 absolute rounded-full ${theme === 'dark' ? 'bg-primary/10' : 'bg-pink-500/20'} w-[70vw] h-[70vw] blur-[120px] top-[-20vw] left-[-20vw]`}></div>
+        <div className={`blur-circle circle-2 absolute rounded-full ${theme === 'dark' ? 'bg-primary/10' : 'bg-pink-500/20'} w-[50vw] h-[50vw] blur-[100px] bottom-[-10vw] right-[-10vw]`}></div>
+        <div className={`blur-circle circle-3 absolute rounded-full ${theme === 'dark' ? 'bg-primary/5' : 'bg-pink-400/15'} w-[40vw] h-[40vw] blur-[80px] top-[30vh] right-[10vw]`}></div>
+        <div className={`blur-circle circle-4 absolute rounded-full ${theme === 'dark' ? 'bg-primary/5' : 'bg-pink-400/15'} w-[60vw] h-[60vw] blur-[100px] bottom-[10vh] left-[20vw]`}></div>
       </div>
     </>
   );

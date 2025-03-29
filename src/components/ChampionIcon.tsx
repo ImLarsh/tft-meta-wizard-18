@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useChampionSet } from '@/providers/ChampionSetProvider';
 
 interface ChampionIconProps {
   name: string;
@@ -20,6 +21,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   onClick
 }) => {
   const [imgError, setImgError] = useState(false);
+  const { set } = useChampionSet();
   
   // Normalize the champion name for different API formats
   let normalizedName = '';
@@ -55,8 +57,8 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   // For display in fallback
   const displayName = name ? name.replace(/([A-Z])/g, ' $1').trim() : 'Unknown'; // Add spaces before capital letters
   
-  // New and more reliable image sources
-  const sources = [
+  // Standard sources (used when set is 'standard')
+  const standardSources = [
     // TFT set 10 specific sources
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
@@ -89,6 +91,19 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     // TFT Tactics
     `https://cdn.tft.tools/champions/${normalizedName}.png`
   ];
+  
+  // Set 14 Cyber City sources
+  const set14Sources = [
+    // TFT Set 14 Cyber City specific sources
+    `https://raw.communitydragon.org/latest/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.13.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    `https://cdn.mobalytics.gg/assets/tft/images/champions/tft14/${normalizedName}.png`,
+    // Fall back to standard sources if set14 sources fail
+    ...standardSources
+  ];
+  
+  // Choose sources based on selected set
+  const sources = set === 'set14' ? set14Sources : standardSources;
   
   // Fallback image - use a more reliable placeholder
   const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Ryze_0.jpg';

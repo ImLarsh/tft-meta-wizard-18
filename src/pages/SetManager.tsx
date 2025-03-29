@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash, Save, X, Info } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { useComps } from '@/contexts/CompsContext';
-import MainLayout from '@/components/MainLayout';
+import PageLayout from '@/components/PageLayout';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -350,7 +350,7 @@ const SetManager = () => {
   };
 
   return (
-    <MainLayout>
+    <PageLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Manage TFT Sets</h1>
@@ -722,7 +722,7 @@ const SetManager = () => {
           </Card>
         )}
       </div>
-    </MainLayout>
+    </PageLayout>
   );
 };
 

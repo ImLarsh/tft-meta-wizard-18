@@ -186,17 +186,12 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                 <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                   {comp.finalComp.map((champion) => (
                     <div key={champion.name} className="flex flex-col items-center gap-1">
-                      <div className={`relative ${champion.isCarry ? 'animate-pulse-subtle' : ''}`}>
-                        <ChampionIcon name={champion.name} cost={champion.cost} />
-                        {champion.isCarry && (
-                          <div className="absolute -top-2 left-0 w-full flex justify-center z-10">
-                            <div className="flex">
-                              <Star size={8} fill="#FFD700" color="#FFD700" />
-                              <Star size={8} fill="#FFD700" color="#FFD700" />
-                              <Star size={8} fill="#FFD700" color="#FFD700" />
-                            </div>
-                          </div>
-                        )}
+                      <div className="relative">
+                        <ChampionIcon 
+                          name={champion.name} 
+                          cost={champion.cost} 
+                          isCarry={champion.isCarry}
+                        />
                       </div>
                       <span className="text-xs text-center">{champion.name}</span>
                       {champion.items && champion.items.length > 0 && (

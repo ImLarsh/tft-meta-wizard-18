@@ -171,7 +171,11 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
                   <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                     {comp.finalComp.map((champion) => (
                       <div key={champion.name} className="flex flex-col items-center gap-1">
-                        <ChampionIcon name={champion.name} cost={champion.cost} />
+                        <ChampionIcon 
+                          name={champion.name} 
+                          cost={champion.cost}
+                          isCarry={champion.isCarry} 
+                        />
                         <span className="text-xs text-center">{champion.name}</span>
                         {champion.items && champion.items.length > 0 && (
                           <div className="flex gap-1 mt-1 flex-wrap justify-center">

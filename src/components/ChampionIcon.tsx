@@ -21,14 +21,12 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
-  // Primary source: DDragon CDN
+  // New, more reliable sources
   const ddragonUrl = `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName}.png`;
-  
-  // Secondary source: Community Dragon
   const communityDragonUrl = `https://raw.communitydragon.org/latest/game/assets/characters/${normalizedName.toLowerCase()}/hud/${normalizedName.toLowerCase()}_square.png`;
-  
-  // Tertiary source: TFT specific CDN if available
   const tftUrl = `https://cdn.metatft.com/file/metatft/champions/${normalizedName.toLowerCase()}.png`;
+  const rerollUrl = `https://rerollcdn.com/characters/${normalizedName.toLowerCase()}.png`;
+  const cdnGamepediaUrl = `https://cdn.mobalytics.gg/assets/tft/images/champions/set9/${normalizedName.toLowerCase()}.png`;
   
   // Fallback image
   const fallbackUrl = '/placeholder.svg';
@@ -68,6 +66,12 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       console.log(`Community Dragon failed for ${name}, trying TFT source`);
       target.src = tftUrl;
     } else if (target.src === tftUrl) {
+      console.log(`TFT source failed for ${name}, trying Reroll CDN`);
+      target.src = rerollUrl;
+    } else if (target.src === rerollUrl) {
+      console.log(`Reroll CDN failed for ${name}, trying Mobalytics`);
+      target.src = cdnGamepediaUrl;
+    } else if (target.src === cdnGamepediaUrl) {
       console.log(`All image sources failed for ${name}, using fallback`);
       setImgError(true);
       target.src = fallbackUrl;

@@ -19,10 +19,12 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   const normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '');
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
-  // Multiple image sources to try
+  // Multiple image sources to try - added more reliable sources
   const primarySource = `https://cdn.metatft.com/file/metatft/items/${normalizedName.toLowerCase()}.png`;
   const secondarySource = `https://rerollcdn.com/items/${normalizedName.toLowerCase()}.png`;
   const tertiarySource = `https://cdn.communitydragon.org/latest/item/${normalizedName.toLowerCase()}/icon`;
+  const fourthSource = `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/${normalizedName.toLowerCase()}.png`;
+  const fifthSource = `https://cdn.mobalytics.gg/assets/tft/images/items/set9/${normalizedName.toLowerCase()}.png`;
   
   // Fallback image
   const fallbackUrl = '/placeholder.svg';
@@ -45,6 +47,12 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       console.log(`Secondary source failed for item ${name}, trying tertiary`);
       target.src = tertiarySource;
     } else if (target.src === tertiarySource) {
+      console.log(`Tertiary source failed for item ${name}, trying fourth source`);
+      target.src = fourthSource;
+    } else if (target.src === fourthSource) {
+      console.log(`Fourth source failed for item ${name}, trying fifth source`);
+      target.src = fifthSource;
+    } else if (target.src === fifthSource) {
       console.log(`All image sources failed for item ${name}, using fallback`);
       setImgError(true);
       target.src = fallbackUrl;

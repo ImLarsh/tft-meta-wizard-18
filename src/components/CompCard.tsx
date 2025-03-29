@@ -118,13 +118,12 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
         
         <div className="flex flex-wrap gap-2 mb-3">
           {comp.finalComp.map((champion) => (
-            <div key={champion.name} className="relative">
-              <ChampionIcon 
-                name={champion.name} 
-                cost={champion.cost} 
-                isCarry={champion.isCarry}
-              />
-            </div>
+            <ChampionIcon 
+              key={champion.name}
+              name={champion.name} 
+              cost={champion.cost} 
+              isCarry={champion.isCarry}
+            />
           ))}
         </div>
       </div>
@@ -185,14 +184,12 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                 <h4 className="text-sm font-medium text-muted-foreground mb-2">Final Composition</h4>
                 <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                   {comp.finalComp.map((champion) => (
-                    <div key={champion.name} className="flex flex-col items-center gap-1 pt-4">
-                      <div className="relative">
-                        <ChampionIcon 
-                          name={champion.name} 
-                          cost={champion.cost} 
-                          isCarry={champion.isCarry}
-                        />
-                      </div>
+                    <div key={champion.name} className="flex flex-col items-center gap-1 pt-2">
+                      <ChampionIcon 
+                        name={champion.name} 
+                        cost={champion.cost} 
+                        isCarry={champion.isCarry}
+                      />
                       <span className="text-xs text-center">{champion.name}</span>
                       {champion.items && champion.items.length > 0 && (
                         <div className="flex gap-1 mt-1 flex-wrap justify-center">

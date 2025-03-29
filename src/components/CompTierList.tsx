@@ -159,7 +159,7 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
                   <h4 className="text-sm font-medium text-muted-foreground mb-2">Final Composition</h4>
                   <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                     {comp.finalComp.map((champion) => (
-                      <div key={champion.name} className="flex flex-col items-center gap-1 pt-4">
+                      <div key={champion.name} className="flex flex-col items-center gap-1 pt-2">
                         <ChampionIcon 
                           name={champion.name} 
                           cost={champion.cost}

@@ -124,16 +124,10 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   };
   
   return (
-    <div 
-      className={cn(
-        size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
-        'rounded-md overflow-hidden relative',
-        className
-      )}
-      onClick={onClick}
-    >
+    <div className="relative">
+      {/* Stars for carry champion - positioned OUTSIDE the main container to prevent clipping */}
       {isCarry && (
-        <div className="absolute -top-4 w-full flex justify-center z-10">
+        <div className="absolute w-full flex justify-center" style={{ top: '-14px' }}>
           <div className="flex space-x-0.5">
             <Star size={10} fill="#FFD700" color="#FFD700" />
             <Star size={10} fill="#FFD700" color="#FFD700" />
@@ -141,31 +135,41 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
           </div>
         </div>
       )}
-      {imgError ? (
-        <div className={cn(
-          "w-full h-full flex items-center justify-center text-[10px] font-medium text-white bg-secondary/60 p-0.5 text-center",
-          sizeClasses[size]
-        )}>
-          {displayName}
-        </div>
-      ) : (
-        <div className="w-full h-full">
-          <img
-            src={sources[currentSourceIndex]}
-            alt={name || 'Unknown Champion'}
-            className="w-full h-full object-cover"
-            onError={handleImageError}
-            loading="lazy"
-          />
-        </div>
-      )}
       
-      {/* Cost indicator number */}
-      <div className={cn(
-        "absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-[10px] font-bold rounded-full bg-black/50",
-        costTextColors[cost]
-      )}>
-        {cost}
+      <div 
+        className={cn(
+          size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
+          'rounded-md overflow-hidden relative',
+          className
+        )}
+        onClick={onClick}
+      >
+        {imgError ? (
+          <div className={cn(
+            "w-full h-full flex items-center justify-center text-[10px] font-medium text-white bg-secondary/60 p-0.5 text-center",
+            sizeClasses[size]
+          )}>
+            {displayName}
+          </div>
+        ) : (
+          <div className="w-full h-full">
+            <img
+              src={sources[currentSourceIndex]}
+              alt={name || 'Unknown Champion'}
+              className="w-full h-full object-cover"
+              onError={handleImageError}
+              loading="lazy"
+            />
+          </div>
+        )}
+        
+        {/* Cost indicator number */}
+        <div className={cn(
+          "absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-[10px] font-bold rounded-full bg-black/50",
+          costTextColors[cost]
+        )}>
+          {cost}
+        </div>
       </div>
     </div>
   );

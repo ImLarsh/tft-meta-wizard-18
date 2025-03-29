@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash, Save, X, Info } from 'lucide-react';
+import { Plus, Trash, Save, X, Info, ArrowLeft, Home } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { useComps } from '@/contexts/CompsContext';
 import PageLayout from '@/components/PageLayout';
@@ -39,6 +40,7 @@ const championFormSchema = z.object({
 });
 
 const SetManager = () => {
+  const navigate = useNavigate();
   const { traitMappings, saveTraitMappings } = useComps();
   const [activeSet, setActiveSet] = useState<string | null>(null);
   const [isAddingSet, setIsAddingSet] = useState(false);
@@ -353,7 +355,18 @@ const SetManager = () => {
     <PageLayout>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Manage TFT Sets</h1>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/')} 
+              className="hover:bg-primary/10"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back to Home
+            </Button>
+            <h1 className="text-2xl font-bold">Manage TFT Sets</h1>
+          </div>
           <Dialog open={isAddingSet} onOpenChange={setIsAddingSet}>
             <DialogTrigger asChild>
               <Button>

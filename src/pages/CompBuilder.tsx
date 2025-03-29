@@ -65,7 +65,7 @@ const CompBuilder: React.FC = () => {
     },
   });
 
-  // Generate sample champions for the available pool
+  // Generate champions for the available pool based on the selected TFT version
   useEffect(() => {
     const tftVersion = form.watch("tftVersion");
     if (!tftVersion || !traitMappings[tftVersion]) return;
@@ -74,13 +74,13 @@ const CompBuilder: React.FC = () => {
     const champions: Champion[] = [];
     
     if (mappings && mappings.championTraits) {
-      // Convert to array of champions with costs
+      // Convert to array of champions with costs from the Set Manager
       Object.keys(mappings.championTraits).forEach(championName => {
-        // Assign a cost between 1-5 based on a simple pattern
-        const cost = (championName.length % 5) + 1 as 1 | 2 | 3 | 4 | 5;
+        // Get cost from championCosts in the mappings
+        const cost = mappings.championCosts?.[championName] || 1;
         champions.push({
           name: championName,
-          cost: cost,
+          cost: cost as 1 | 2 | 3 | 4 | 5,
           isCarry: false,
           position: null,
         });

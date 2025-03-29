@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,6 +27,11 @@ const formSchema = z.object({
   tftVersion: z.string(),
 });
 
+const championFormSchema = z.object({
+  name: z.string().min(1, { message: "Please select a champion" }),
+  isCarry: z.boolean().default(false)
+});
+
 interface SimpleCompFormProps {
   initialData?: TFTComp;
   onSubmit: (data: TFTComp) => void;
@@ -38,7 +42,6 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
   const [finalComp, setFinalComp] = useState<Champion[]>(initialData?.finalComp || []);
   const [activeTab, setActiveTab] = useState("general");
   const [newChampName, setNewChampName] = useState("");
-  const [newChampCost, setNewChampCost] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [newChampIsCarry, setNewChampIsCarry] = useState(false);
 
   const { traitMappings } = useComps();
@@ -69,6 +72,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
 
   const currentTftVersion = form.watch("tftVersion") || availableSets[0] || "Set 10";
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
+  const currentCostMap = traitMappings[currentTftVersion]?.championCosts || {};
   
   useEffect(() => {
     if (initialData?.finalComp) {
@@ -79,16 +83,17 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
   const handleAddChampion = () => {
     if (!newChampName) return;
     
+    const cost = currentCostMap[newChampName] || 1;
+    
     const newChampion: Champion = {
       name: newChampName,
-      cost: newChampCost,
+      cost: cost as 1 | 2 | 3 | 4 | 5,
       isCarry: newChampIsCarry,
       position: null,
     };
     
     setFinalComp([...finalComp, newChampion]);
     setNewChampName("");
-    setNewChampCost(1);
     setNewChampIsCarry(false);
   };
 
@@ -105,7 +110,6 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
       return;
     }
 
-    // Auto-detect traits from champions
     const detectedTraits: { [key: string]: number } = {};
     finalComp.forEach(champion => {
       const championTraits = currentTraitMap[champion.name] || [];
@@ -132,7 +136,6 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
       finalComp,
       traits: traitsArray,
       boardPositions: finalComp.some(champ => champ.position !== null),
-      // These fields were missing and causing the build error:
       earlyGame: [],
       keyItems: [],
       strengthsWeaknesses: {
@@ -402,7 +405,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
               <div className="space-y-4 border border-border rounded-md p-4 bg-card/50">
                 <h4 className="font-medium text-sm">Add Champion</h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="mb-2 block">Champion Name</Label>
                     <select
@@ -415,25 +418,6 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                         <option key={name} value={name}>{name}</option>
                       ))}
                     </select>
-                  </div>
-                  
-                  <div>
-                    <Label className="mb-2 block">Cost</Label>
-                    <Select 
-                      value={newChampCost.toString()} 
-                      onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Cost" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1 Cost</SelectItem>
-                        <SelectItem value="2">2 Cost</SelectItem>
-                        <SelectItem value="3">3 Cost</SelectItem>
-                        <SelectItem value="4">4 Cost</SelectItem>
-                        <SelectItem value="5">5 Cost</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                   
                   <div className="flex items-end mb-1">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
@@ -97,6 +96,14 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     return itemIdMap[itemName] || "";
   };
   
+  // Function to convert item name to Data Dragon format
+  const getDataDragonFormat = (itemName: string): string => {
+    // Remove special characters and spaces, keeping alphanumeric
+    return itemName
+      .replace(/['\s.]/g, '')
+      .replace(/&/g, 'And');
+  };
+  
   // Improved function to clean item name for URL paths
   const getCleanItemName = (itemName: string): string => {
     return itemName
@@ -112,7 +119,20 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       return "https://rerollcdn.com/items/JeweledGauntlet.png";
     }
     
-    return null;
+    // Handle other special cases here
+    const specialCases: Record<string, string> = {
+      "B.F. Sword": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/1038.png",
+      "Needlessly Large Rod": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/1058.png",
+      "Recurve Bow": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/1043.png",
+      "Tear of the Goddess": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/3070.png",
+      "Chain Vest": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/1031.png",
+      "Negatron Cloak": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/1057.png",
+      "Giant's Belt": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/1011.png",
+      "Spatula": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/3311.png",
+      "Sparring Gloves": "https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/3177.png",
+    };
+    
+    return specialCases[itemName] || null;
   };
   
   // Get TFT-specific CDNs for the various sites
@@ -121,6 +141,9 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     
     return `https://cdn.metatft.com/file/metatft/items/${cleanName}.png`;
   };
+  
+  // Generate patch versions to try
+  const patchVersions = ['14.7.1', '14.6.1', '14.5.1', '14.1.1', '13.24.1'];
   
   // Get item sources in priority order of reliability
   const getItemSources = (itemName: string): string[] => {
@@ -133,17 +156,22 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     const cleanName = getCleanItemName(itemName);
     const itemId = formatItemId(itemName);
     const tftSpecificUrl = getTFTSpecificUrl(itemName);
+    const dataDragonFormat = getDataDragonFormat(itemName);
     
     const sources = [
       // TFT-specific sources first (most reliable)
       tftSpecificUrl,
       `https://rerollcdn.com/items/${cleanName.replace(/_/g, '')}.png`,
       
+      // TFT Data Dragon specific paths
+      ...patchVersions.map(version => 
+        `https://ddragon.leagueoflegends.com/cdn/${version}/img/tft-item/${dataDragonFormat}.png`
+      ),
+      
       // Riot Data Dragon sources
-      ...(itemId ? [
-        `https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/${itemId}.png`,
-        `https://ddragon.leagueoflegends.com/cdn/latest/img/item/${itemId}.png`,
-      ] : []),
+      ...(itemId ? patchVersions.map(version => 
+        `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`
+      ) : []),
       
       // Mobalytics
       `https://cdn.mobalytics.gg/assets/tft/images/items/${cleanName}.png`,
@@ -167,7 +195,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   const sources = getItemSources(name);
   
   // Fallback (use a reliable default image)
-  const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/3089.png';
+  const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/14.7.1/img/item/3089.png';
   
   const handleImageError = () => {
     const nextIndex = currentSourceIndex + 1;

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ChampionIconProps {
@@ -16,6 +16,13 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   className
 }) => {
   const [imgError, setImgError] = useState(false);
+  const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
+  
+  // Reset error state when name changes
+  useEffect(() => {
+    setImgError(false);
+    setCurrentSourceIndex(0);
+  }, [name]);
   
   // Normalize the champion name for different API formats
   let normalizedName;
@@ -39,6 +46,16 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     normalizedName = "jarvaniv";
   } else if (name === "LeBlanc" || name === "Le Blanc") {
     normalizedName = "leblanc";
+  } else if (name === "KhaZix" || name === "Kha'Zix") {
+    normalizedName = "khazix";
+  } else if (name === "ChoGath" || name === "Cho'Gath") {
+    normalizedName = "chogath";
+  } else if (name === "KaiSa" || name === "Kai'Sa") {
+    normalizedName = "kaisa";
+  } else if (name === "VelKoz" || name === "Vel'Koz") {
+    normalizedName = "velkoz";
+  } else if (name === "RekSai" || name === "Rek'Sai") {
+    normalizedName = "reksai";
   } else {
     // Standard normalization for other champions
     // Remove spaces and special characters, convert to lowercase
@@ -48,22 +65,34 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   // For display in fallback
   const displayName = name.replace(/([A-Z])/g, ' $1').trim(); // Add spaces before capital letters
   
+  // Generate an array of possible patch versions to try
+  const patchVersions = ['14.7.1', '14.6.1', '14.5.1', '14.1.1', '13.24.1'];
+  
   // New and more reliable image sources
   const sources = [
+    // Data Dragon TFT-specific image paths (most reliable)
+    ...patchVersions.map(version => 
+      `https://ddragon.leagueoflegends.com/cdn/${version}/img/tft-champion/${normalizedName}.png`
+    ),
+    
     // TFT set 10 specific sources
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     `https://raw.communitydragon.org/latest/game/assets/characters/tft10_${normalizedName}/hud/tft10_${normalizedName}_square.tft_set10.png`,
     
-    // Riot Data Dragon - First try with normalized name
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
+    // TFT set 11 specific sources (for future-proofing)
+    `https://raw.communitydragon.org/pbe/game/assets/characters/tft11_${normalizedName}/hud/tft11_${normalizedName}_square.tft_set11.png`,
     
-    // Then try with original name (for Data Dragon which sometimes uses spaces)
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name.replace(/\s+/g, '')}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name.replace(/\s+/g, '')}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name.replace(/\s+/g, '')}_0.jpg`,
+    // Riot Data Dragon - Try with normalized name
+    ...patchVersions.map(version => 
+      `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`
+    ),
     
-    // Community Dragon
+    // Try with original name (for Data Dragon which sometimes uses spaces)
+    ...patchVersions.map(version => 
+      `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${name.replace(/\s+/g, '')}.png`
+    ),
+    
+    // Community Dragon fallbacks
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName}/${normalizedName}_0.jpg`,
     
@@ -74,10 +103,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     // MetaTFT & Reroll
     `https://cdn.metatft.com/file/metatft/champions/${normalizedName}.png`,
     `https://rerollcdn.com/characters/${normalizedName}.png`,
-    
-    // League of Legends asset links
-    `https://static.wikia.nocookie.net/leagueoflegends/images/latest/scale-to-width-down/123?cb=20200412015006&path-prefix=${normalizedName}`,
-    `https://lolg-cdn.porofessor.gg/img/champion-icons/${normalizedName}.png`,
     
     // TFT Tactics
     `https://cdn.tft.tools/champions/${normalizedName}.png`
@@ -109,8 +134,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     4: 'bg-cost-4',
     5: 'bg-cost-5'
   };
-  
-  const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   
   const handleImageError = () => {
     const nextIndex = currentSourceIndex + 1;

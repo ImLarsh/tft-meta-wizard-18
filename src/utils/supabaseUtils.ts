@@ -117,7 +117,8 @@ export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
       const comps = data[0]?.comps;
       if (comps && Array.isArray(comps)) {
         console.log('Successfully fetched comps from Supabase:', comps);
-        return comps as TFTComp[];
+        // Type assertion to convert Json[] to TFTComp[] safely
+        return comps as unknown as TFTComp[];
       }
     }
     

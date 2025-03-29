@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import TFTBoardBuilder from '@/components/TFTBoardBuilder';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Sparkles, HelpCircle, Save } from 'lucide-react';
+import { ArrowLeft, Sparkles, HelpCircle, Save, Crown, Plus } from 'lucide-react';
 import { Champion, TFTComp } from '@/data/comps';
 import { toast } from '@/components/ui/use-toast';
 import { useComps } from '@/contexts/CompsContext';
@@ -36,6 +36,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import ChampionDetailCard from '@/components/ChampionDetailCard';
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
@@ -52,6 +54,7 @@ const CompBuilder: React.FC = () => {
   const [availableChampions, setAvailableChampions] = useState<Champion[]>([]);
   const [boardChampions, setBoardChampions] = useState<Champion[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState('board');
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,6 +86,7 @@ const CompBuilder: React.FC = () => {
           cost: cost as 1 | 2 | 3 | 4 | 5,
           isCarry: false,
           position: null,
+          items: [],
         });
       });
     }
@@ -97,6 +101,20 @@ const CompBuilder: React.FC = () => {
       title: "Board Saved",
       description: `${champions.length} champions saved to your composition.`,
     });
+  };
+
+  // Update champion details
+  const updateChampion = (index: number, updatedChampion: Champion) => {
+    const newChampions = [...boardChampions];
+    newChampions[index] = updatedChampion;
+    setBoardChampions(newChampions);
+  };
+
+  // Remove champion
+  const removeChampion = (index: number) => {
+    const newChampions = [...boardChampions];
+    newChampions.splice(index, 1);
+    setBoardChampions(newChampions);
   };
 
   // Handle form submission
@@ -198,19 +216,53 @@ const CompBuilder: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Board Builder - Takes up 3 columns on large screens */}
+          {/* Board Builder & Champion Details - Takes up 3 columns on large screens */}
           <div className="lg:col-span-3 space-y-6">
             <Card className="border border-primary/20 shadow-md backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Champion Board</CardTitle>
-                <CardDescription>Drag and drop champions to create your team composition</CardDescription>
+              <CardHeader className="pb-2">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="grid grid-cols-2">
+                    <TabsTrigger value="board">Board Builder</TabsTrigger>
+                    <TabsTrigger value="champions">Champion Details</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </CardHeader>
               <CardContent>
-                <TFTBoardBuilder 
-                  availableChampions={availableChampions} 
-                  onSave={handleSaveBoard}
-                  initialChampions={boardChampions}
-                />
+                <TabsContent value="board" className="mt-0">
+                  <TFTBoardBuilder 
+                    availableChampions={availableChampions} 
+                    onSave={handleSaveBoard}
+                    initialChampions={boardChampions}
+                  />
+                </TabsContent>
+                <TabsContent value="champions" className="mt-0">
+                  {boardChampions.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {boardChampions.map((champion, index) => (
+                        <ChampionDetailCard 
+                          key={index}
+                          champion={champion}
+                          onUpdate={(updated) => updateChampion(index, updated)}
+                          onRemove={() => removeChampion(index)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <div className="bg-muted/50 p-8 rounded-lg border border-border">
+                        <Crown className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="text-lg font-medium">No Champions Added</h3>
+                        <p className="text-muted-foreground mt-2 mb-4">
+                          Use the Board Builder tab to add champions to your composition.
+                        </p>
+                        <Button variant="default" onClick={() => setActiveTab('board')}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Champions
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
               </CardContent>
             </Card>
           </div>

@@ -1,18 +1,17 @@
-
 import * as React from "react";
-import { ReactNode } from "react";
-import { v4 as uuidv4 } from "uuid";
-import * as ToastPrimitives from "@radix-ui/react-toast";
-import type { ToastProps } from "@/components/ui/toast";
+import {
+  type ToastActionElement,
+  type ToastProps,
+} from "@/components/ui/toast";
 
 const TOAST_LIMIT = 5;
-const TOAST_REMOVE_DELAY = 1000 * 60 * 60;
+const TOAST_REMOVE_DELAY = 1000000;
 
 type ToasterToast = ToastProps & {
   id: string;
-  title?: ReactNode;
-  description?: ReactNode;
-  action?: ReactNode;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
 };
 
 const actionTypes = {
@@ -39,15 +38,14 @@ type Action =
   | {
       type: ActionType["UPDATE_TOAST"];
       toast: Partial<ToasterToast>;
-      id: string;
     }
   | {
       type: ActionType["DISMISS_TOAST"];
-      id: string;
+      toastId?: string;
     }
   | {
       type: ActionType["REMOVE_TOAST"];
-      id: string;
+      toastId?: string;
     };
 
 interface State {
@@ -65,7 +63,7 @@ const addToRemoveQueue = (toastId: string) => {
     toastTimeouts.delete(toastId);
     dispatch({
       type: "REMOVE_TOAST",
-      id: toastId,
+      toastId: toastId,
     });
   }, TOAST_REMOVE_DELAY);
 
@@ -84,41 +82,50 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === action.id ? { ...t, ...action.toast } : t
+          t.id === action.toast.id ? { ...t, ...action.toast } : t
         ),
       };
 
     case "DISMISS_TOAST": {
-      const { toasts } = state;
-      
-      let newToasts = toasts.map((t) =>
-        t.id === action.id
-          ? {
-              ...t,
-              open: false,
-            }
-          : t
-      );
+      const { toastId } = action;
 
-      addToRemoveQueue(action.id);
+      // ! Side effects ! - This could be extracted into a dismissToast() action,
+      // but I'll keep it here for simplicity
+      if (toastId) {
+        addToRemoveQueue(toastId);
+      } else {
+        state.toasts.forEach((toast) => {
+          addToRemoveQueue(toast.id);
+        });
+      }
 
       return {
         ...state,
-        toasts: newToasts,
+        toasts: state.toasts.map((t) =>
+          t.id === toastId || toastId === undefined
+            ? {
+                ...t,
+                open: false,
+              }
+            : t
+        ),
       };
     }
-
     case "REMOVE_TOAST":
-      if (state.toasts.find((t) => t.id === action.id)?.open) return state;
-      
+      if (action.toastId === undefined) {
+        return {
+          ...state,
+          toasts: [],
+        };
+      }
       return {
         ...state,
-        toasts: state.toasts.filter((t) => t.id !== action.id),
+        toasts: state.toasts.filter((t) => t.id !== action.toastId),
       };
   }
 };
 
-const listeners: ((state: State) => void)[] = [];
+const listeners: Array<(state: State) => void> = [];
 
 let memoryState: State = { toasts: [] };
 
@@ -132,16 +139,14 @@ function dispatch(action: Action) {
 type Toast = Omit<ToasterToast, "id">;
 
 function toast({ ...props }: Toast) {
-  const id = uuidv4();
+  const id = genId();
 
   const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
-      id,
-      toast: props,
+      toast: { ...props, id },
     });
-
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", id });
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
   dispatch({
     type: "ADD_TOAST",
@@ -156,7 +161,7 @@ function toast({ ...props }: Toast) {
   });
 
   return {
-    id,
+    id: id,
     dismiss,
     update,
   };
@@ -173,16 +178,12 @@ function useToast() {
         listeners.splice(index, 1);
       }
     };
-  }, []);
+  }, [state]);
 
   return {
     ...state,
     toast,
-    dismiss: (toastId?: string) => {
-      if (toastId) {
-        dispatch({ type: "DISMISS_TOAST", id: toastId });
-      }
-    },
+    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   };
 }
 

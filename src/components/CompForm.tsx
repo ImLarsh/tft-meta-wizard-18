@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -55,7 +56,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   const [weaknesses, setWeaknesses] = useState<string[]>(initialData?.strengthsWeaknesses?.weaknesses || []);
   
   const [newChampName, setNewChampName] = useState("");
-  const [newChampCost, setNewChampCost] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [newChampItems, setNewChampItems] = useState<string[]>([]);
   const [newChampIsCarry, setNewChampIsCarry] = useState(false);
   const [newChampType, setNewChampType] = useState<"early" | "final">("early");
@@ -101,6 +101,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   const availableTraits = traitMappings[currentTftVersion]?.traits || [];
   
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
+  const currentCostMap = traitMappings[currentTftVersion]?.championCosts || {};
 
   useEffect(() => {
     const championsInCurrentSet = Object.keys(currentTraitMap);
@@ -121,12 +122,20 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
     return currentTraitMap[championName] || [];
   };
 
+  const getChampionCost = (championName: string): 1 | 2 | 3 | 4 | 5 => {
+    // Use the cost from the champion cost map, default to 1 if not found
+    const cost = currentCostMap[championName] || 1;
+    return cost as 1 | 2 | 3 | 4 | 5;
+  };
+
   const handleAddChampion = (champType: "early" | "final") => {
     if (!newChampName) return;
     
+    const championCost = getChampionCost(newChampName);
+    
     const newChampion: Champion = {
       name: newChampName,
-      cost: newChampCost,
+      cost: championCost,
       items: newChampItems.length > 0 ? [...newChampItems] : undefined,
       isCarry: newChampIsCarry,
       position: null,
@@ -165,7 +174,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
     }
     
     setNewChampName("");
-    setNewChampCost(1);
     setNewChampItems([]);
     setNewChampIsCarry(false);
   };
@@ -506,7 +514,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 </div>
               )}
               
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div className="sm:col-span-2">
                   <Label className="mb-2 block">Champion Name</Label>
                   <Popover>
@@ -530,7 +538,10 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                               className="w-full justify-start rounded-none text-left font-normal"
                               onClick={() => setNewChampName(name)}
                             >
-                              {name}
+                              <span>{name}</span>
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                ({getChampionCost(name)} Cost)
+                              </span>
                             </Button>
                           ))
                         }
@@ -539,36 +550,15 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   </Popover>
                 </div>
                 
-                <div className="flex gap-3">
-                  <div className="w-full sm:w-2/3">
-                    <Label className="mb-2 block">Cost</Label>
-                    <Select 
-                      value={newChampCost.toString()} 
-                      onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Cost" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1 Cost</SelectItem>
-                        <SelectItem value="2">2 Cost</SelectItem>
-                        <SelectItem value="3">3 Cost</SelectItem>
-                        <SelectItem value="4">4 Cost</SelectItem>
-                        <SelectItem value="5">5 Cost</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <Button 
-                    type="button" 
-                    onClick={() => handleAddChampion("early")}
-                    disabled={!newChampName || filteredChampions.length === 0}
-                    className="flex-1"
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
+                <Button 
+                  type="button" 
+                  onClick={() => handleAddChampion("early")}
+                  disabled={!newChampName || filteredChampions.length === 0}
+                  className="flex-1"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
               </div>
             </Card>
 
@@ -667,7 +657,10 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                                 className="w-full justify-start rounded-none text-left font-normal"
                                 onClick={() => setNewChampName(name)}
                               >
-                                {name}
+                                <span>{name}</span>
+                                <span className="ml-2 text-xs text-muted-foreground">
+                                  ({getChampionCost(name)} Cost)
+                                </span>
                               </Button>
                             ))
                           }
@@ -676,39 +669,18 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                     </Popover>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="mb-2 block">Cost</Label>
-                      <Select 
-                        value={newChampCost.toString()} 
-                        onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Cost" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1 Cost</SelectItem>
-                          <SelectItem value="2">2 Cost</SelectItem>
-                          <SelectItem value="3">3 Cost</SelectItem>
-                          <SelectItem value="4">4 Cost</SelectItem>
-                          <SelectItem value="5">5 Cost</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex items-end mb-1">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id="carry-checkbox"
-                          checked={newChampIsCarry}
-                          onChange={(e) => setNewChampIsCarry(e.target.checked)}
-                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <Label htmlFor="carry-checkbox" className="cursor-pointer">
-                          Is Carry?
-                        </Label>
-                      </div>
+                  <div className="flex items-end mb-1">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="carry-checkbox"
+                        checked={newChampIsCarry}
+                        onChange={(e) => setNewChampIsCarry(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <Label htmlFor="carry-checkbox" className="cursor-pointer">
+                        Is Carry?
+                      </Label>
                     </div>
                   </div>
                 </div>

@@ -1,513 +1,728 @@
 
 import React, { useState, useEffect } from 'react';
-import { useComps } from '@/contexts/CompsContext';
-import Header from '@/components/Header';
-import { Button } from '@/components/ui/button';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Save, Trash, ChevronDown, ChevronUp, Settings, RefreshCw, Loader2 } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, Trash, Save, X, Info } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
+import { useComps } from '@/contexts/CompsContext';
+import MainLayout from '@/components/MainLayout';
+import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-const SetManager: React.FC = () => {
-  const { 
-    traitMappings, 
-    addTraitMapping, 
-    updateTraitMapping, 
-    removeTraitMapping,
-    loading
-  } = useComps();
-  
-  const [activeTab, setActiveTab] = useState<string>("manage");
-  const [activeSetTab, setActiveSetTab] = useState<string | null>(null);
-  
-  const [newSetName, setNewSetName] = useState("");
-  const [newSetVersion, setNewSetVersion] = useState("");
-  const [newSetTraits, setNewSetTraits] = useState<string[]>([]);
-  const [newTraitInput, setNewTraitInput] = useState("");
-  
-  const [championTraitMapping, setChampionTraitMapping] = useState<Record<string, string[]>>({});
-  const [newChampName, setNewChampName] = useState("");
-  const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
+// Schema for the set form
+const setFormSchema = z.object({
+  id: z.string().min(1, { message: "Set ID is required" }),
+  name: z.string().min(1, { message: "Set name is required" }),
+});
+
+// Schema for the trait form
+const traitFormSchema = z.object({
+  name: z.string().min(1, { message: "Trait name is required" }),
+});
+
+// Schema for the champion form
+const championFormSchema = z.object({
+  name: z.string().min(1, { message: "Champion name is required" }),
+  cost: z.enum(['1', '2', '3', '4', '5'], { 
+    required_error: "Champion cost is required" 
+  }),
+});
+
+const SetManager = () => {
+  const { traitMappings, saveTraitMappings } = useComps();
+  const [activeSet, setActiveSet] = useState<string | null>(null);
+  const [isAddingSet, setIsAddingSet] = useState(false);
+  const [isAddingTrait, setIsAddingTrait] = useState(false);
+  const [isAddingChampion, setIsAddingChampion] = useState(false);
+  const [traitToEdit, setTraitToEdit] = useState<string | null>(null);
+
+  // Set form
+  const setForm = useForm<z.infer<typeof setFormSchema>>({
+    resolver: zodResolver(setFormSchema),
+    defaultValues: {
+      id: "",
+      name: "",
+    },
+  });
+
+  // Trait form
+  const traitForm = useForm<z.infer<typeof traitFormSchema>>({
+    resolver: zodResolver(traitFormSchema),
+    defaultValues: {
+      name: "",
+    },
+  });
+
+  // Champion form
+  const championForm = useForm<z.infer<typeof championFormSchema>>({
+    resolver: zodResolver(championFormSchema),
+    defaultValues: {
+      name: "",
+      cost: "1",
+    },
+  });
+
+  // Get all available sets
+  const availableSets = Object.keys(traitMappings || {});
 
   useEffect(() => {
-    if (!activeSetTab && Object.keys(traitMappings).length > 0) {
-      setActiveSetTab(Object.keys(traitMappings)[0]);
+    if (availableSets.length > 0 && !activeSet) {
+      setActiveSet(availableSets[0]);
     }
-  }, [traitMappings, activeSetTab]);
-  
-  useEffect(() => {
-    if (activeSetTab && traitMappings[activeSetTab]) {
-      const traits = traitMappings[activeSetTab].traits || [];
-      setNewSetTraits([...traits]);
-      
-      const champTraits = traitMappings[activeSetTab].championTraits || {};
-      setChampionTraitMapping({ ...champTraits });
+  }, [availableSets, activeSet]);
+
+  // Get traits for active set
+  const getTraitsForActiveSet = () => {
+    if (!activeSet || !traitMappings[activeSet]) return [];
+    return traitMappings[activeSet].traits || [];
+  };
+
+  // Get champions for active set
+  const getChampionsForActiveSet = () => {
+    if (!activeSet || !traitMappings[activeSet]) return [];
+    const champions = [];
+    const champTraits = traitMappings[activeSet].championTraits || {};
+    const champCosts = traitMappings[activeSet].championCosts || {};
+    
+    for (const champName in champTraits) {
+      champions.push({
+        name: champName,
+        traits: champTraits[champName],
+        cost: champCosts[champName] || 1
+      });
     }
-  }, [activeSetTab, traitMappings]);
-  
-  const handleAddSet = () => {
-    if (!newSetVersion || !newSetName) {
+    
+    return champions;
+  };
+
+  // Get champion traits for active set
+  const getChampionTraitsForActiveSet = (championName: string) => {
+    if (!activeSet || !traitMappings[activeSet] || !traitMappings[activeSet].championTraits) return [];
+    return traitMappings[activeSet].championTraits[championName] || [];
+  };
+
+  // Get champion cost for active set
+  const getChampionCostForActiveSet = (championName: string) => {
+    if (!activeSet || !traitMappings[activeSet] || !traitMappings[activeSet].championCosts) return 1;
+    return traitMappings[activeSet].championCosts[championName] || 1;
+  };
+
+  // Handle add set
+  const handleAddSet = (values: z.infer<typeof setFormSchema>) => {
+    const newSetId = values.id;
+    
+    if (traitMappings[newSetId]) {
       toast({
-        title: "Missing Information",
-        description: "Please provide both a set version and name",
-        variant: "destructive",
+        title: "Error",
+        description: `Set with ID "${newSetId}" already exists`,
+        variant: "destructive"
       });
       return;
     }
     
-    if (traitMappings[newSetVersion]) {
-      toast({
-        title: "Set Already Exists",
-        description: `Set ${newSetVersion} already exists`,
-        variant: "destructive",
-      });
-      return;
-    }
+    const updatedMappings = {
+      ...traitMappings,
+      [newSetId]: {
+        name: values.name,
+        traits: [],
+        championTraits: {},
+        championCosts: {}
+      }
+    };
     
-    addTraitMapping(newSetVersion, newSetName, newSetTraits, {});
+    saveTraitMappings(updatedMappings);
+    setActiveSet(newSetId);
+    setIsAddingSet(false);
+    setForm.reset();
     
-    setNewSetVersion("");
-    setNewSetName("");
-    setNewSetTraits([]);
-    setActiveSetTab(newSetVersion);
-    setActiveTab("manage");
-  };
-  
-  const handleAddTrait = () => {
-    if (!newTraitInput) return;
-    if (!newSetTraits.includes(newTraitInput)) {
-      setNewSetTraits([...newSetTraits, newTraitInput]);
-      setNewTraitInput("");
-    }
-  };
-  
-  const handleRemoveTrait = (index: number) => {
-    setNewSetTraits(newSetTraits.filter((_, i) => i !== index));
-  };
-  
-  const handleUpdateSet = (setKey: string) => {
-    if (!traitMappings[setKey]) return;
-    
-    const setName = traitMappings[setKey].name;
-    updateTraitMapping(setKey, setName, newSetTraits, championTraitMapping);
-  };
-  
-  const handleDeleteSet = (setKey: string) => {
-    if (!traitMappings[setKey]) return;
-    
-    removeTraitMapping(setKey);
-    
-    if (setKey === activeSetTab) {
-      const remainingSets = Object.keys(traitMappings).filter(key => key !== setKey);
-      setActiveSetTab(remainingSets.length > 0 ? remainingSets[0] : null);
-    }
-  };
-  
-  const handleSelectSet = (setKey: string) => {
-    setActiveSetTab(setKey);
-    if (traitMappings[setKey]) {
-      const traits = traitMappings[setKey].traits || [];
-      setNewSetTraits([...traits]);
-      
-      const champTraits = traitMappings[setKey].championTraits || {};
-      setChampionTraitMapping({ ...champTraits });
-    }
-  };
-  
-  const handleAddChampion = () => {
-    if (!newChampName || selectedTraits.length === 0) return;
-    
-    setChampionTraitMapping(prev => ({
-      ...prev,
-      [newChampName]: selectedTraits
-    }));
-    
-    setNewChampName("");
-    setSelectedTraits([]);
-  };
-  
-  const handleRemoveChampion = (champName: string) => {
-    setChampionTraitMapping(prev => {
-      const updated = { ...prev };
-      delete updated[champName];
-      return updated;
+    toast({
+      title: "Set Added",
+      description: `Set "${values.name}" has been added successfully`,
     });
   };
-  
-  const handleToggleTrait = (trait: string) => {
-    if (selectedTraits.includes(trait)) {
-      setSelectedTraits(selectedTraits.filter(t => t !== trait));
-    } else {
-      setSelectedTraits([...selectedTraits, trait]);
+
+  // Handle delete set
+  const handleDeleteSet = (setId: string) => {
+    if (!window.confirm(`Are you sure you want to delete the set "${traitMappings[setId].name}"?`)) {
+      return;
     }
+    
+    const { [setId]: _, ...restMappings } = traitMappings;
+    saveTraitMappings(restMappings);
+    
+    if (activeSet === setId) {
+      setActiveSet(Object.keys(restMappings)[0] || null);
+    }
+    
+    toast({
+      title: "Set Deleted",
+      description: `Set "${traitMappings[setId].name}" has been deleted`,
+    });
   };
 
-  // Render loading state if needed
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container py-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center">
-                <Settings className="mr-2 h-6 w-6 text-primary" />
-                TFT Set Manager
-              </h1>
-              <p className="text-muted-foreground mt-1">Loading trait mappings from database...</p>
-            </div>
-          </div>
-          <div className="flex items-center justify-center py-12">
-            <div className="flex flex-col items-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <p className="text-muted-foreground">Loading trait mappings from Supabase...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Handle add trait
+  const handleAddTrait = (values: z.infer<typeof traitFormSchema>) => {
+    if (!activeSet) return;
+    
+    const traitName = values.name;
+    const currentTraits = traitMappings[activeSet].traits || [];
+    
+    if (currentTraits.includes(traitName)) {
+      toast({
+        title: "Error",
+        description: `Trait "${traitName}" already exists in this set`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const updatedMappings = {
+      ...traitMappings,
+      [activeSet]: {
+        ...traitMappings[activeSet],
+        traits: [...currentTraits, traitName]
+      }
+    };
+    
+    saveTraitMappings(updatedMappings);
+    setIsAddingTrait(false);
+    traitForm.reset();
+    
+    toast({
+      title: "Trait Added",
+      description: `Trait "${traitName}" has been added to set "${traitMappings[activeSet].name}"`,
+    });
+  };
+
+  // Handle delete trait
+  const handleDeleteTrait = (traitName: string) => {
+    if (!activeSet) return;
+    
+    const updatedTraits = (traitMappings[activeSet].traits || []).filter(t => t !== traitName);
+    
+    // Also remove this trait from any champions that have it
+    const updatedChampionTraits = { ...traitMappings[activeSet].championTraits };
+    
+    for (const champion in updatedChampionTraits) {
+      updatedChampionTraits[champion] = updatedChampionTraits[champion].filter(t => t !== traitName);
+    }
+    
+    const updatedMappings = {
+      ...traitMappings,
+      [activeSet]: {
+        ...traitMappings[activeSet],
+        traits: updatedTraits,
+        championTraits: updatedChampionTraits
+      }
+    };
+    
+    saveTraitMappings(updatedMappings);
+    
+    toast({
+      title: "Trait Deleted",
+      description: `Trait "${traitName}" has been deleted from set "${traitMappings[activeSet].name}"`,
+    });
+  };
+
+  // Handle add champion
+  const handleAddChampion = (values: z.infer<typeof championFormSchema>) => {
+    if (!activeSet) return;
+    
+    const championName = values.name;
+    const championCost = parseInt(values.cost);
+    
+    if (traitMappings[activeSet].championTraits && traitMappings[activeSet].championTraits[championName]) {
+      toast({
+        title: "Error",
+        description: `Champion "${championName}" already exists in this set`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const updatedMappings = {
+      ...traitMappings,
+      [activeSet]: {
+        ...traitMappings[activeSet],
+        championTraits: {
+          ...traitMappings[activeSet].championTraits,
+          [championName]: []
+        },
+        championCosts: {
+          ...traitMappings[activeSet].championCosts,
+          [championName]: championCost
+        }
+      }
+    };
+    
+    saveTraitMappings(updatedMappings);
+    setIsAddingChampion(false);
+    championForm.reset();
+    
+    toast({
+      title: "Champion Added",
+      description: `Champion "${championName}" has been added to set "${traitMappings[activeSet].name}"`,
+    });
+  };
+
+  // Handle delete champion
+  const handleDeleteChampion = (championName: string) => {
+    if (!activeSet) return;
+    
+    const { [championName]: _, ...restChampionTraits } = traitMappings[activeSet].championTraits;
+    const { [championName]: __, ...restChampionCosts } = traitMappings[activeSet].championCosts || {};
+    
+    const updatedMappings = {
+      ...traitMappings,
+      [activeSet]: {
+        ...traitMappings[activeSet],
+        championTraits: restChampionTraits,
+        championCosts: restChampionCosts
+      }
+    };
+    
+    saveTraitMappings(updatedMappings);
+    
+    toast({
+      title: "Champion Deleted",
+      description: `Champion "${championName}" has been deleted from set "${traitMappings[activeSet].name}"`,
+    });
+  };
+
+  // Handle toggle trait for champion
+  const handleToggleTraitForChampion = (championName: string, traitName: string) => {
+    if (!activeSet) return;
+    
+    const currentTraits = getChampionTraitsForActiveSet(championName);
+    let updatedTraits: string[];
+    
+    if (currentTraits.includes(traitName)) {
+      updatedTraits = currentTraits.filter(t => t !== traitName);
+    } else {
+      updatedTraits = [...currentTraits, traitName];
+    }
+    
+    const updatedMappings = {
+      ...traitMappings,
+      [activeSet]: {
+        ...traitMappings[activeSet],
+        championTraits: {
+          ...traitMappings[activeSet].championTraits,
+          [championName]: updatedTraits
+        }
+      }
+    };
+    
+    saveTraitMappings(updatedMappings);
+  };
+
+  // Handle update champion cost
+  const handleUpdateChampionCost = (championName: string, newCost: number) => {
+    if (!activeSet) return;
+    
+    const updatedMappings = {
+      ...traitMappings,
+      [activeSet]: {
+        ...traitMappings[activeSet],
+        championCosts: {
+          ...traitMappings[activeSet].championCosts,
+          [championName]: newCost
+        }
+      }
+    };
+    
+    saveTraitMappings(updatedMappings);
+    
+    toast({
+      title: "Champion Updated",
+      description: `${championName}'s cost updated to ${newCost}`,
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <div className="container py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center">
-              <Settings className="mr-2 h-6 w-6 text-primary" />
-              TFT Set Manager
-            </h1>
-            <p className="text-muted-foreground mt-1">Manage champions, traits, and sets for Teamfight Tactics</p>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setActiveTab("create")}>
-              <Plus className="h-4 w-4 mr-1" />
-              New Set
-            </Button>
-          </div>
-        </div>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="manage">Manage Sets</TabsTrigger>
-            <TabsTrigger value="create">Create New Set</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="manage" className="space-y-6">
-            {Object.keys(traitMappings).length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-3 space-y-2">
-                  <h3 className="font-semibold mb-2">Available Sets</h3>
-                  
-                  {Object.keys(traitMappings).map((setKey) => (
-                    <Button 
-                      key={setKey}
-                      variant={activeSetTab === setKey ? "default" : "outline"}
-                      className="w-full justify-start"
-                      onClick={() => handleSelectSet(setKey)}
-                    >
-                      <span>{traitMappings[setKey]?.name || setKey}</span>
-                      <span className="ml-auto text-xs opacity-70">{setKey}</span>
+    <MainLayout>
+      <div className="container mx-auto py-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Manage TFT Sets</h1>
+          <Dialog open={isAddingSet} onOpenChange={setIsAddingSet}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Set
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New TFT Set</DialogTitle>
+              </DialogHeader>
+              <Form {...setForm}>
+                <form onSubmit={setForm.handleSubmit(handleAddSet)} className="space-y-4">
+                  <FormField
+                    control={setForm.control}
+                    name="id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Set ID</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Set10" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={setForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Set Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Remix Rumble" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setIsAddingSet(false)}>
+                      Cancel
                     </Button>
-                  ))}
-                </div>
-                
-                <div className="lg:col-span-9">
-                  {activeSetTab && traitMappings[activeSetTab] ? (
-                    <div className="border border-border rounded-lg p-6">
-                      <div className="flex items-center justify-between mb-6">
-                        <div>
-                          <h3 className="text-xl font-bold">{traitMappings[activeSetTab]?.name}</h3>
-                          <p className="text-sm text-muted-foreground">{activeSetTab}</p>
-                        </div>
+                    <Button type="submit">Add Set</Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {availableSets.length > 0 ? (
+          <Tabs 
+            value={activeSet || ''} 
+            onValueChange={setActiveSet}
+            className="space-y-4"
+          >
+            <TabsList className="w-full border-b">
+              {availableSets.map((setId) => (
+                <TabsTrigger key={setId} value={setId} className="relative">
+                  {traitMappings[setId].name}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-5 w-5 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteSet(setId);
+                    }}
+                  >
+                    <Trash className="h-3 w-3 text-destructive" />
+                  </Button>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {availableSets.map((setId) => (
+              <TabsContent key={setId} value={setId} className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>Set Information</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Info className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <div className="space-y-2">
+                            <h4 className="font-medium">About Sets Management</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Here you can manage TFT sets, traits, and champions. Add traits first, then add champions and assign traits to them.
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Champion costs will be stored here to automatically populate in comp creation.
+                            </p>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Traits</h3>
                         
-                        <div className="flex gap-2">
-                          <Button 
-                            onClick={() => handleUpdateSet(activeSetTab)} 
-                            className="flex items-center"
-                          >
-                            <Save className="h-4 w-4 mr-1" />
-                            Save Changes
-                          </Button>
-                          
-                          <Button 
-                            variant="outline" 
-                            className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                            onClick={() => handleDeleteSet(activeSetTab)}
-                          >
-                            <Trash className="h-4 w-4 mr-1" />
-                            Delete Set
-                          </Button>
-                        </div>
+                        {getTraitsForActiveSet().length > 0 ? (
+                          <div className="space-y-2">
+                            {getTraitsForActiveSet().map((trait) => (
+                              <div key={trait} className="flex items-center justify-between p-2 bg-secondary/20 rounded-md">
+                                <span>{trait}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteTrait(trait)}
+                                >
+                                  <Trash className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-4 bg-muted/30 rounded-md">
+                            <p className="text-muted-foreground">No traits added yet</p>
+                          </div>
+                        )}
+                        
+                        <Dialog open={isAddingTrait} onOpenChange={setIsAddingTrait}>
+                          <DialogTrigger asChild>
+                            <Button className="w-full mt-4">
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Trait
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Add Trait to {traitMappings[setId].name}</DialogTitle>
+                            </DialogHeader>
+                            <Form {...traitForm}>
+                              <form onSubmit={traitForm.handleSubmit(handleAddTrait)} className="space-y-4">
+                                <FormField
+                                  control={traitForm.control}
+                                  name="name"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Trait Name</FormLabel>
+                                      <FormControl>
+                                        <Input placeholder="e.g., K/DA" {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <div className="flex justify-end gap-2">
+                                  <Button type="button" variant="outline" onClick={() => setIsAddingTrait(false)}>
+                                    Cancel
+                                  </Button>
+                                  <Button type="submit">Add Trait</Button>
+                                </div>
+                              </form>
+                            </Form>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                       
-                      <Tabs defaultValue="traits">
-                        <TabsList className="mb-4">
-                          <TabsTrigger value="traits">Traits</TabsTrigger>
-                          <TabsTrigger value="champions">Champions</TabsTrigger>
-                        </TabsList>
+                      <div>
+                        <h3 className="text-lg font-medium mb-4">Champions</h3>
                         
-                        <TabsContent value="traits" className="space-y-4">
-                          <div className="flex gap-2">
-                            <Input 
-                              value={newTraitInput}
-                              onChange={(e) => setNewTraitInput(e.target.value)}
-                              placeholder="Add a trait (e.g., Guardian, Bruiser)"
-                              className="flex-1"
-                            />
-                            <Button onClick={handleAddTrait} disabled={!newTraitInput}>
-                              <Plus className="h-4 w-4 mr-1" />
-                              Add
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                            {newSetTraits.map((trait, index) => (
-                              <div 
-                                key={index} 
-                                className="flex items-center p-2 border border-border rounded bg-card"
-                              >
-                                <span>{trait}</span>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0 ml-auto"
-                                  onClick={() => handleRemoveTrait(index)}
-                                >
-                                  <Trash className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        </TabsContent>
-                        
-                        <TabsContent value="champions" className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium mb-1">Champion Name</label>
-                              <Input 
-                                value={newChampName}
-                                onChange={(e) => setNewChampName(e.target.value)}
-                                placeholder="Champion name (e.g., Garen, Jinx)"
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className="block text-sm font-medium mb-1">Traits</label>
-                              <Select
-                                onValueChange={(value) => handleToggleTrait(value)}
-                                value={selectedTraits[0] || ""}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select traits" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {newSetTraits.map((trait) => (
-                                    <SelectItem 
-                                      key={trait} 
-                                      value={trait}
-                                      className={selectedTraits.includes(trait) ? "bg-primary/20" : ""}
-                                    >
-                                      {trait} {selectedTraits.includes(trait) ? "✓" : ""}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {selectedTraits.map((trait, index) => (
-                              <div 
-                                key={index} 
-                                className="px-2 py-1 bg-primary/20 rounded-full text-sm flex items-center"
-                              >
-                                <span>{trait}</span>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-5 w-5 p-0 ml-1"
-                                  onClick={() => handleToggleTrait(trait)}
-                                >
-                                  <Trash className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                          
-                          <Button 
-                            onClick={handleAddChampion} 
-                            disabled={!newChampName || selectedTraits.length === 0}
-                            className="mb-4"
-                          >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Add Champion
-                          </Button>
-                          
-                          <div className="border border-border rounded">
-                            <table className="w-full text-sm">
-                              <thead className="bg-muted/50">
-                                <tr>
-                                  <th className="text-left p-2">Champion</th>
-                                  <th className="text-left p-2">Traits</th>
-                                  <th className="p-2 w-10"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {Object.entries(championTraitMapping).map(([champ, traits], index) => (
-                                  <tr key={index} className="border-t border-border">
-                                    <td className="p-2">{champ}</td>
-                                    <td className="p-2">
-                                      <div className="flex flex-wrap gap-1">
-                                        {traits.map((trait, i) => (
-                                          <span key={i} className="px-1.5 py-0.5 bg-secondary/50 text-xs rounded">
-                                            {trait}
-                                          </span>
-                                        ))}
-                                      </div>
-                                    </td>
-                                    <td className="p-2">
+                        {getChampionsForActiveSet().length > 0 ? (
+                          <div className="space-y-2">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Champion</TableHead>
+                                  <TableHead>Cost</TableHead>
+                                  <TableHead>Traits</TableHead>
+                                  <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {getChampionsForActiveSet().map((champion) => (
+                                  <TableRow key={champion.name}>
+                                    <TableCell>{champion.name}</TableCell>
+                                    <TableCell>
+                                      <Select
+                                        value={champion.cost.toString()}
+                                        onValueChange={(value) => handleUpdateChampionCost(champion.name, parseInt(value))}
+                                      >
+                                        <SelectTrigger className="w-16">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="1">1</SelectItem>
+                                          <SelectItem value="2">2</SelectItem>
+                                          <SelectItem value="3">3</SelectItem>
+                                          <SelectItem value="4">4</SelectItem>
+                                          <SelectItem value="5">5</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Popover>
+                                        <PopoverTrigger asChild>
+                                          <Button variant="outline" size="sm" className="h-7">
+                                            {champion.traits.length > 0 
+                                              ? `${champion.traits.length} traits` 
+                                              : "Assign traits"}
+                                          </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-4">
+                                          <div className="space-y-2">
+                                            <h4 className="font-medium mb-2">Traits for {champion.name}</h4>
+                                            <div className="space-y-1">
+                                              {getTraitsForActiveSet().map((trait) => (
+                                                <div key={trait} className="flex items-center space-x-2">
+                                                  <input
+                                                    type="checkbox"
+                                                    id={`${champion.name}-${trait}`}
+                                                    checked={champion.traits.includes(trait)}
+                                                    onChange={() => handleToggleTraitForChampion(champion.name, trait)}
+                                                    className="rounded"
+                                                  />
+                                                  <Label
+                                                    htmlFor={`${champion.name}-${trait}`}
+                                                    className="text-sm cursor-pointer"
+                                                  >
+                                                    {trait}
+                                                  </Label>
+                                                </div>
+                                              ))}
+                                            </div>
+                                            {getTraitsForActiveSet().length === 0 && (
+                                              <p className="text-sm text-muted-foreground">
+                                                Add traits first to assign them to champions.
+                                              </p>
+                                            )}
+                                          </div>
+                                        </PopoverContent>
+                                      </Popover>
+                                    </TableCell>
+                                    <TableCell className="text-right">
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0"
-                                        onClick={() => handleRemoveChampion(champ)}
+                                        onClick={() => handleDeleteChampion(champion.name)}
                                       >
-                                        <Trash className="h-3 w-3" />
+                                        <Trash className="h-4 w-4 text-destructive" />
                                       </Button>
-                                    </td>
-                                  </tr>
+                                    </TableCell>
+                                  </TableRow>
                                 ))}
-                                {Object.keys(championTraitMapping).length === 0 && (
-                                  <tr>
-                                    <td colSpan={3} className="p-4 text-center text-muted-foreground">
-                                      No champions added yet
-                                    </td>
-                                  </tr>
-                                )}
-                              </tbody>
-                            </table>
+                              </TableBody>
+                            </Table>
                           </div>
-                        </TabsContent>
-                      </Tabs>
+                        ) : (
+                          <div className="text-center py-4 bg-muted/30 rounded-md">
+                            <p className="text-muted-foreground">No champions added yet</p>
+                          </div>
+                        )}
+                        
+                        <Dialog open={isAddingChampion} onOpenChange={setIsAddingChampion}>
+                          <DialogTrigger asChild>
+                            <Button className="w-full mt-4">
+                              <Plus className="h-4 w-4 mr-2" />
+                              Add Champion
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Add Champion to {traitMappings[setId].name}</DialogTitle>
+                            </DialogHeader>
+                            <Form {...championForm}>
+                              <form onSubmit={championForm.handleSubmit(handleAddChampion)} className="space-y-4">
+                                <FormField
+                                  control={championForm.control}
+                                  name="name"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Champion Name</FormLabel>
+                                      <FormControl>
+                                        <Input placeholder="e.g., Ahri" {...field} />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={championForm.control}
+                                  name="cost"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Champion Cost</FormLabel>
+                                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                          <SelectTrigger>
+                                            <SelectValue placeholder="Select cost" />
+                                          </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                          <SelectItem value="1">1 Cost</SelectItem>
+                                          <SelectItem value="2">2 Cost</SelectItem>
+                                          <SelectItem value="3">3 Cost</SelectItem>
+                                          <SelectItem value="4">4 Cost</SelectItem>
+                                          <SelectItem value="5">5 Cost</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <div className="flex justify-end gap-2">
+                                  <Button type="button" variant="outline" onClick={() => setIsAddingChampion(false)}>
+                                    Cancel
+                                  </Button>
+                                  <Button type="submit">Add Champion</Button>
+                                </div>
+                              </form>
+                            </Form>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center p-8 text-center">
-                      <Settings className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">No Set Selected</h3>
-                      <p className="text-muted-foreground">Choose a set from the sidebar or create a new one</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center p-8 text-center">
-                <Settings className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No TFT Sets</h3>
-                <p className="text-muted-foreground mb-4">You haven't created any TFT sets yet</p>
-                <Button onClick={() => setActiveTab("create")}>
-                  <Plus className="h-4 w-4 mr-1" />
-                  Create Your First Set
-                </Button>
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="create" className="space-y-6">
-            <div className="border border-border rounded-lg p-6">
-              <h3 className="text-xl font-bold mb-4">Create New TFT Set</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Set Version</label>
-                  <Input 
-                    value={newSetVersion}
-                    onChange={(e) => setNewSetVersion(e.target.value)}
-                    placeholder="e.g., Set 11"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    This is the version identifier (e.g., "Set 10", "Set 11")
-                  </p>
-                </div>
+                  </CardContent>
+                </Card>
                 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Set Name</label>
-                  <Input 
-                    value={newSetName}
-                    onChange={(e) => setNewSetName(e.target.value)}
-                    placeholder="e.g., Remix Rumble"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    This is the display name of the set (e.g., "Remix Rumble", "Inkborn Fables")
-                  </p>
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <label className="block text-sm font-medium mb-1">Traits</label>
-                <div className="flex gap-2">
-                  <Input 
-                    value={newTraitInput}
-                    onChange={(e) => setNewTraitInput(e.target.value)}
-                    placeholder="Add a trait (e.g., Guardian, Bruiser)"
-                    className="flex-1"
-                  />
-                  <Button onClick={handleAddTrait} disabled={!newTraitInput}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </Button>
-                </div>
-                
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {newSetTraits.map((trait, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center px-2 py-1 bg-secondary/50 rounded"
-                    >
-                      <span>{trait}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-5 w-5 p-0 ml-1"
-                        onClick={() => handleRemoveTrait(index)}
-                      >
-                        <Trash className="h-3 w-3" />
-                      </Button>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Export / Import</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <Button
+                          onClick={() => {
+                            const dataStr = JSON.stringify(traitMappings[setId], null, 2);
+                            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                            const exportFileDefaultName = `${setId}_${traitMappings[setId].name.replace(/\s+/g, '_')}.json`;
+                            
+                            const linkElement = document.createElement('a');
+                            linkElement.setAttribute('href', dataUri);
+                            linkElement.setAttribute('download', exportFileDefaultName);
+                            linkElement.click();
+                          }}
+                        >
+                          Export Set Data
+                        </Button>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="flex justify-end gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setActiveTab("manage");
-                    setNewSetTraits([]);
-                    setNewSetVersion("");
-                    setNewSetName("");
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={handleAddSet}
-                  disabled={!newSetVersion || !newSetName || newSetTraits.length === 0}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Create Set
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            ))}
+          </Tabs>
+        ) : (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">No TFT sets found. Add your first set to get started.</p>
+                <Button onClick={() => setIsAddingSet(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Set
                 </Button>
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </CardContent>
+          </Card>
+        )}
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

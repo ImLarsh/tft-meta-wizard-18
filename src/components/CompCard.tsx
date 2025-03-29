@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TFTComp } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
@@ -157,9 +158,8 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
       {expanded && (
         <div className="border-t border-border/40 p-4">
           <Tabs defaultValue="composition">
-            <TabsList className="grid grid-cols-4 mb-4">
+            <TabsList className="grid grid-cols-3 mb-4">
               <TabsTrigger value="composition">Composition</TabsTrigger>
-              <TabsTrigger value="items">Items</TabsTrigger>
               <TabsTrigger value="positioning" className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 <span>Positioning</span>
@@ -201,46 +201,6 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                     </div>
                   ))}
                 </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="items" className="pt-2">
-              <div className="mb-6">
-                <h4 className="text-sm font-medium text-muted-foreground mb-2">Key Items</h4>
-                <div className="flex flex-wrap gap-2">
-                  {comp.keyItems.map((item, idx) => (
-                    <div key={idx} className="bg-secondary/70 px-2 py-1 rounded text-xs flex items-center gap-1">
-                      <ItemIcon name={item} size="sm" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground mb-2">Item Priority</h4>
-                {comp.finalComp
-                  .filter(champ => champ.items && champ.items.length > 0)
-                  .map((champion) => (
-                    <div key={champion.name} className="mb-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <ChampionIcon name={champion.name} cost={champion.cost} size="sm" />
-                        <span className="text-sm font-medium">{champion.name}</span>
-                        {champion.isCarry && (
-                          <span className="text-xs bg-primary/20 text-primary px-1 rounded">Carry</span>
-                        )}
-                      </div>
-                      <div className="flex flex-wrap gap-2 ml-10">
-                        {champion.items && champion.items.map((item, idx) => (
-                          <div key={idx} className="bg-secondary/50 px-2 py-1 rounded text-xs flex items-center gap-1">
-                            <span className="text-primary mr-1">{idx + 1}.</span>
-                            <ItemIcon name={item} size="sm" />
-                            <span>{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
               </div>
             </TabsContent>
             

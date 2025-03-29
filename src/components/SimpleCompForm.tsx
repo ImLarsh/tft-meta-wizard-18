@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,7 +16,6 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import BoardPositioning from './BoardPositioning';
 
-// Common TFT items for the dropdown
 const commonItems = [
   "B.F. Sword", "Recurve Bow", "Needlessly Large Rod", "Tear of the Goddess", 
   "Chain Vest", "Negatron Cloak", "Giant's Belt", "Spatula", "Sparring Gloves",
@@ -118,7 +116,6 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
 
   const addItemToChampion = () => {
     if (!selectedItem || selectedItems.length >= 3) return;
-    // Removed the check for duplicates
     setSelectedItems([...selectedItems, selectedItem]);
     setSelectedItem("");
   };
@@ -501,7 +498,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
                       type="button" 
                       size="sm"
                       onClick={addItemToChampion}
-                      disabled={!selectedItem || selectedItems.includes(selectedItem) || selectedItems.length >= 3}
+                      disabled={!selectedItem || selectedItems.length >= 3}
                     >
                       <Plus className="h-4 w-4" />
                       Add Item

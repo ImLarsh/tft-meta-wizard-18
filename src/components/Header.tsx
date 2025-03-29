@@ -2,14 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { List, Sparkles, Settings, Moon, Sun, Monitor } from 'lucide-react';
+import { List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
-import { useChampionSet } from '@/providers/ChampionSetProvider';
-import { Switch } from '@/components/ui/switch';
 
 const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
-  const { set, toggleSet } = useChampionSet();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -47,17 +44,6 @@ const Header: React.FC = () => {
           </Link>
           
           <nav className="flex items-center space-x-2">
-            {/* Set Toggle Switch */}
-            <div className={`flex items-center space-x-2 mr-2 hover-glow transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`} style={{ transitionDelay: '50ms' }}>
-              <span className="text-sm text-muted-foreground">Standard</span>
-              <Switch 
-                checked={set === 'set14'} 
-                onCheckedChange={toggleSet}
-                aria-label="Toggle champion set"
-              />
-              <span className="text-sm text-muted-foreground">Set 14</span>
-            </div>
-            
             {/* Theme Toggle Button */}
             <Button 
               variant="ghost" 
@@ -108,6 +94,8 @@ const Header: React.FC = () => {
                 </span>
               </Button>
             </Link>
+            
+            {/* Create Comp button removed */}
           </nav>
         </div>
       </div>

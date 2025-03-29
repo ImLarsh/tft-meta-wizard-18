@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -57,6 +58,8 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Exo 2', sans-serif;
+    /* Prevent iOS text size adjust after orientation change */
+    -webkit-text-size-adjust: 100%;
   }
   
   /* Custom styling for the board UI */
@@ -150,7 +153,7 @@
   }
   
   .board-instructions {
-    @apply flex items-center text-sm text-muted-foreground bg-background/60 p-2 rounded-md mb-2;
+    @apply flex items-center text-sm text-muted-foreground bg-background/60 p-2 rounded-md mb-2 text-center md:text-left;
   }
   
   .board-tip {
@@ -180,7 +183,7 @@
 
   /* Custom card styling for TFT comps */
   .tft-card {
-    @apply bg-card border border-border/60 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-md;
+    @apply bg-card border border-border/60 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-md w-full;
   }
 
   /* Gaming-style button with glow */
@@ -197,6 +200,33 @@
   @keyframes shine {
     100% {
       transform: translateX(100%);
+    }
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    #root {
+      padding: 1rem !important;
+    }
+    
+    .container {
+      @apply px-2;
+    }
+    
+    .board-wrapper {
+      @apply scale-90 origin-top;
+    }
+    
+    .board-row:nth-child(odd) {
+      @apply ml-2;
+    }
+    
+    .champions-grid {
+      @apply grid-cols-2 gap-1;
+    }
+    
+    .champion-card {
+      @apply p-1;
     }
   }
 }

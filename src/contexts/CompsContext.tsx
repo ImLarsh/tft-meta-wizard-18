@@ -175,7 +175,10 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         
         // If Supabase data exists, use it
         if (compsData && !compsError) {
-          loadedComps = compsData.comps;
+          // Ensure we're getting an array from the comps field
+          if (compsData.comps && Array.isArray(compsData.comps)) {
+            loadedComps = compsData.comps;
+          }
         } else {
           // Try localStorage as fallback
           const savedComps = localStorage.getItem('tftComps');
@@ -205,16 +208,24 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
         
         // If Supabase trait mappings exist, use it
         if (mappingsData && !mappingsError) {
-          loadedMappings = mappingsData.mappings;
+          // Ensure we're getting an object from the mappings field
+          if (mappingsData.mappings && typeof mappingsData.mappings === 'object') {
+            loadedMappings = {
+              ...defaultTraitMappings,
+              ...mappingsData.mappings
+            };
+          }
         } else {
           // Try localStorage as fallback
           const savedTraitMappings = localStorage.getItem('tftTraitMappings');
           if (savedTraitMappings) {
             try {
-              loadedMappings = JSON.parse(savedTraitMappings);
+              loadedMappings = {
+                ...defaultTraitMappings,
+                ...JSON.parse(savedTraitMappings)
+              };
             } catch (e) {
               console.error('Failed to parse saved trait mappings', e);
-              loadedMappings = defaultTraitMappings;
             }
           }
         }
@@ -259,7 +270,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Update existing record
           const { error: updateError } = await supabase
             .from('tft_comps')
-            .update({ comps })
+            .update({ comps: comps })
             .eq('id', existingComps[0].id);
             
           if (updateError) {
@@ -269,7 +280,7 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
           // Insert new record
           const { error: insertError } = await supabase
             .from('tft_comps')
-            .insert([{ comps }]);
+            .insert([{ comps: comps }]);
             
           if (insertError) {
             console.error('Error inserting comps:', insertError);

@@ -32,6 +32,14 @@ const SetManager: React.FC = () => {
     }
   }, [traitMappings, activeSetTab]);
   
+  // When the active set tab changes, update the traits and champion mappings
+  useEffect(() => {
+    if (activeSetTab && traitMappings[activeSetTab]) {
+      setNewSetTraits([...traitMappings[activeSetTab].traits]);
+      setChampionTraitMapping({ ...traitMappings[activeSetTab].championTraits });
+    }
+  }, [activeSetTab, traitMappings]);
+  
   // Function to add a new TFT set
   const handleAddSet = () => {
     if (!newSetVersion || !newSetName) {
@@ -124,8 +132,10 @@ const SetManager: React.FC = () => {
   // Load trait mappings for a specific set
   const handleSelectSet = (setKey: string) => {
     setActiveSetTab(setKey);
-    setNewSetTraits([...traitMappings[setKey].traits]);
-    setChampionTraitMapping({ ...traitMappings[setKey].championTraits });
+    if (traitMappings[setKey]) {
+      setNewSetTraits([...traitMappings[setKey].traits]);
+      setChampionTraitMapping({ ...traitMappings[setKey].championTraits });
+    }
   };
   
   // Add champion to trait mapping
@@ -200,18 +210,18 @@ const SetManager: React.FC = () => {
                       className="w-full justify-start"
                       onClick={() => handleSelectSet(setKey)}
                     >
-                      <span>{traitMappings[setKey].name}</span>
+                      <span>{traitMappings[setKey]?.name || setKey}</span>
                       <span className="ml-auto text-xs opacity-70">{setKey}</span>
                     </Button>
                   ))}
                 </div>
                 
                 <div className="lg:col-span-9">
-                  {activeSetTab ? (
+                  {activeSetTab && traitMappings[activeSetTab] ? (
                     <div className="border border-border rounded-lg p-6">
                       <div className="flex items-center justify-between mb-6">
                         <div>
-                          <h3 className="text-xl font-bold">{traitMappings[activeSetTab].name}</h3>
+                          <h3 className="text-xl font-bold">{traitMappings[activeSetTab]?.name}</h3>
                           <p className="text-sm text-muted-foreground">{activeSetTab}</p>
                         </div>
                         

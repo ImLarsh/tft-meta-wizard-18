@@ -35,7 +35,7 @@ const formSchema = z.object({
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }),
   patch: z.string(),
-  tftVersion: z.string().optional(),
+  tftVersion: z.string(),
 });
 
 interface CompFormProps {
@@ -78,6 +78,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   const [activeTab, setActiveTab] = useState("general");
 
   const { traitMappings } = useComps();
+  const availableSets = Object.keys(traitMappings);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -98,15 +99,19 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
       difficulty: "Medium",
       description: "",
       patch: "14.1",
-      tftVersion: "Set 10",
+      tftVersion: availableSets[0] || "Set 10",
     },
   });
 
-  const currentTftVersion = form.watch("tftVersion") || "Set 10";
+  const currentTftVersion = form.watch("tftVersion") || availableSets[0] || "Set 10";
   
   const availableTraits = traitMappings[currentTftVersion]?.traits || [];
   
   const currentTraitMap = traitMappings[currentTftVersion]?.championTraits || {};
+
+  useEffect(() => {
+    setNewTraitVersion(currentTftVersion);
+  }, [currentTftVersion]);
 
   const handleUpdatePositions = (updatedChampions: Champion[]) => {
     setFinalComp(updatedChampions);
@@ -410,7 +415,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                         field.onChange(value);
                         setNewTraitVersion(value);
                       }} 
-                      defaultValue={field.value || "Set 10"}
+                      defaultValue={field.value || availableSets[0] || "Set 10"}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -418,9 +423,11 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Set 9">Set 9</SelectItem>
-                        <SelectItem value="Set 10">Set 10</SelectItem>
-                        <SelectItem value="Set 11">Set 11</SelectItem>
+                        {availableSets.map((setName) => (
+                          <SelectItem key={setName} value={setName}>
+                            {setName} - {traitMappings[setName]?.name || ''}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -803,17 +810,21 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               </div>
               
               <div className="bg-secondary/20 p-4 rounded-md">
-                <h4 className="text-sm font-medium mb-2">Available Traits for {currentTftVersion}</h4>
+                <h4 className="text-sm font-medium mb-2">Available Traits for {currentTftVersion} - {traitMappings[currentTftVersion]?.name || ''}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {availableTraits.map((trait) => (
-                    <div 
-                      key={trait} 
-                      className="px-2 py-1 bg-secondary/50 rounded text-xs cursor-pointer hover:bg-secondary"
-                      onClick={() => setNewTraitName(trait)}
-                    >
-                      {trait}
-                    </div>
-                  ))}
+                  {availableTraits.length > 0 ? (
+                    availableTraits.map((trait) => (
+                      <div 
+                        key={trait} 
+                        className="px-2 py-1 bg-secondary/50 rounded text-xs cursor-pointer hover:bg-secondary"
+                        onClick={() => setNewTraitName(trait)}
+                      >
+                        {trait}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No traits available for this set. Please add traits in the Set Manager.</p>
+                  )}
                 </div>
               </div>
             </div>

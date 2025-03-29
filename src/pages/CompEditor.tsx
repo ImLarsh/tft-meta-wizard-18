@@ -12,12 +12,17 @@ import { useComps } from '@/contexts/CompsContext';
 const CompEditor: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { addComp } = useComps();
+  const { addComp, traitMappings } = useComps();
 
   const handleSubmit = (compData: TFTComp) => {
     setIsSubmitting(true);
     
     try {
+      // Validate that the TFT version exists in trait mappings
+      if (!traitMappings[compData.tftVersion]) {
+        throw new Error(`Invalid TFT version: ${compData.tftVersion}`);
+      }
+      
       // Save the comp to our context/localStorage
       addComp(compData);
       
@@ -36,7 +41,7 @@ const CompEditor: React.FC = () => {
       console.error('Error saving comp:', error);
       toast({
         title: "Error",
-        description: "There was a problem saving your composition.",
+        description: error instanceof Error ? error.message : "There was a problem saving your composition.",
         variant: "destructive",
       });
     } finally {

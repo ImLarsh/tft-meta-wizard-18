@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isUsingDefaultCredentials } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface AuthFormProps {
   mode: 'login' | 'signup';
@@ -18,11 +19,24 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const usingDefaultCredentials = isUsingDefaultCredentials();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
+
+    // Show warning when using demo credentials
+    if (usingDefaultCredentials) {
+      setErrorMessage('Supabase credentials not configured. Authentication will not work properly.');
+      toast({
+        title: "Configuration required",
+        description: "Please set up Supabase credentials to enable authentication.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
 
     try {
       if (mode === 'signup') {
@@ -95,6 +109,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      {usingDefaultCredentials && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangle className="h-4 w-4 mr-2" />
+          <AlertDescription>
+            Demo mode: Authentication is simulated. To enable real authentication, configure Supabase credentials.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       {mode === 'signup' && (
         <div className="space-y-2">
           <Label htmlFor="username">Username</Label>

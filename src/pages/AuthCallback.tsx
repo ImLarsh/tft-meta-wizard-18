@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, isUsingDefaultCredentials } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 
@@ -12,6 +12,19 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // Check if we're using default credentials
+        if (isUsingDefaultCredentials()) {
+          console.warn('Using default Supabase credentials. Authentication will not work correctly.');
+          setMessage('Configuration issue detected');
+          toast({
+            title: "Configuration warning",
+            description: "Supabase credentials are not set. Please configure the application with valid credentials.",
+            variant: "destructive",
+          });
+          setTimeout(() => navigate('/', { replace: true }), 3000);
+          return;
+        }
+
         // Get the current URL hash and query parameters
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const queryParams = new URLSearchParams(window.location.search);
@@ -22,7 +35,6 @@ const AuthCallback = () => {
         console.log('Query params:', Object.fromEntries(queryParams.entries()));
         
         // Manually handle the auth callback if needed
-        // This can help with troubleshooting
         if (hashParams.has('access_token') || queryParams.has('code')) {
           setMessage('Processing authentication...');
           
@@ -57,7 +69,7 @@ const AuthCallback = () => {
         setTimeout(() => {
           // Redirect to home page regardless of outcome
           navigate('/', { replace: true });
-        }, 2000);
+        }, 3000);
       }
     };
 

@@ -89,21 +89,44 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   // Use the special case mapping if available
   const specialCaseName = specialCaseMap[name] || normalizedName;
   
-  // Prioritize Mobafire source (based on the specific site format)
+  // Add more reliable image sources
   const sources = [
-    // Mobafire main source - most reliable based on your information
+    // TFT Set 10 specific sources
+    `https://raw.communitydragon.org/latest/game/assets/items/icons/${specialCaseName.toLowerCase()}.png`,
+    
+    // Riot Community Dragon
+    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/${specialCaseName.toLowerCase()}.png`,
+    
+    // TFTactics.gg
+    `https://tftactics.gg/cdn-cgi/image/width=160,height=160/itemicons/${specialCaseName.toLowerCase()}.png`,
+    
+    // Mobafire sources
     `https://www.mobafire.com/images/tft/item/${specialCaseName}.png`,
     `https://www.mobafire.com/images/tft/item/${normalizedName}.png`,
     `https://www.mobafire.com/images/tft/item/${normalizedNameNoDashes}.png`,
     
-    // Fallback to other sources if Mobafire fails
+    // Alternate sources
+    `https://cdn.metatft.com/file/metatft/items/${specialCaseName}.png`,
+    `https://cdn.metatft.com/file/metatft/items/${normalizedName}.png`,
+    `https://cdn.metatft.com/file/metatft/items/${normalizedNameNoDashes}.png`,
+    
+    // More fallback sources  
+    `https://cdn.tft.tools/items/${specialCaseName}.png`,
     `https://cdn.tft.tools/items/${normalizedName}.png`,
     `https://cdn.tft.tools/items/${normalizedNameNoDashes}.png`,
+    
+    // Tactics.tools
+    `https://tactics.tools/img/items/${specialCaseName}.png`,
     `https://tactics.tools/img/items/${normalizedName}.png`,
     `https://tactics.tools/img/items/${normalizedNameNoDashes}.png`,
+    
+    // Lolchess
+    `https://lolchess.gg/images/tft/items/${specialCaseName}.png`,
+    `https://lolchess.gg/images/tft/items/${normalizedName}.png`,
   ];
   
-  const fallbackUrl = 'https://cdn.tft.tools/items/deathblade.png';
+  // Use a common item as fallback that's likely to exist
+  const fallbackUrl = 'https://raw.communitydragon.org/latest/game/assets/items/icons/deathblade.png';
   
   const sizeClasses = {
     sm: 'w-6 h-6',
@@ -112,17 +135,10 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   };
   
   const handleImageError = () => {
-    console.log(`Image error for ${name}, trying next source. Current source: ${sources[currentSourceIndex]}`);
     const nextIndex = currentSourceIndex + 1;
     if (nextIndex < sources.length) {
       setCurrentSourceIndex(nextIndex);
     } else {
-      console.log(`All sources failed for ${name}. Variations tried:`, { 
-        original: name,
-        specialCase: specialCaseName,
-        normalizedWithDashes: normalizedName,
-        normalizedNoDashes: normalizedNameNoDashes
-      });
       setImgError(true);
     }
   };
@@ -131,7 +147,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     <div 
       className={cn(
         sizeClasses[size],
-        'rounded overflow-hidden relative border border-border/50 shadow-sm',
+        'rounded overflow-hidden relative border border-border/50 shadow-sm bg-secondary/30',
         className
       )}
     >

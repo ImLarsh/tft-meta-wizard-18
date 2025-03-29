@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -133,11 +132,9 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
       position: null,
     };
     
-    // Using the newChampType state to determine where to add the champion
     if (newChampType === "early") {
       setEarlyGame([...earlyGame, newChampion]);
     } else if (newChampType === "final") {
-      // Fix: Now champions will always be added to the correct collection
       setFinalComp([...finalComp, newChampion]);
     }
     
@@ -780,7 +777,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 <Button 
                   type="button" 
                   onClick={() => {
-                    // Fix: Setting the type to "final" before calling handleAddChampion
                     setNewChampType("final");
                     handleAddChampion();
                   }}

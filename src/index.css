@@ -5,39 +5,40 @@
  
 @layer base {
   :root {
-    /* Softer light gray for light mode */
-    --background: 220 20% 97%; /* Soft light gray */
-    --foreground: 240 10% 3.9%;
+    /* Light Purple Theme for Light Mode */
+    --background: 270 25% 97%; /* Light purple background */
+    --foreground: 270 10% 10%;
     
-    --card: 215 27% 96%; /* Even softer for cards */
-    --card-foreground: 240 10% 3.9%;
+    --card: 270 25% 94%; /* Slightly darker for cards */
+    --card-foreground: 270 10% 10%;
     
-    --popover: 215 27% 96%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover: 270 25% 94%;
+    --popover-foreground: 270 10% 10%;
     
     --primary: 275 85% 47%; /* Vibrant purple */
     --primary-foreground: 0 0% 98%;
     
-    --secondary: 220 14% 90%; /* Lighter gray for secondary elements */
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 270 25% 90%; /* Light purple for secondary elements */
+    --secondary-foreground: 270 10% 15%;
     
-    --muted: 220 14% 90%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 270 25% 90%;
+    --muted-foreground: 270 10% 40%;
     
-    --accent: 275 65% 95%; /* Light purple accent */
-    --accent-foreground: 240 5.9% 10%;
+    --accent: 275 65% 92%; /* Light purple accent */
+    --accent-foreground: 270 10% 15%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 215 32% 88%; /* Light border */
-    --input: 215 32% 88%;
+    --border: 270 25% 85%; /* Light purple border */
+    --input: 270 25% 85%;
     --ring: 275 85% 47%;
     
     --radius: 0.5rem;
   }
  
   .dark {
+    /* Keep existing dark mode colors */
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     

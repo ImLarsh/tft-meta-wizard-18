@@ -127,12 +127,13 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           champ => champ.position && champ.position.row === row && champ.position.col === col
         );
         
+        // Determine if this is an odd or even column for the honeycomb pattern
+        const isOddCol = col % 2 === 1;
+        
         rowCells.push(
           <div 
             key={`${row}-${col}`}
-            className={`relative w-12 h-12 border border-border ${
-              (row + col) % 2 === 0 ? 'bg-secondary/30' : 'bg-secondary/10'
-            } ${
+            className={`relative hexagon-cell w-14 h-14 ${
               !readonly && (!championAtPosition && selectedChampion) 
                 ? 'cursor-pointer hover:bg-primary/20' 
                 : ''
@@ -140,40 +141,50 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onClick={() => handleCellClick(row, col)}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
+            style={{
+              transform: isOddCol ? 'translateY(12px)' : '' // Offset odd columns for honeycomb effect
+            }}
           >
-            {championAtPosition ? (
-              <div 
-                className={`absolute inset-0 flex items-center justify-center ${
-                  !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
-                }`}
-                draggable={!readonly}
-                onDragStart={(e) => handleDragStart(e, championAtPosition)}
-              >
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div>
-                        <ChampionIcon
-                          name={championAtPosition.name}
-                          cost={championAtPosition.cost}
-                          size="md"
-                          isCarry={championAtPosition.isCarry}
-                          onClick={() => !readonly && handleChampionClick(championAtPosition)}
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{championAtPosition.name}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            ) : null}
+            <div className={`hexagon ${
+              (row + col) % 2 === 0 ? 'bg-secondary/30' : 'bg-secondary/10'
+            } ${
+              !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
+            } w-full h-full`}>
+              {championAtPosition ? (
+                <div 
+                  className={`absolute inset-0 flex items-center justify-center ${
+                    !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
+                  }`}
+                  draggable={!readonly}
+                  onDragStart={(e) => handleDragStart(e, championAtPosition)}
+                >
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="hexagon-content">
+                          <ChampionIcon
+                            name={championAtPosition.name}
+                            cost={championAtPosition.cost}
+                            size="md"
+                            isCarry={championAtPosition.isCarry}
+                            onClick={() => !readonly && handleChampionClick(championAtPosition)}
+                            className="hexagon-icon"
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{championAtPosition.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              ) : null}
+            </div>
           </div>
         );
       }
       board.push(
-        <div key={row} className="flex">
+        <div key={row} className="flex gap-1 my-1">
           {rowCells}
         </div>
       );

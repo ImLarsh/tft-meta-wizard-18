@@ -18,7 +18,21 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
     const savedComps = localStorage.getItem('tftComps');
     if (savedComps) {
       try {
-        setComps(JSON.parse(savedComps));
+        const parsedComps = JSON.parse(savedComps);
+        
+        // Check for boardPositions property and add it if it doesn't exist
+        const updatedComps = parsedComps.map((comp: TFTComp) => {
+          if (!('boardPositions' in comp)) {
+            return {
+              ...comp,
+              boardPositions: comp.finalComp.some(champ => champ.position !== null),
+              tftVersion: comp.tftVersion || "Set 10"
+            };
+          }
+          return comp;
+        });
+        
+        setComps(updatedComps);
       } catch (e) {
         console.error('Failed to parse saved comps', e);
         setComps(defaultComps);

@@ -2,9 +2,10 @@
 import React, { useState } from 'react';
 import { TFTComp } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
+import BoardPositioning from './BoardPositioning';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronRight, Star, Trophy, BarChart, Brain } from 'lucide-react';
+import { ChevronRight, Star, Trophy, BarChart, Brain, MapPin } from 'lucide-react';
 
 interface CompCardProps {
   comp: TFTComp;
@@ -23,6 +24,9 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
     }
   };
   
+  // Check if any champions have position data
+  const hasPositioningData = comp.boardPositions || comp.finalComp.some(champ => champ.position);
+  
   return (
     <div className={`tft-card ${expanded ? 'col-span-full' : 'col-span-1'} transition-all duration-300`}>
       {/* Card Header */}
@@ -33,15 +37,22 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
           </div>
           <h3 className="text-lg font-bold">{comp.name}</h3>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => setExpanded(!expanded)}
-          className="hover:bg-secondary/50"
-        >
-          {expanded ? 'Collapse' : 'Expand'}
-          <ChevronRight className={`ml-1 h-4 w-4 transform transition-transform ${expanded ? 'rotate-90' : ''}`} />
-        </Button>
+        <div className="flex items-center gap-2">
+          {comp.tftVersion && (
+            <span className="text-xs bg-secondary/70 px-2 py-1 rounded">
+              {comp.tftVersion}
+            </span>
+          )}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setExpanded(!expanded)}
+            className="hover:bg-secondary/50"
+          >
+            {expanded ? 'Collapse' : 'Expand'}
+            <ChevronRight className={`ml-1 h-4 w-4 transform transition-transform ${expanded ? 'rotate-90' : ''}`} />
+          </Button>
+        </div>
       </div>
       
       {/* Card Summary */}
@@ -52,6 +63,11 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
             <div key={trait.name} className="flex items-center px-2 py-1 bg-secondary/50 rounded text-xs">
               <span className="font-medium">{trait.name}</span>
               <span className="ml-1 text-primary">({trait.count})</span>
+              {trait.version && (
+                <span className="ml-1 text-[10px] text-muted-foreground">
+                  {trait.version}
+                </span>
+              )}
             </div>
           ))}
         </div>
@@ -90,9 +106,13 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
       {expanded && (
         <div className="border-t border-border/40 p-4">
           <Tabs defaultValue="composition">
-            <TabsList className="grid grid-cols-3 mb-4">
+            <TabsList className="grid grid-cols-4 mb-4">
               <TabsTrigger value="composition">Composition</TabsTrigger>
               <TabsTrigger value="items">Items</TabsTrigger>
+              <TabsTrigger value="positioning" className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                <span>Positioning</span>
+              </TabsTrigger>
               <TabsTrigger value="strategy">Strategy</TabsTrigger>
             </TabsList>
             
@@ -173,6 +193,33 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                     </div>
                   ))}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="positioning" className="pt-2">
+              {hasPositioningData ? (
+                <div>
+                  <h4 className="text-sm font-medium text-primary mb-4">Recommended Positioning</h4>
+                  <BoardPositioning
+                    champions={comp.finalComp.map(champ => ({ ...champ, position: champ.position || null }))}
+                  />
+                  <p className="text-xs text-muted-foreground mt-4">
+                    This shows the recommended positioning for the late game board. Position your units as shown for optimal performance.
+                  </p>
+                </div>
+              ) : comp.positioning ? (
+                <div className="text-center">
+                  <img 
+                    src={comp.positioning} 
+                    alt="Positioning" 
+                    className="max-w-full mx-auto border border-border rounded-md"
+                  />
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground">No positioning information available for this comp</p>
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="strategy" className="pt-2">

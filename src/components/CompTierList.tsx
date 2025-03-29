@@ -146,29 +146,35 @@ const CompTierList: React.FC = () => {
           <Tabs defaultValue="S">
             <TabsList className="mb-6">
               {tierOrder.map(tier => (
-                <TabsTrigger key={tier} value={tier}>
+                <TabsTrigger key={tier} value={tier} className="flex-1">
                   Tier {tier}
                 </TabsTrigger>
               ))}
             </TabsList>
             
             {tierOrder.map(tier => (
-              <TabsContent key={tier} value={tier}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {groupedComps[tier]?.map(comp => (
-                    <div key={comp.id} className="relative group">
-                      <CompCard comp={comp} />
-                      <Button 
-                        variant="destructive" 
-                        size="icon" 
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => setCompToDelete(comp.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+              <TabsContent key={tier} value={tier} className="space-y-4">
+                {groupedComps[tier]?.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {groupedComps[tier]?.map(comp => (
+                      <div key={comp.id} className="relative group">
+                        <CompCard comp={comp} />
+                        <Button 
+                          variant="destructive" 
+                          size="icon" 
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => setCompToDelete(comp.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">No compositions in Tier {tier}</p>
+                  </div>
+                )}
               </TabsContent>
             ))}
           </Tabs>

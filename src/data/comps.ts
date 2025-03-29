@@ -3,6 +3,16 @@ export interface Champion {
   cost: 1 | 2 | 3 | 4 | 5;
   items?: string[];
   isCarry?: boolean;
+  position?: {
+    row: number;
+    col: number;
+  } | null;
+}
+
+export interface Trait {
+  name: string;
+  count: number;
+  version?: string; // TFT version where this trait exists
 }
 
 export interface TFTComp {
@@ -14,14 +24,16 @@ export interface TFTComp {
   earlyGame: Champion[];
   finalComp: Champion[];
   keyItems: string[];
-  traits: { name: string; count: number }[];
+  traits: Trait[];
   strengthsWeaknesses: {
     strengths: string[];
     weaknesses: string[];
   };
-  positioning?: string; // URL to positioning image
+  positioning?: string; // URL to positioning image, for backward compatibility
+  boardPositions?: boolean; // Flag to indicate board positions are set
   description: string;
   patch: string;
+  tftVersion?: string; // TFT Set version (e.g., "Set 9", "Set 10")
 }
 
 const tftComps: TFTComp[] = [
@@ -31,6 +43,7 @@ const tftComps: TFTComp[] = [
     tier: 'S',
     playstyle: 'Fast 8',
     difficulty: 'Medium',
+    tftVersion: 'Set 9',
     earlyGame: [
       { name: 'Kennen', cost: 1 },
       { name: 'Corki', cost: 1 },
@@ -38,20 +51,20 @@ const tftComps: TFTComp[] = [
       { name: 'Vex', cost: 2 },
     ],
     finalComp: [
-      { name: 'Kennen', cost: 1, items: ['Ionic Spark', 'Sunfire Cape'] },
-      { name: 'Garen', cost: 2 },
-      { name: 'Vex', cost: 2 },
-      { name: 'Miss Fortune', cost: 3, items: ['Blue Buff', 'Jeweled Gauntlet', 'Giant Slayer'], isCarry: true },
-      { name: 'Sona', cost: 3 },
-      { name: 'Mordekaiser', cost: 4 },
-      { name: 'Ahri', cost: 4 },
-      { name: 'Bard', cost: 5 },
+      { name: 'Kennen', cost: 1, items: ['Ionic Spark', 'Sunfire Cape'], position: { row: 1, col: 1 } },
+      { name: 'Garen', cost: 2, position: { row: 0, col: 2 } },
+      { name: 'Vex', cost: 2, position: { row: 0, col: 3 } },
+      { name: 'Miss Fortune', cost: 3, items: ['Blue Buff', 'Jeweled Gauntlet', 'Giant Slayer'], isCarry: true, position: { row: 2, col: 3 } },
+      { name: 'Sona', cost: 3, position: { row: 2, col: 4 } },
+      { name: 'Mordekaiser', cost: 4, position: { row: 0, col: 4 } },
+      { name: 'Ahri', cost: 4, position: { row: 3, col: 3 } },
+      { name: 'Bard', cost: 5, position: { row: 3, col: 4 } },
     ],
     keyItems: ['Blue Buff', 'Jeweled Gauntlet', 'Giant Slayer', 'Ionic Spark'],
     traits: [
-      { name: '8-Bit', count: 4 },
-      { name: 'Disco', count: 4 },
-      { name: 'Superfan', count: 2 },
+      { name: '8-Bit', count: 4, version: 'Set 9' },
+      { name: 'Disco', count: 4, version: 'Set 9' },
+      { name: 'Superfan', count: 2, version: 'Set 9' },
     ],
     strengthsWeaknesses: {
       strengths: ['Strong AoE damage', 'Good CC', 'Flexible positioning'],
@@ -59,6 +72,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'This comp focuses on Miss Fortune as the main carry with 8-Bit and Disco synergies. The combination provides both AoE damage and CC, making it very strong in the current meta.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'kda-heartsteel',
@@ -66,6 +80,7 @@ const tftComps: TFTComp[] = [
     tier: 'S',
     playstyle: 'Standard',
     difficulty: 'Easy',
+    tftVersion: 'Set 10',
     earlyGame: [
       { name: 'Evelynn', cost: 1 },
       { name: 'Kayle', cost: 1 },
@@ -73,20 +88,20 @@ const tftComps: TFTComp[] = [
       { name: 'Sett', cost: 2 },
     ],
     finalComp: [
-      { name: 'Evelynn', cost: 1 },
-      { name: 'Kayle', cost: 1, items: ['Bloodthirster', 'Runaan\'s Hurricane'] },
-      { name: 'Lillia', cost: 2 },
-      { name: 'Sett', cost: 2 },
-      { name: 'Samira', cost: 3 },
-      { name: 'Akali', cost: 4, items: ['Infinity Edge', 'Last Whisper', 'Bloodthirster'], isCarry: true },
-      { name: 'Seraphine', cost: 4 },
-      { name: 'Yone', cost: 4 },
+      { name: 'Evelynn', cost: 1, position: { row: 1, col: 1 } },
+      { name: 'Kayle', cost: 1, items: ['Bloodthirster', 'Runaan\'s Hurricane'], position: { row: 0, col: 2 } },
+      { name: 'Lillia', cost: 2, position: { row: 0, col: 3 } },
+      { name: 'Sett', cost: 2, position: { row: 1, col: 0 } },
+      { name: 'Samira', cost: 3, position: { row: 2, col: 1 } },
+      { name: 'Akali', cost: 4, items: ['Infinity Edge', 'Last Whisper', 'Bloodthirster'], isCarry: true, position: { row: 3, col: 0 } },
+      { name: 'Seraphine', cost: 4, position: { row: 2, col: 4 } },
+      { name: 'Yone', cost: 4, position: { row: 0, col: 0 } },
     ],
     keyItems: ['Infinity Edge', 'Last Whisper', 'Bloodthirster'],
     traits: [
-      { name: 'K/DA', count: 4 },
-      { name: 'Heartsteel', count: 4 },
-      { name: 'Crowd Diver', count: 2 },
+      { name: 'K/DA', count: 4, version: 'Set 10' },
+      { name: 'Heartsteel', count: 4, version: 'Set 10' },
+      { name: 'Crowd Diver', count: 2, version: 'Set 10' },
     ],
     strengthsWeaknesses: {
       strengths: ['High single-target damage', 'Good frontline', 'Consistent performance'],
@@ -94,6 +109,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'A powerful comp that utilizes Akali as the main carry with K/DA and Heartsteel synergies. The combination provides a good balance of damage and durability.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'illbeats-edm',
@@ -101,6 +117,7 @@ const tftComps: TFTComp[] = [
     tier: 'A',
     playstyle: 'Slow Roll',
     difficulty: 'Medium',
+    tftVersion: 'Set 11',
     earlyGame: [
       { name: 'Taric', cost: 1 },
       { name: 'Gragas', cost: 1 },
@@ -119,9 +136,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Titan\'s Resolve', 'Warmog\'s Armor', 'Dragon\'s Claw'],
     traits: [
-      { name: 'Illbeats', count: 3 },
-      { name: 'EDM', count: 3 },
-      { name: 'Bruiser', count: 4 },
+      { name: 'Illbeats', count: 3, version: 'Set 11' },
+      { name: 'EDM', count: 3, version: 'Set 11' },
+      { name: 'Bruiser', count: 4, version: 'Set 11' },
     ],
     strengthsWeaknesses: {
       strengths: ['Very tanky', 'Good sustain', 'Strong against burst comps'],
@@ -129,6 +146,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'This comp focuses on survivability through the Bruiser trait and Illaoi as a tank carry. It excels in longer fights where it can outlast opponents.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'pentakill-country',
@@ -136,6 +154,7 @@ const tftComps: TFTComp[] = [
     tier: 'A',
     playstyle: 'Fast 8',
     difficulty: 'Hard',
+    tftVersion: 'Set 12',
     earlyGame: [
       { name: 'Olaf', cost: 1 },
       { name: 'Tahm Kench', cost: 1 },
@@ -154,9 +173,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Spear of Shojin', 'Jeweled Gauntlet', 'Archangel\'s Staff'],
     traits: [
-      { name: 'Pentakill', count: 5 },
-      { name: 'Country', count: 3 },
-      { name: 'Guardian', count: 2 },
+      { name: 'Pentakill', count: 5, version: 'Set 12' },
+      { name: 'Country', count: 3, version: 'Set 12' },
+      { name: 'Guardian', count: 2, version: 'Set 12' },
     ],
     strengthsWeaknesses: {
       strengths: ['Ramping damage', 'Good frontline', 'Strong late game'],
@@ -164,6 +183,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'A powerful late-game composition that focuses on Karthus as the main carry with Pentakill synergy. Requires good economy management to reach level 8 quickly.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'jazz-punk',
@@ -171,6 +191,7 @@ const tftComps: TFTComp[] = [
     tier: 'B',
     playstyle: 'Standard',
     difficulty: 'Easy',
+    tftVersion: 'Set 13',
     earlyGame: [
       { name: 'Annie', cost: 1 },
       { name: 'Jinx', cost: 1 },
@@ -189,9 +210,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Guinsoo\'s Rageblade', 'Giant Slayer', 'Infinity Edge'],
     traits: [
-      { name: 'Jazz', count: 3 },
-      { name: 'Punk', count: 4 },
-      { name: 'Big Shot', count: 2 },
+      { name: 'Jazz', count: 3, version: 'Set 13' },
+      { name: 'Punk', count: 4, version: 'Set 13' },
+      { name: 'Big Shot', count: 2, version: 'Set 13' },
     ],
     strengthsWeaknesses: {
       strengths: ['Fast attack speed', 'Good sustained damage', 'Flexible positioning'],
@@ -199,6 +220,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'A composition that focuses on Jinx as the main carry with Jazz and Punk synergies. This comp requires good positioning to protect Jinx while she ramps up her attack speed.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'true-damage-kda',
@@ -206,6 +228,7 @@ const tftComps: TFTComp[] = [
     tier: 'S',
     playstyle: 'Fast 8',
     difficulty: 'Medium',
+    tftVersion: 'Set 14',
     earlyGame: [
       { name: 'Evelynn', cost: 1 },
       { name: 'Kennen', cost: 1 },
@@ -224,9 +247,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Blue Buff', 'Jeweled Gauntlet', 'Infinity Edge', 'Giant Slayer'],
     traits: [
-      { name: 'True Damage', count: 4 },
-      { name: 'K/DA', count: 3 },
-      { name: 'Crowd Diver', count: 2 },
+      { name: 'True Damage', count: 4, version: 'Set 14' },
+      { name: 'K/DA', count: 3, version: 'Set 14' },
+      { name: 'Crowd Diver', count: 2, version: 'Set 14' },
     ],
     strengthsWeaknesses: {
       strengths: ['High burst damage', 'Strong mid-game', 'Good against backline comps'],
@@ -234,6 +257,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'This comp focuses on Akali as your primary carry with True Damage and K/DA synergies. Look to 3-star Akali if possible, but a 2-star with the right items is still very powerful.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'hyperpop-8bit',
@@ -241,6 +265,7 @@ const tftComps: TFTComp[] = [
     tier: 'A',
     playstyle: 'Standard',
     difficulty: 'Medium',
+    tftVersion: 'Set 15',
     earlyGame: [
       { name: 'Corki', cost: 1 },
       { name: 'Kennen', cost: 1 },
@@ -259,9 +284,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Spear of Shojin', 'Jeweled Gauntlet', 'Infinity Edge', 'Redemption'],
     traits: [
-      { name: '8-Bit', count: 4 },
-      { name: 'Hyperpop', count: 3 },
-      { name: 'Superfan', count: 2 },
+      { name: '8-Bit', count: 4, version: 'Set 15' },
+      { name: 'Hyperpop', count: 3, version: 'Set 15' },
+      { name: 'Superfan', count: 2, version: 'Set 15' },
     ],
     strengthsWeaknesses: {
       strengths: ['Strong AoE damage', 'Good frontline with Neeko', 'Scales well into late game'],
@@ -269,6 +294,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'This comp utilizes Ziggs as the main carry with 8-Bit and Hyperpop synergies for massive AoE damage. Focus on positioning to protect Ziggs and let him cast multiple times.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'country-maestro',
@@ -276,6 +302,7 @@ const tftComps: TFTComp[] = [
     tier: 'A',
     playstyle: 'Slow Roll',
     difficulty: 'Easy',
+    tftVersion: 'Set 16',
     earlyGame: [
       { name: 'Tahm Kench', cost: 1 },
       { name: 'Twisted Fate', cost: 1 },
@@ -294,9 +321,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Spear of Shojin', 'Jeweled Gauntlet', 'Giant Slayer', 'Warmog\'s Armor'],
     traits: [
-      { name: 'Country', count: 4 },
-      { name: 'Maestro', count: 2 },
-      { name: 'Guardian', count: 2 },
+      { name: 'Country', count: 4, version: 'Set 16' },
+      { name: 'Maestro', count: 2, version: 'Set 16' },
+      { name: 'Guardian', count: 2, version: 'Set 16' },
     ],
     strengthsWeaknesses: {
       strengths: ['Strong frontline', 'Consistent damage', 'Easy to play'],
@@ -304,6 +331,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'A powerful mid-game composition that focuses on 3-starring Twisted Fate as your main carry. The Country trait provides good utility and sustain while Maestro enhances your spellcasting.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'pentakill-edm',
@@ -311,6 +339,7 @@ const tftComps: TFTComp[] = [
     tier: 'S',
     playstyle: 'Fast 8',
     difficulty: 'Hard',
+    tftVersion: 'Set 17',
     earlyGame: [
       { name: 'Olaf', cost: 1 },
       { name: 'Jax', cost: 2 },
@@ -329,9 +358,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Archangel\'s Staff', 'Jeweled Gauntlet', 'Hextech Gunblade', 'Titan\'s Resolve'],
     traits: [
-      { name: 'Pentakill', count: 6 },
-      { name: 'EDM', count: 2 },
-      { name: 'Bruiser', count: 2 },
+      { name: 'Pentakill', count: 6, version: 'Set 17' },
+      { name: 'EDM', count: 2, version: 'Set 17' },
+      { name: 'Bruiser', count: 2, version: 'Set 17' },
     ],
     strengthsWeaknesses: {
       strengths: ['Massive AoE damage', 'Strong frontline', 'Excellent late game'],
@@ -339,6 +368,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'This comp revolves around Mordekaiser as your main carry with Pentakill synergy. The 6 Pentakill bonus grants massive damage boosts, making Mordekaiser an unstoppable force in the late game.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'disco-punk',
@@ -346,6 +376,7 @@ const tftComps: TFTComp[] = [
     tier: 'B',
     playstyle: 'Hyper Roll',
     difficulty: 'Medium',
+    tftVersion: 'Set 18',
     earlyGame: [
       { name: 'Jinx', cost: 1 },
       { name: 'Twitch', cost: 2 },
@@ -364,9 +395,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Guinsoo\'s Rageblade', 'Runaan\'s Hurricane', 'Infinity Edge', 'Spear of Shojin'],
     traits: [
-      { name: 'Disco', count: 4 },
-      { name: 'Punk', count: 4 },
-      { name: 'Big Shot', count: 2 },
+      { name: 'Disco', count: 4, version: 'Set 18' },
+      { name: 'Punk', count: 4, version: 'Set 18' },
+      { name: 'Big Shot', count: 2, version: 'Set 18' },
     ],
     strengthsWeaknesses: {
       strengths: ['Strong early game', 'Good transition options', 'High attack speed'],
@@ -374,6 +405,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'A strong early to mid-game composition focused on 3-star Jinx as your main carry. This comp can snowball hard if you hit your 3-stars early, but has options to transition if you don\'t.',
     patch: '13.24',
+    boardPositions: true,
   },
   {
     id: 'heartsteel-emo',
@@ -381,6 +413,7 @@ const tftComps: TFTComp[] = [
     tier: 'S',
     playstyle: 'Standard',
     difficulty: 'Medium',
+    tftVersion: 'Set 19',
     earlyGame: [
       { name: 'Annie', cost: 1 },
       { name: 'Evelynn', cost: 1 },
@@ -399,9 +432,9 @@ const tftComps: TFTComp[] = [
     ],
     keyItems: ['Bloodthirster', 'Giant Slayer', 'Infinity Edge', 'Warmog\'s Armor'],
     traits: [
-      { name: 'Heartsteel', count: 5 },
-      { name: 'Emo', count: 3 },
-      { name: 'Edgelord', count: 2 },
+      { name: 'Heartsteel', count: 5, version: 'Set 19' },
+      { name: 'Emo', count: 3, version: 'Set 19' },
+      { name: 'Edgelord', count: 2, version: 'Set 19' },
     ],
     strengthsWeaknesses: {
       strengths: ['Excellent sustain', 'Strong frontline', 'Consistent damage'],
@@ -409,6 +442,7 @@ const tftComps: TFTComp[] = [
     },
     description: 'This comp builds around Yone as your main carry with Heartsteel and Emo synergies. The combination provides excellent sustain and damage, making it a strong all-around composition.',
     patch: '13.24',
+    boardPositions: true,
   },
 ];
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CompCard from './CompCard';
@@ -17,25 +18,43 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from '@/components/ui/use-toast';
 import { TFTComp } from '@/data/comps';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CompTierList: React.FC = () => {
-  const { comps, removeComp } = useComps();
+  const { comps, removeComp, traitMappings } = useComps();
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     tier: 'all',
     playstyle: 'all',
+    tftVersion: 'all',
   });
   const [compToDelete, setCompToDelete] = useState<string | null>(null);
   const [groupedComps, setGroupedComps] = useState<Record<string, TFTComp[]>>({});
   const [activeTab, setActiveTab] = useState('S');
   const navigate = useNavigate();
+  const [availableVersions, setAvailableVersions] = useState<string[]>([]);
+
+  // Get available TFT versions
+  useEffect(() => {
+    const versions = Object.keys(traitMappings);
+    // Sort versions to get the latest sets first
+    const sortedVersions = [...versions].sort().reverse();
+    setAvailableVersions(sortedVersions);
+  }, [traitMappings]);
 
   useEffect(() => {
+    // Sort comps to show latest sets first
+    const sortedComps = [...comps].sort((a, b) => {
+      const versionA = a.tftVersion || "Set 10";
+      const versionB = b.tftVersion || "Set 10";
+      return versionB.localeCompare(versionA);
+    });
+
     const tierOrder = ['S', 'A', 'B', 'C'];
     const grouped: Record<string, TFTComp[]> = {};
     
     tierOrder.forEach(tier => {
-      grouped[tier] = comps.filter(comp => comp.tier === tier);
+      grouped[tier] = sortedComps.filter(comp => comp.tier === tier);
     });
     
     setGroupedComps(grouped);
@@ -50,7 +69,19 @@ const CompTierList: React.FC = () => {
     
     const matchesPlaystyle = filters.playstyle === 'all' || comp.playstyle === filters.playstyle;
     
-    return matchesSearch && matchesTier && matchesPlaystyle;
+    const matchesVersion = filters.tftVersion === 'all' || comp.tftVersion === filters.tftVersion;
+    
+    return matchesSearch && matchesTier && matchesPlaystyle && matchesVersion;
+  }).sort((a, b) => {
+    // Sort by version (latest first) then by tier
+    const versionA = a.tftVersion || "Set 10";
+    const versionB = b.tftVersion || "Set 10";
+    const versionCompare = versionB.localeCompare(versionA);
+    
+    if (versionCompare !== 0) return versionCompare;
+    
+    const tierOrder = { S: 0, A: 1, B: 2, C: 3 };
+    return (tierOrder[a.tier] || 0) - (tierOrder[b.tier] || 0);
   });
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
@@ -73,7 +104,7 @@ const CompTierList: React.FC = () => {
     navigate(`/edit/${compId}`);
   };
 
-  const shouldShowFilteredView = !(filters.tier === 'all' && filters.playstyle === 'all' && searchTerm === '');
+  const shouldShowFilteredView = !(filters.tier === 'all' && filters.playstyle === 'all' && filters.tftVersion === 'all' && searchTerm === '');
 
   return (
     <section className="py-12">
@@ -156,6 +187,31 @@ const CompTierList: React.FC = () => {
               ))}
             </div>
           </div>
+          
+          <div>
+            <span className="text-sm font-medium mr-2 flex items-center">
+              <Filter className="h-4 w-4 mr-1" />
+              TFT Set:
+            </span>
+            <div className="w-48">
+              <Select 
+                value={filters.tftVersion} 
+                onValueChange={(value) => handleFilterChange('tftVersion', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Set" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sets</SelectItem>
+                  {availableVersions.map((version) => (
+                    <SelectItem key={version} value={version}>
+                      {version} - {traitMappings[version]?.name || ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
         
         {shouldShowFilteredView ? (
@@ -194,7 +250,7 @@ const CompTierList: React.FC = () => {
                   variant="outline" 
                   onClick={() => {
                     setSearchTerm('');
-                    setFilters({ tier: 'all', playstyle: 'all' });
+                    setFilters({ tier: 'all', playstyle: 'all', tftVersion: 'all' });
                   }}
                 >
                   Reset Filters

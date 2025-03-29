@@ -1,4 +1,3 @@
-
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -290,6 +289,35 @@
   margin-top: -8px; /* Pull rows closer for honeycomb pattern */
 }
 
+.board-wrapper > div:nth-child(odd) {
+  margin-left: 8px; /* Offset odd rows to create proper hexagonal grid */
+}
+
 .board-wrapper > div:first-child {
   margin-top: 0;
+}
+
+/* TFT board specific layout */
+.tft-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tft-board-row {
+  display: flex;
+  justify-content: center;
+}
+
+/* Compact board styles */
+.board-compact .hexagon-cell {
+  margin: 0 -2px;
+}
+
+.board-compact .board-wrapper > div {
+  margin-top: -4px;
+}
+
+.board-compact .board-wrapper > div:nth-child(odd) {
+  margin-left: 4px;
 }

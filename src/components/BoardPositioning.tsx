@@ -10,13 +10,15 @@ interface BoardPositioningProps {
   onChange?: (champions: Champion[]) => void;
   onUpdatePositions?: (champions: Champion[]) => void;
   readonly?: boolean;
+  compact?: boolean;
 }
 
 const BoardPositioning: React.FC<BoardPositioningProps> = ({ 
   champions, 
   onChange, 
   onUpdatePositions,
-  readonly = false 
+  readonly = false,
+  compact = false
 }) => {
   const [positionedChampions, setPositionedChampions] = useState<Champion[]>([]);
   const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
@@ -115,8 +117,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   };
 
   const renderBoard = () => {
-    // TFT board dimensions: 7 columns x 3 rows (hexagonal grid)
-    const rows = 3;
+    // TFT board dimensions: 7 columns x 4 rows (hexagonal grid)
+    const rows = 4;
     const cols = 7;
     const board = [];
     
@@ -127,13 +129,16 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           champ => champ.position && champ.position.row === row && champ.position.col === col
         );
         
-        // Determine if this is an odd or even column for the honeycomb pattern
-        const isOddCol = col % 2 === 1;
+        // Adjust offset for even and odd rows to create proper hexagon grid
+        // Even rows are offset to create the honeycomb pattern
+        const isEvenRow = row % 2 === 0;
+        
+        const cellSize = compact ? 10 : 14;
         
         rowCells.push(
           <div 
             key={`${row}-${col}`}
-            className={`relative hexagon-cell w-14 h-14 ${
+            className={`relative hexagon-cell w-${cellSize} h-${cellSize} ${
               !readonly && (!championAtPosition && selectedChampion) 
                 ? 'cursor-pointer hover:bg-primary/20' 
                 : ''
@@ -142,7 +147,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
             style={{
-              transform: isOddCol ? 'translateY(12px)' : '' // Offset odd columns for honeycomb effect
+              transform: isEvenRow ? 'translateX(8px)' : '' // Offset even rows for proper honeycomb
             }}
           >
             <div className={`hexagon ${
@@ -165,7 +170,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                           <ChampionIcon
                             name={championAtPosition.name}
                             cost={championAtPosition.cost}
-                            size="md"
+                            size={compact ? "xs" : "md"}
                             isCarry={championAtPosition.isCarry}
                             onClick={() => !readonly && handleChampionClick(championAtPosition)}
                             className="hexagon-icon"
@@ -194,9 +199,9 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col items-center bg-card/30 p-4 rounded-md border border-border/30">
-        {!readonly && (
+    <div className={`space-y-4 ${compact ? 'scale-75 origin-top-left' : ''}`}>
+      <div className={`flex flex-col items-center bg-card/30 p-4 rounded-md border border-border/30 ${compact ? 'p-2' : ''}`}>
+        {!readonly && !compact && (
           <div className="flex items-center mb-4 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4 mr-1" />
             {selectedChampion ? (
@@ -211,14 +216,14 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
           </div>
         )}
         
-        <div className="board-container p-2 bg-card/50 rounded-md">
+        <div className={`board-container ${compact ? 'p-1' : 'p-2'} bg-card/50 rounded-md`}>
           <div className="board-wrapper">
             {renderBoard()}
           </div>
         </div>
       </div>
       
-      {!readonly && (
+      {!readonly && !compact && (
         <>
           <h3 className="text-sm font-medium mt-4">Available Champions</h3>
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">

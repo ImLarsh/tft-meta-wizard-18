@@ -140,11 +140,12 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             backgroundImage: `url('/lovable-uploads/05dfb5bb-6439-4226-a524-46098004018c.png')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
             boxShadow: '0 0 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.1)'
           }}
         >
           {/* Semi-transparent overlay to ensure cell visibility */}
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]"></div>
           
           {board.map((row, rowIndex) => (
             <React.Fragment key={`row-${rowIndex}`}>
@@ -163,7 +164,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   `}
                   style={{
                     boxShadow: cell ? '0 0 8px rgba(192, 132, 252, 0.3)' : 'none',
-                    border: cell ? '1px solid rgba(192, 132, 252, 0.4)' : '1px dashed rgba(255, 255, 255, 0.1)'
+                    border: cell ? '1px solid rgba(192, 132, 252, 0.4)' : '1px dashed rgba(255, 255, 255, 0.3)'
                   }}
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, rowIndex, colIndex)}

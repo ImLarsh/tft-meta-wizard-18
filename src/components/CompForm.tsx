@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,13 +31,11 @@ const commonItems = [
 ];
 
 const formSchema = z.object({
-  id: z.string().min(3, { message: "ID must be at least 3 characters" }),
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
   tier: z.enum(['S', 'A', 'B', 'C']),
   playstyle: z.enum(['Fast 8', 'Slow Roll', 'Standard', 'Hyper Roll']),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }),
-  patch: z.string(),
   tftVersion: z.string(),
 });
 
@@ -76,22 +75,18 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
-      id: initialData.id,
       name: initialData.name,
       tier: initialData.tier,
       playstyle: initialData.playstyle,
       difficulty: initialData.difficulty,
       description: initialData.description,
-      patch: initialData.patch,
       tftVersion: initialData.tftVersion || "Set 10",
     } : {
-      id: "",
       name: "",
       tier: "A",
       playstyle: "Standard",
       difficulty: "Medium",
       description: "",
-      patch: "14.1",
       tftVersion: availableSets[0] || "Set 10",
     },
   });
@@ -260,14 +255,17 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
       return;
     }
 
+    // Generate a unique ID based on the name
+    const id = values.name.toLowerCase().replace(/\s+/g, '-');
+
     const newComp: TFTComp = {
-      id: values.id,
+      id,
       name: values.name,
       tier: values.tier,
       playstyle: values.playstyle,
       difficulty: values.difficulty,
       description: values.description,
-      patch: values.patch,
+      patch: "14.1", // Default value since we removed the field
       tftVersion: values.tftVersion,
       earlyGame,
       finalComp,
@@ -297,41 +295,21 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsList>
 
           <TabsContent value="general" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Comp Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="8-Bit Disco" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ID (for URL)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="8bit-disco" 
-                        {...field} 
-                        onChange={(e) => field.onChange(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Comp Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="8-Bit Disco" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="tier"
@@ -411,38 +389,38 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   </FormItem>
                 )}
               />
-              
-              <FormField
-                control={form.control}
-                name="tftVersion"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>TFT Version</FormLabel>
-                    <Select 
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setNewTraitVersion(value);
-                      }} 
-                      defaultValue={field.value || availableSets[0] || "Set 10"}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select TFT version" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {availableSets.map((setName) => (
-                          <SelectItem key={setName} value={setName}>
-                            {traitMappings[setName]?.name || setName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
+            
+            <FormField
+              control={form.control}
+              name="tftVersion"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>TFT Version</FormLabel>
+                  <Select 
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setNewTraitVersion(value);
+                    }} 
+                    defaultValue={field.value || availableSets[0] || "Set 10"}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select TFT version" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {availableSets.map((setName) => (
+                        <SelectItem key={setName} value={setName}>
+                          {traitMappings[setName]?.name || setName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -456,20 +434,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                       className="min-h-[100px]" 
                       {...field} 
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="patch"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Patch</FormLabel>
-                  <FormControl>
-                    <Input placeholder="14.1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -1066,14 +1030,16 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsContent>
         </Tabs>
 
-        <div className="flex justify-end pt-6 border-t border-border">
-          <Button 
-            type="submit" 
-            disabled={isSubmitting} 
-            className="w-full md:w-auto"
-          >
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Comp
+        <div className="flex justify-end pt-4 border-t border-border/40">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Saving...
+              </>
+            ) : (
+              'Save Composition'
+            )}
           </Button>
         </div>
       </form>

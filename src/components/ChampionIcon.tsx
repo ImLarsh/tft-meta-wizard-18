@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -93,10 +92,10 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   // Fallback image - use a more reliable placeholder
   const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Ryze_0.jpg';
   
-  // Size classes
+  // Size classes - adjusted for better filling of hexagons
   const sizeClasses = {
     sm: 'w-8 h-8',
-    md: 'w-12 h-12',
+    md: 'w-full h-full', // Changed to fill parent container
     lg: 'w-16 h-16'
   };
   
@@ -133,7 +132,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   return (
     <div 
       className={cn(
-        sizeClasses[size],
+        size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
         `champion-border-${cost}`,
         'rounded-md overflow-hidden relative border',
         costClasses[cost],

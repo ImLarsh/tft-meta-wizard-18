@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -133,9 +132,18 @@
   margin-bottom: 12px; /* Increased vertical spacing between rows */
 }
 
-/* Staggered hexagon grid */
+/* Staggered hexagon grid with increased offset for bottom rows */
 .board-row:nth-child(even) {
-  @apply ml-[22px]; /* Increased offset for even rows */
+  @apply ml-[30px]; /* Further increased offset for even rows */
+}
+
+/* Even more offset for bottom rows */
+.board-row:nth-child(3) {
+  @apply ml-[38px];
+}
+
+.board-row:nth-child(4) {
+  @apply ml-[46px];
 }
 
 .hexagon-cell {
@@ -158,24 +166,25 @@
 
 .hexagon.empty {
   @apply bg-transparent;
-  border: 2px solid rgba(155, 89, 246, 0.2); /* Cleaner purple border */
-  background: rgba(91, 33, 182, 0.03);
+  border: 2px solid rgba(155, 89, 246, 0.3); /* Cleaner purple border with higher opacity */
+  background: rgba(91, 33, 182, 0.05);
 }
 
 .hexagon.occupied {
   @apply bg-purple-900/20;
-  border: 2px solid rgba(155, 89, 246, 0.5); /* More visible border when occupied */
-  box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.1);
+  border: 3px solid rgba(155, 89, 246, 0.6); /* Thicker, more visible border when occupied */
+  box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.15);
 }
 
 .hexagon.selected {
-  border: 2px solid rgba(155, 89, 246, 0.9); /* Brighter border when selected */
+  border: 3px solid rgba(155, 89, 246, 1); /* Thicker, full opacity border when selected */
   @apply bg-purple-900/40;
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
 }
 
 .champion-content {
   @apply flex items-center justify-center w-full h-full cursor-grab active:cursor-grabbing;
+  transform: scale(1.15);
 }
 
 /* Champions grid styling */

@@ -1,37 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, List, Sparkles, Settings, Moon, Sun, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { Home, List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
-import { useAuth } from '@/providers/AuthProvider';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import AuthForm from '@/components/AuthForm';
 
 const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
-  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [signupOpen, setSignupOpen] = useState(false);
-  
-  const { user, username, signOut } = useAuth();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -94,13 +72,6 @@ const Header: React.FC = () => {
               )}
             </Button>
             
-            {/* Welcome Message when signed in */}
-            {user && username && (
-              <div className={`mr-4 font-medium text-sm text-foreground/90 transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-                Welcome, <span className="text-primary font-semibold">{username}</span>!
-              </div>
-            )}
-            
             {/* Nav Items with staggered animation */}
             <Link to="/sets">
               <Button 
@@ -135,81 +106,6 @@ const Header: React.FC = () => {
                 </span>
               </Button>
             </Link>
-            
-            {/* Auth buttons */}
-            {!user ? (
-              <>
-                <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="ghost"
-                      size="sm"
-                      className={`hover:bg-primary/10 hover-glow transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-                      style={{ transitionDelay: '400ms' }}
-                    >
-                      <LogIn className="h-4 w-4 mr-2" />
-                      Login
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Login to your account</DialogTitle>
-                      <DialogDescription>
-                        Sign in to access all features
-                      </DialogDescription>
-                    </DialogHeader>
-                    <AuthForm mode="login" onSuccess={() => setLoginOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="default"
-                      size="sm"
-                      className={`transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-                      style={{ transitionDelay: '500ms' }}
-                    >
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Create Account
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Create a new account</DialogTitle>
-                      <DialogDescription>
-                        Join TFT Genie to create and vote on comps
-                      </DialogDescription>
-                    </DialogHeader>
-                    <AuthForm mode="signup" onSuccess={() => setSignupOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-              </>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-                    style={{ transitionDelay: '400ms' }}
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    <span className="font-medium">{username || 'Account'}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>
-                    Welcome, {username || 'User'}
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
           </nav>
         </div>
       </div>

@@ -171,7 +171,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField control={form.control} name="name" render={({
               field
-            }) => <FormItem>
+            }) => <FormItem className="px-[11px] mx-[9px] my-0 py-[6px]">
                     <FormLabel>Comp Name</FormLabel>
                     <FormControl>
                       <Input placeholder="8-Bit Disco" {...field} />

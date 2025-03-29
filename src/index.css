@@ -1,100 +1,56 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --background: 0 0% 99%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
+    --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
-    --primary: 272 75% 59%;
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 272 100% 50%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 96.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 96.5%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 272 100% 96%;
+    --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 272 75% 59%;
- 
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 272 94% 50%;
     --radius: 0.5rem;
-
-    --cost-1: 127 10% 55%;
-    --cost-2: 216 60% 60%;
-    --cost-3: 269 75% 65%;
-    --cost-4: 312 70% 60%;
-    --cost-5: 35 90% 61%;
   }
- 
+
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --primary: 270 67% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 272 100% 50%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 272 100% 25%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 270 67% 60%;
-
-    --cost-1: 127 10% 55%;
-    --cost-2: 216 60% 60%;
-    --cost-3: 269 75% 65%;
-    --cost-4: 312 70% 60%;
-    --cost-5: 35 90% 61%;
-  }
-
-  /* Add cost border colors */
-  .champion-border-1 {
-    @apply border-cost-1;
-  }
-  .champion-border-2 {
-    @apply border-cost-2;
-  }
-  .champion-border-3 {
-    @apply border-cost-3;
-  }
-  .champion-border-4 {
-    @apply border-cost-4;
-  }
-  .champion-border-5 {
-    @apply border-cost-5;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 272 94% 44%;
   }
 }
- 
+
+/* Universal styles */
 @layer base {
   * {
     @apply border-border;
@@ -103,166 +59,145 @@
     @apply bg-background text-foreground;
     font-family: 'Exo 2', sans-serif;
   }
-}
+  
+  /* Custom styling for the board UI */
+  .board-wrapper {
+    @apply flex flex-col items-center gap-4 p-2;
+  }
 
-/* Hexagon Grid for TFT Board */
-.board-wrapper {
-  @apply flex flex-col items-center space-y-4 max-w-3xl mx-auto;
-}
+  .board-wrapper.compact {
+    @apply p-0;
+  }
+  
+  .board-container {
+    @apply relative;
+  }
+  
+  .board-grid {
+    @apply inline-block relative;
+  }
+  
+  .board-row {
+    @apply flex justify-center;
+  }
+  
+  .board-row:nth-child(odd) {
+    @apply ml-4;
+  }
+  
+  .hexagon-cell {
+    @apply w-12 h-12 m-[2px] relative cursor-pointer;
+  }
+  
+  .compact .hexagon-cell {
+    @apply w-8 h-8 m-[1px];
+  }
+  
+  .hexagon {
+    @apply w-full h-full flex items-center justify-center;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  
+  .hexagon.empty {
+    @apply bg-secondary/60 hover:bg-secondary/80;
+  }
+  
+  .hexagon.occupied {
+    @apply bg-primary/20;
+  }
+  
+  .hexagon.selected {
+    @apply bg-primary/40;
+  }
+  
+  .champion-content {
+    @apply w-10 h-10 flex items-center justify-center;
+  }
+  
+  .compact .champion-content {
+    @apply w-6 h-6;
+  }
+  
+  .champions-title {
+    @apply text-lg font-medium mt-4 mb-2;
+  }
+  
+  .champions-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full max-w-2xl;
+  }
+  
+  .champion-card {
+    @apply bg-secondary/30 p-2 rounded-md cursor-pointer border border-transparent hover:border-primary/40 transition-all;
+  }
+  
+  .champion-card.selected {
+    @apply bg-primary/20 border-primary;
+  }
+  
+  .champion-card.positioned {
+    @apply opacity-80;
+  }
+  
+  .champion-info {
+    @apply flex flex-col items-center gap-1;
+  }
+  
+  .champion-name {
+    @apply text-xs font-medium;
+  }
+  
+  .position-indicator {
+    @apply text-[10px] flex items-center text-muted-foreground;
+  }
+  
+  .board-instructions {
+    @apply flex items-center text-sm text-muted-foreground bg-background/60 p-2 rounded-md mb-2;
+  }
+  
+  .board-tip {
+    @apply mt-4 text-xs text-muted-foreground;
+  }
+  
+  /* Champion border colors based on cost */
+  .champion-border-1 {
+    @apply border-2 border-cost-1;
+  }
+  
+  .champion-border-2 {
+    @apply border-2 border-cost-2;
+  }
+  
+  .champion-border-3 {
+    @apply border-2 border-cost-3;
+  }
+  
+  .champion-border-4 {
+    @apply border-2 border-cost-4;
+  }
+  
+  .champion-border-5 {
+    @apply border-2 border-cost-5;
+  }
 
-.board-wrapper.compact {
-  @apply scale-[0.8] origin-top-left;
-}
+  /* Custom card styling for TFT comps */
+  .tft-card {
+    @apply bg-card border border-border/60 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-md;
+  }
 
-.board-instructions {
-  @apply flex items-center justify-center text-sm text-muted-foreground mt-2 mb-4;
-}
+  /* Gaming-style button with glow */
+  .gaming-button {
+    @apply bg-primary text-primary-foreground relative overflow-hidden shadow-[0_0_10px_rgba(123,31,162,0.5)];
+  }
 
-.board-container {
-  @apply rounded-lg bg-[#0A071D] p-6 border border-purple-900/30 shadow-lg;
-  background-image: radial-gradient(circle at center, rgba(139, 92, 246, 0.05) 0%, rgba(10, 7, 29, 1) 70%);
-}
+  .gaming-button::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-primary/0 via-white/20 to-primary/0 -translate-x-full;
+    animation: shine 3s infinite;
+  }
 
-.board-grid {
-  @apply flex flex-col items-center gap-0 p-4;
-}
-
-.board-row {
-  @apply flex gap-3 my-0;
-  margin-bottom: 12px; /* Increased vertical spacing between rows */
-}
-
-/* Staggered hexagon grid with increased offset for bottom rows */
-.board-row:nth-child(even) {
-  @apply ml-[30px]; /* Further increased offset for even rows */
-}
-
-/* Even more offset for bottom rows */
-.board-row:nth-child(3) {
-  @apply ml-[38px];
-}
-
-.board-row:nth-child(4) {
-  @apply ml-[46px];
-}
-
-.hexagon-cell {
-  position: relative;
-  width: 50px; /* Slightly larger cells */
-  height: 58px;
-  margin: 0 2px;
-}
-
-.hexagon {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  transition: all 0.2s ease-out;
-}
-
-.hexagon.empty {
-  @apply bg-transparent;
-  border: 2px solid rgba(155, 89, 246, 0.3); /* Cleaner purple border with higher opacity */
-  background: rgba(91, 33, 182, 0.05);
-}
-
-.hexagon.occupied {
-  @apply bg-purple-900/20;
-  border: 3px solid rgba(155, 89, 246, 0.6); /* Thicker, more visible border when occupied */
-  box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.15);
-}
-
-.hexagon.selected {
-  border: 3px solid rgba(155, 89, 246, 1); /* Thicker, full opacity border when selected */
-  @apply bg-purple-900/40;
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
-}
-
-.champion-content {
-  @apply flex items-center justify-center w-full h-full cursor-grab active:cursor-grabbing;
-  transform: scale(1.15);
-}
-
-/* Champions grid styling */
-.champions-title {
-  @apply text-sm font-medium mt-6 mb-2 text-center;
-}
-
-.champions-grid {
-  @apply grid grid-cols-4 sm:grid-cols-5 gap-2;
-}
-
-.champion-card {
-  @apply relative border border-border/40 rounded-md p-2 bg-card/20 hover:bg-card/40 transition-all duration-200 cursor-pointer;
-  backdrop-filter: blur(8px);
-}
-
-.champion-card.selected {
-  @apply bg-primary/10 border-primary/50 shadow-md;
-}
-
-.champion-card.positioned {
-  @apply border-primary/30;
-}
-
-.champion-info {
-  @apply flex flex-col items-center gap-1;
-}
-
-.champion-name {
-  @apply text-xs mt-1 text-center truncate w-full;
-}
-
-.position-indicator {
-  @apply text-xs text-primary flex items-center mt-1;
-}
-
-.board-tip {
-  @apply text-xs text-muted-foreground mt-4 text-center;
-}
-
-/* Cost-specific colors */
-.bg-cost-1 { @apply bg-[hsl(var(--cost-1))]; }
-.bg-cost-2 { @apply bg-[hsl(var(--cost-2))]; }
-.bg-cost-3 { @apply bg-[hsl(var(--cost-3))]; }
-.bg-cost-4 { @apply bg-[hsl(var(--cost-4))]; }
-.bg-cost-5 { @apply bg-[hsl(var(--cost-5))]; }
-
-.border-cost-1 { @apply border-[hsl(var(--cost-1))]; }
-.border-cost-2 { @apply border-[hsl(var(--cost-2))]; }
-.border-cost-3 { @apply border-[hsl(var(--cost-3))]; }
-.border-cost-4 { @apply border-[hsl(var(--cost-4))]; }
-.border-cost-5 { @apply border-[hsl(var(--cost-5))]; }
-
-/* Particle effects for background */
-.particles-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.abstract-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: -2;
-}
-
-.blur-circle {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.6;
+  @keyframes shine {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }

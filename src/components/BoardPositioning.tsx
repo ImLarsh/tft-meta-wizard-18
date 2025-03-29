@@ -105,7 +105,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       const rowCells = [];
       for (let col = 0; col < cols; col++) {
         const championAtPosition = positionedChampions.find(champ => champ.position && champ.position.row === row && champ.position.col === col);
-        rowCells.push(<div key={`${row}-${col}`} onClick={() => handleCellClick(row, col)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, row, col)} className="hexagon-cell mx-0 bg-[#211b4b]/0 my-[13px] py-0 px-0">
+        rowCells.push(<div key={`${row}-${col}`} onClick={() => handleCellClick(row, col)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, row, col)} className="hexagon-cell bg-[#211b4b]/0 py-0 px-0 mx-[11px] my-0">
             {championAtPosition?.isCarry && <div className="carry-stars my-[7px]">
                 <Star size={14} fill="#FFD700" color="#FFD700" />
                 <Star size={14} fill="#FFD700" color="#FFD700" />
@@ -136,7 +136,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
               </div>}
           </div>);
       }
-      boardPositions.push(<div key={row} className="board-row py-0 my-0 mx-0 px-0">
+      boardPositions.push(<div key={row} className="board-row py-[9px] my-px mx-[10px] px-px">
           {rowCells}
         </div>);
     }
@@ -150,8 +150,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             </span> : isDragging ? <span>Drag champion to a position on the board</span> : <span>Select a champion to position or drag directly onto the board</span>}
         </div>}
       
-      <div className="board-container">
-        <div className="tft-board-grid">
+      <div className="board-container my-[px] mx-0 px-0">
+        <div className="tft-board-grid my-[26px] mx-0 px-0 py-0">
           {renderBoard()}
         </div>
       </div>

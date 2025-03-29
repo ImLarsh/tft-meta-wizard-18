@@ -22,11 +22,10 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   const [imgError, setImgError] = useState(false);
   
   // Normalize the champion name for different API formats
-  let normalizedName;
+  let normalizedName = '';
   
   // Guard against undefined or null name
   if (!name) {
-    normalizedName = '';
     console.error('ChampionIcon received undefined or null name');
   }
   // Special case handling for champions with known naming issues
@@ -49,9 +48,8 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   } else if (name === "LeBlanc" || name === "Le Blanc") {
     normalizedName = "leblanc";
   } else {
-    // Standard normalization for other champions
-    // Remove spaces and special characters, convert to lowercase
-    normalizedName = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    // Standard normalization for other champions - safely handle name
+    normalizedName = name ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unknown';
   }
   
   // For display in fallback

@@ -18,10 +18,11 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
 }) => {
   const [positionedChampions, setPositionedChampions] = useState<Champion[]>([]);
   const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   
   // This ensures we properly handle champions with or without positions
   useEffect(() => {
-    setPositionedChampions(champions);
+    setPositionedChampions(champions || []);
   }, [champions]);
 
   const handleCellClick = (row: number, col: number) => {
@@ -65,8 +66,52 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     setSelectedChampion(selectedChampion === champion ? null : champion);
   };
 
+  const handleDragStart = (e: React.DragEvent, champion: Champion) => {
+    if (readonly) return;
+    e.dataTransfer.setData('championIndex', positionedChampions.indexOf(champion).toString());
+    setIsDragging(true);
+    setSelectedChampion(champion);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (readonly) return;
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, row: number, col: number) => {
+    if (readonly) return;
+    e.preventDefault();
+    const championIndex = parseInt(e.dataTransfer.getData('championIndex'));
+    
+    // Make sure we have a valid champion index
+    if (isNaN(championIndex) || championIndex < 0 || championIndex >= positionedChampions.length) {
+      return;
+    }
+
+    const updatedChampions = [...positionedChampions];
+    updatedChampions[championIndex] = {
+      ...updatedChampions[championIndex],
+      position: { row, col }
+    };
+    
+    setPositionedChampions(updatedChampions);
+    setIsDragging(false);
+    setSelectedChampion(null);
+    
+    // Notify parent of change
+    if (onChange) {
+      onChange(updatedChampions);
+    }
+    
+    // Support for the onUpdatePositions prop
+    if (onUpdatePositions) {
+      onUpdatePositions(updatedChampions);
+    }
+  };
+
   const renderBoard = () => {
-    const rows = 4;
+    // Correct TFT board dimensions: 7 columns x 3 rows (hexagonal grid)
+    const rows = 3;
     const cols = 7;
     const board = [];
     
@@ -88,12 +133,16 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                 : ''
             }`}
             onClick={() => handleCellClick(row, col)}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, row, col)}
           >
             {championAtPosition && (
               <div 
                 className={`absolute inset-0 flex items-center justify-center ${
                   !readonly && selectedChampion === championAtPosition ? 'ring-2 ring-primary' : ''
                 }`}
+                draggable={!readonly}
+                onDragStart={(e) => handleDragStart(e, championAtPosition)}
               >
                 <ChampionIcon
                   name={championAtPosition.name}
@@ -119,8 +168,15 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-center">
-        {renderBoard()}
+      <div className="flex flex-col items-center">
+        {isDragging && !readonly && (
+          <div className="text-sm text-primary mb-2">
+            Drag champion to a position on the board
+          </div>
+        )}
+        <div className="flex justify-center">
+          {renderBoard()}
+        </div>
       </div>
       
       {!readonly && (
@@ -132,6 +188,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                 selectedChampion === champion ? 'bg-primary/20 ring-1 ring-primary' : ''
               }`}
               onClick={() => handleChampionClick(champion)}
+              draggable
+              onDragStart={(e) => handleDragStart(e, champion)}
             >
               <div className="flex flex-col items-center">
                 <ChampionIcon

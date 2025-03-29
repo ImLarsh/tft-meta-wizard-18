@@ -110,6 +110,15 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     5: 'bg-cost-5'
   };
   
+  // Cost-specific border classes
+  const costBorderClasses = {
+    1: 'border-2 border-cost-1', // white
+    2: 'border-2 border-cost-2', // green
+    3: 'border-2 border-cost-3', // blue
+    4: 'border-2 border-cost-4', // pink
+    5: 'border-2 border-cost-5'  // yellow
+  };
+  
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   
   const handleImageError = () => {
@@ -128,6 +137,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       className={cn(
         size !== 'md' ? sizeClasses[size] : 'w-11 h-11', // Adjust mid size to fit hexagons better
         'rounded-md overflow-hidden relative',
+        costBorderClasses[cost], // Add cost-specific border
         className
       )}
       onClick={onClick}
@@ -143,7 +153,7 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       )}
       {imgError ? (
         <div className={cn(
-          "w-full h-full flex items-center justify-center text-[10px] font-medium text-white bg-secondary p-0.5 text-center",
+          "w-full h-full flex items-center justify-center text-[10px] font-medium text-white bg-secondary/60 p-0.5 text-center",
           sizeClasses[size]
         )}>
           {displayName}

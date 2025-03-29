@@ -60,10 +60,26 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
   const handleVote = async (voteType: VoteType) => {
     if (isLoading) return;
     
-    // Generate a unique ID for anonymous voting
-    const voteId = `${compId}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    // If the user is trying to vote the same way twice, ignore
+    if (voteType === currentVote) return;
     
     try {
+      // Remove previous vote if it exists (in the database we'd use a unique constraint,
+      // but for client-side we'll just track with localStorage)
+      
+      // Generate a unique ID for anonymous voting
+      const voteId = `${compId}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      
+      // If there was a previous vote of a different type, adjust the counts
+      if (currentVote) {
+        // Decrement the previous vote count
+        if (currentVote === 'like') {
+          setLikes(prev => Math.max(0, prev - 1));
+        } else {
+          setDislikes(prev => Math.max(0, prev - 1));
+        }
+      }
+      
       // Insert new vote without user authentication
       if (voteType) {
         // Using typed insert

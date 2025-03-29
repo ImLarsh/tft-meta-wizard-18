@@ -103,9 +103,9 @@ export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
       return [];
     }
     
-    // Check if data.comps is an array
+    // Check if data.comps is an array and cast it to TFTComp[] with a type assertion
     if (data?.comps && Array.isArray(data.comps)) {
-      return data.comps as TFTComp[];
+      return data.comps as unknown as TFTComp[];
     }
     
     return [];
@@ -129,11 +129,11 @@ export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> =>
       .limit(1);
     
     if (existingRecord && existingRecord.length > 0) {
-      // Update existing record
+      // Update existing record with type coercion
       const { error } = await supabase
         .from('tft_comps')
         .update({ 
-          comps, 
+          comps: comps as any, 
           updated_at: new Date().toISOString() 
         })
         .eq('id', existingRecord[0].id);
@@ -143,10 +143,10 @@ export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> =>
         return false;
       }
     } else {
-      // Insert new record
+      // Insert new record with type coercion
       const { error } = await supabase
         .from('tft_comps')
-        .insert({ comps });
+        .insert({ comps: comps as any });
       
       if (error) {
         console.error('Error inserting comps:', error);

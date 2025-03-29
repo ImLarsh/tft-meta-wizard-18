@@ -1,16 +1,52 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import CompTierList from '@/components/CompTierList';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Plus } from 'lucide-react';
+import { Sparkles, Plus, LogIn, UserPlus } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
+import { supabase } from '@/integrations/supabase/client';
 import AppLogo from '@/components/AppLogo';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import AuthForm from '@/components/AuthForm';
 
 const Index: React.FC = () => {
   const { comps, traitMappings } = useComps();
   const hasTraitMappings = Object.keys(traitMappings).length > 0;
+  const [user, setUser] = useState<any>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+  
+  // Check for authentication
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+
+    // Set up listener for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+  
+  const handleCreateCompClick = (e: React.MouseEvent) => {
+    if (!user) {
+      e.preventDefault();
+      setLoginOpen(true);
+    }
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,16 +63,40 @@ const Index: React.FC = () => {
           </p>
           
           <div className="flex justify-center gap-4">
-            <Link to="/create">
-              <Button 
-                className="gap-2 hover-lift gaming-button"
-                size="lg"
-                disabled={!hasTraitMappings}
-              >
-                <Sparkles className="h-5 w-5" />
-                Create New Comp
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/create">
+                <Button 
+                  className="gap-2 hover-lift gaming-button"
+                  size="lg"
+                  disabled={!hasTraitMappings}
+                >
+                  <Sparkles className="h-5 w-5" />
+                  Create New Comp
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/create" onClick={handleCreateCompClick}>
+                  <Button 
+                    className="gap-2 hover-lift gaming-button"
+                    size="lg"
+                    disabled={!hasTraitMappings}
+                  >
+                    <Sparkles className="h-5 w-5" />
+                    Create New Comp
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline"
+                  size="lg"
+                  className="hover-lift"
+                  onClick={() => setSignupOpen(true)}
+                >
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Create Account
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -62,16 +122,80 @@ const Index: React.FC = () => {
             <p className="mb-6 text-muted-foreground">
               Create your first team composition to get started.
             </p>
-            <Link to="/create">
-              <Button variant="default" size="lg">
-                Create Your First Comp
-              </Button>
-            </Link>
+            {user ? (
+              <Link to="/create">
+                <Button variant="default" size="lg">
+                  Create Your First Comp
+                </Button>
+              </Link>
+            ) : (
+              <div className="flex justify-center gap-4">
+                <Button variant="default" size="lg" onClick={() => setLoginOpen(true)}>
+                  <LogIn className="h-5 w-5 mr-2" />
+                  Login
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => setSignupOpen(true)}>
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Create Account
+                </Button>
+              </div>
+            )}
           </div>
         )}
         
         {comps.length > 0 && <CompTierList />}
       </main>
+      
+      {/* Auth Dialogs */}
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Login to your account</DialogTitle>
+            <DialogDescription>
+              Sign in to create and vote on compositions
+            </DialogDescription>
+          </DialogHeader>
+          <AuthForm mode="login" onSuccess={() => setLoginOpen(false)} />
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Button 
+              variant="link" 
+              className="p-0 h-auto"
+              onClick={() => {
+                setLoginOpen(false);
+                setSignupOpen(true);
+              }}
+            >
+              Create one
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create a new account</DialogTitle>
+            <DialogDescription>
+              Join TFT Genie to create and vote on compositions
+            </DialogDescription>
+          </DialogHeader>
+          <AuthForm mode="signup" onSuccess={() => setSignupOpen(false)} />
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Button 
+              variant="link" 
+              className="p-0 h-auto"
+              onClick={() => {
+                setSignupOpen(false);
+                setLoginOpen(true);
+              }}
+            >
+              Login
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       {/* Footer */}
       <footer className="py-12 mt-8 border-t border-border/30 relative z-10">

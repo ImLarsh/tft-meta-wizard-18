@@ -1,15 +1,30 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, List, Sparkles, Settings, Moon, Sun } from 'lucide-react';
+import { Home, List, Sparkles, Settings, Moon, Sun, LogIn, UserPlus } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import AuthForm from '@/components/AuthForm';
 
 const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
   
   // Handle scroll effects
   useEffect(() => {
@@ -30,6 +45,41 @@ const Header: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  
+  // Check authentication status
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+
+    // Set up listener for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Error signing out",
+        description: "There was a problem signing you out",
+        variant: "destructive",
+      });
+    }
+  };
   
   return (
     <header className={`bg-card/80 backdrop-blur-md sticky top-0 z-10 border-b transition-all duration-300 ${scrolled ? 'shadow-md border-primary/20' : 'shadow-sm border-primary/10'}`}>
@@ -108,7 +158,66 @@ const Header: React.FC = () => {
               </Button>
             </Link>
             
-            {/* Create Comp button removed */}
+            {/* Auth buttons */}
+            {!user ? (
+              <>
+                <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="ghost"
+                      size="sm"
+                      className={`hover:bg-primary/10 hover-glow transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                      style={{ transitionDelay: '400ms' }}
+                    >
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Login
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Login to your account</DialogTitle>
+                      <DialogDescription>
+                        Sign in to access all features
+                      </DialogDescription>
+                    </DialogHeader>
+                    <AuthForm mode="login" onSuccess={() => setLoginOpen(false)} />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="default"
+                      size="sm"
+                      className={`transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                      style={{ transitionDelay: '500ms' }}
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Create Account
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Create a new account</DialogTitle>
+                      <DialogDescription>
+                        Join TFT Genie to create and vote on comps
+                      </DialogDescription>
+                    </DialogHeader>
+                    <AuthForm mode="signup" onSuccess={() => setSignupOpen(false)} />
+                  </DialogContent>
+                </Dialog>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className={`hover:bg-primary/10 transition-all duration-300 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                style={{ transitionDelay: '400ms' }}
+              >
+                Sign Out
+              </Button>
+            )}
           </nav>
         </div>
       </div>

@@ -4,6 +4,15 @@ import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import AuthForm from './AuthForm';
 
 interface CompVoteSystemProps {
   compId: string;
@@ -17,20 +26,24 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   
-  // Generate a consistent user ID - ideally this would be a logged-in user's ID
-  const [userId, setUserId] = useState<string | null>(null);
-  
+  // Check for authentication
   useEffect(() => {
-    // Get or create a user ID from localStorage for anonymous voting
-    const storedUserId = localStorage.getItem('anonymous_user_id');
-    if (storedUserId) {
-      setUserId(storedUserId);
-    } else {
-      const newUserId = crypto.randomUUID();
-      localStorage.setItem('anonymous_user_id', newUserId);
-      setUserId(newUserId);
-    }
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+
+    // Set up listener for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
   
   // Fetch current votes
@@ -66,13 +79,13 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
         setDislikes(dislikesData.length);
       }
       
-      // Get user's current vote if they have one
-      if (userId) {
+      // Get user's current vote if they have one and are logged in
+      if (user) {
         const { data: userVote, error: userVoteError } = await supabase
           .from('comp_votes')
           .select('vote_type')
           .eq('comp_id', compId)
-          .eq('user_id', userId)
+          .eq('user_id', user.id)
           .single();
         
         if (userVoteError && userVoteError.code !== 'PGRST116') { // PGRST116 is "no rows returned" which is fine
@@ -85,13 +98,17 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
       setIsLoading(false);
     };
     
-    if (compId && userId) {
-      fetchVotes();
-    }
-  }, [compId, userId]);
+    fetchVotes();
+  }, [compId, user]);
   
   const handleVote = async (voteType: VoteType) => {
-    if (!userId || isLoading) return;
+    if (isLoading) return;
+    
+    // If not logged in, show login dialog
+    if (!user) {
+      setLoginDialogOpen(true);
+      return;
+    }
     
     // If clicking the same vote type, remove the vote
     const newVoteType = voteType === currentVote ? null : voteType;
@@ -103,7 +120,7 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
           .from('comp_votes')
           .delete()
           .eq('comp_id', compId)
-          .eq('user_id', userId);
+          .eq('user_id', user.id);
         
         if (deleteError) throw deleteError;
         
@@ -121,7 +138,7 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
           .from('comp_votes')
           .insert({
             comp_id: compId,
-            user_id: userId,
+            user_id: user.id,
             vote_type: newVoteType
           });
         
@@ -173,6 +190,35 @@ const CompVoteSystem: React.FC<CompVoteSystemProps> = ({ compId, className }) =>
           <span>{dislikes}</span>
         </Button>
       </div>
+      
+      {/* Login Dialog */}
+      <Dialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Login Required</DialogTitle>
+            <DialogDescription>
+              You need to be logged in to vote on compositions.
+            </DialogDescription>
+          </DialogHeader>
+          <AuthForm mode="login" onSuccess={() => setLoginDialogOpen(false)} />
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Button 
+              variant="link" 
+              className="p-0 h-auto"
+              onClick={() => {
+                setLoginDialogOpen(false);
+                // Open signup dialog (this would be handled at a higher level in Header)
+                document.querySelector('[data-dialog-trigger="signup"]')?.dispatchEvent(
+                  new MouseEvent('click', { bubbles: true })
+                );
+              }}
+            >
+              Create one
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

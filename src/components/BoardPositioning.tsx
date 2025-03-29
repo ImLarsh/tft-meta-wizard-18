@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Champion } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { TFTComp } from '@/data/comps';
 import ChampionIcon from './ChampionIcon';
+import ItemIcon from './ItemIcon';
 import BoardPositioning from './BoardPositioning';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -146,9 +147,7 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                       {champion.items && champion.items.length > 0 && (
                         <div className="flex gap-1 mt-1 flex-wrap justify-center">
                           {champion.items.map((item, idx) => (
-                            <div key={idx} className="bg-secondary/50 px-1 py-0.5 rounded text-[8px] whitespace-nowrap">
-                              {item}
-                            </div>
+                            <ItemIcon key={idx} name={item} size="sm" />
                           ))}
                         </div>
                       )}
@@ -163,8 +162,9 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                 <h4 className="text-sm font-medium text-muted-foreground mb-2">Key Items</h4>
                 <div className="flex flex-wrap gap-2">
                   {comp.keyItems.map((item, idx) => (
-                    <div key={idx} className="bg-secondary/70 px-2 py-1 rounded text-xs">
-                      {item}
+                    <div key={idx} className="bg-secondary/70 px-2 py-1 rounded text-xs flex items-center gap-1">
+                      <ItemIcon name={item} size="sm" />
+                      <span>{item}</span>
                     </div>
                   ))}
                 </div>
@@ -185,8 +185,10 @@ const CompCard: React.FC<CompCardProps> = ({ comp }) => {
                       </div>
                       <div className="flex flex-wrap gap-2 ml-10">
                         {champion.items && champion.items.map((item, idx) => (
-                          <div key={idx} className="bg-secondary/50 px-2 py-1 rounded text-xs flex items-center">
-                            <span className="text-primary mr-1">{idx + 1}.</span> {item}
+                          <div key={idx} className="bg-secondary/50 px-2 py-1 rounded text-xs flex items-center gap-1">
+                            <span className="text-primary mr-1">{idx + 1}.</span>
+                            <ItemIcon name={item} size="sm" />
+                            <span>{item}</span>
                           </div>
                         ))}
                       </div>

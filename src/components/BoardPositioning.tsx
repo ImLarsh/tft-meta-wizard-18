@@ -148,7 +148,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   onDragStart={e => handleDragStart(e, championAtPosition)}
                 >
                   {championAtPosition.isCarry && (
-                    <div className="carry-stars">
+                    <div className="carry-stars" style={{ pointerEvents: 'none' }}>
                       <Star size={12} fill="#FFD700" color="#FFD700" />
                       <Star size={12} fill="#FFD700" color="#FFD700" />
                       <Star size={12} fill="#FFD700" color="#FFD700" />
@@ -175,7 +175,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   </TooltipProvider>
                   
                   {championAtPosition.items && championAtPosition.items.length > 0 && (
-                    <div className="items-container">
+                    <div className="items-container" style={{ pointerEvents: 'none' }}>
                       {championAtPosition.items.map((item, idx) => (
                         <ItemIcon key={idx} name={item} size="sm" />
                       ))}

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -22,92 +22,84 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   showTooltip = true
 }) => {
   const [imgError, setImgError] = useState(false);
-  const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   
-  useEffect(() => {
-    setCurrentSourceIndex(0);
-    setImgError(false);
-  }, [name]);
-  
-  // Format the item name for wiki URL
-  const formatNameForWiki = (itemName: string) => {
-    return itemName
-      .replace(/'/g, '%27') // Replace apostrophes with URL encoding
-      .replace(/\s+/g, '_'); // Replace spaces with underscores
-  };
-  
-  // Format for other sources
-  const dashedName = name
-    .toLowerCase()
-    .replace(/[']/g, '') // Remove apostrophes
-    .replace(/\s+/g, '-'); // Replace spaces with dashes
-  
-  // For sources that use simple names
-  const simplifiedName = name
-    .toLowerCase()
-    .replace(/[']/g, '')
-    .replace(/\s+/g, '')
-    .replace(/[^a-z0-9]/g, '');
-  
-  // Display name for fallback text
-  const displayName = name.replace(/([A-Z])/g, ' $1').trim();
-  
-  // Get the formatted name for wiki URL
-  const wikiName = formatNameForWiki(name);
-  
-  // Special mappings for commonly confused item names
-  const specialWikiMappings: Record<string, string> = {
-    "Bloodthirster": "Bloodthirster_TFT_item",
-    "Blue Buff": "Blue_Buff_TFT_item",
-    "Jeweled Gauntlet": "Jeweled_Gauntlet_TFT_item",
-    "Giant Slayer": "Giant_Slayer_TFT_item",
-    "Infinity Edge": "Infinity_Edge_TFT_item",
-    "Deathblade": "Deathblade_TFT_item",
-    "Spear of Shojin": "Spear_of_Shojin_TFT_item",
-    "Rapid Firecannon": "Rapid_Firecannon_TFT_item",
-    "Runaan's Hurricane": "Runaan%27s_Hurricane_TFT_item",
-    "Guinsoo's Rageblade": "Guinsoo%27s_Rageblade_TFT_item",
-    "Dragon's Claw": "Dragon%27s_Claw_TFT_item",
-    "Titan's Resolve": "Titan%27s_Resolve_TFT_item"
-  };
-  
-  // Get the correct wiki file name
-  const wikiFileName = specialWikiMappings[name] || `${wikiName}_TFT_item`;
-  
-  // Image sources in priority order
-  const sources = [
-    // Primary source: LoL Wiki with revision/latest
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/archive/${wikiFileName}.png/120px-${wikiFileName}.png`,
-    `https://static.wikia.nocookie.net/leagueoflegends/images/archive/${wikiFileName}.png`,
-    `https://static.wikia.nocookie.net/leagueoflegends/images/${wikiFileName}.png/revision/latest`,
-    
-    // Secondary sources
-    `https://tftactics.gg/img/items/${dashedName}.png`,
-    `https://cdn.metatft.com/file/metatft/items/${dashedName}.png`,
-    `https://rerollcdn.com/items/${simplifiedName}.png`,
-    `https://raw.communitydragon.org/latest/game/assets/items/icons/${dashedName}.png`,
-    `https://tft.mobalytics.gg/images/items/${simplifiedName}.png`,
-    `https://lolchess.gg/images/tft/items/${dashedName}.png`
-  ];
-  
-  // Guaranteed fallback image (Bloodthirster direct link)
-  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Bloodthirster_TFT_item.png/revision/latest';
-  
+  // Size classes for the icon container
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-8 h-8',
     lg: 'w-10 h-10'
   };
   
+  // Format the item name for URL usage
+  const getWikiName = (itemName: string) => {
+    // Replace spaces with underscores and preserve apostrophes for wiki URLs
+    return itemName
+      .replace(/\s+/g, '_');
+  };
+  
+  // Special mappings for commonly confused item names 
+  // Maps from display name to the actual file name on the wiki
+  const specialMappings: Record<string, string> = {
+    "Bloodthirster": "Bloodthirster_(Teamfight_Tactics)",
+    "Blue Buff": "Blue_Buff_(Teamfight_Tactics)",
+    "Bramble Vest": "Bramble_Vest_(Teamfight_Tactics)",
+    "Deathblade": "Deathblade_(Teamfight_Tactics)",
+    "Dragon's Claw": "Dragon%27s_Claw_(Teamfight_Tactics)",
+    "Edge of Night": "Edge_of_Night_(Teamfight_Tactics)",
+    "Giant Slayer": "Giant_Slayer_(Teamfight_Tactics)",
+    "Guinsoo's Rageblade": "Guinsoo%27s_Rageblade_(Teamfight_Tactics)",
+    "Hand of Justice": "Hand_of_Justice_(Teamfight_Tactics)",
+    "Infinity Edge": "Infinity_Edge_(Teamfight_Tactics)",
+    "Ionic Spark": "Ionic_Spark_(Teamfight_Tactics)",
+    "Jeweled Gauntlet": "Jeweled_Gauntlet_(Teamfight_Tactics)",
+    "Last Whisper": "Last_Whisper_(Teamfight_Tactics)",
+    "Locket of the Iron Solari": "Locket_of_the_Iron_Solari_(Teamfight_Tactics)",
+    "Morellonomicon": "Morellonomicon_(Teamfight_Tactics)",
+    "Quicksilver": "Quicksilver_(Teamfight_Tactics)",
+    "Rabadon's Deathcap": "Rabadon%27s_Deathcap_(Teamfight_Tactics)",
+    "Rapid Firecannon": "Rapid_Firecannon_(Teamfight_Tactics)",
+    "Redemption": "Redemption_(Teamfight_Tactics)",
+    "Runaan's Hurricane": "Runaan%27s_Hurricane_(Teamfight_Tactics)",
+    "Spear of Shojin": "Spear_of_Shojin_(Teamfight_Tactics)",
+    "Statikk Shiv": "Statikk_Shiv_(Teamfight_Tactics)",
+    "Sunfire Cape": "Sunfire_Cape_(Teamfight_Tactics)",
+    "Thief's Gloves": "Thief%27s_Gloves_(Teamfight_Tactics)",
+    "Titan's Resolve": "Titan%27s_Resolve_(Teamfight_Tactics)",
+    "Warmog's Armor": "Warmog%27s_Armor_(Teamfight_Tactics)",
+    "Zeke's Herald": "Zeke%27s_Herald_(Teamfight_Tactics)",
+    "Zephyr": "Zephyr_(Teamfight_Tactics)",
+    "Zz'Rot Portal": "Zz%27Rot_Portal_(Teamfight_Tactics)",
+  };
+  
+  // Get the appropriate wiki page name
+  const wikiPageName = specialMappings[name] || `${getWikiName(name)}_(Teamfight_Tactics)`;
+  
+  // Main image URL using the League of Legends wiki
+  const imageUrl = `https://static.wikia.nocookie.net/leagueoflegends/images/${wikiPageName}.png/revision/latest`;
+  
+  // Alternative direct URLs for popular items
+  const directImageUrls: Record<string, string> = {
+    "Bloodthirster": "https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Bloodthirster_%28Teamfight_Tactics%29.png/revision/latest",
+    "Blue Buff": "https://static.wikia.nocookie.net/leagueoflegends/images/e/e7/Blue_Buff_%28Teamfight_Tactics%29.png/revision/latest",
+    "Infinity Edge": "https://static.wikia.nocookie.net/leagueoflegends/images/5/5a/Infinity_Edge_%28Teamfight_Tactics%29.png/revision/latest",
+    "Jeweled Gauntlet": "https://static.wikia.nocookie.net/leagueoflegends/images/9/9c/Jeweled_Gauntlet_%28Teamfight_Tactics%29.png/revision/latest",
+    "Rabadon's Deathcap": "https://static.wikia.nocookie.net/leagueoflegends/images/4/46/Rabadon%27s_Deathcap_%28Teamfight_Tactics%29.png/revision/latest",
+    "Runaan's Hurricane": "https://static.wikia.nocookie.net/leagueoflegends/images/e/eb/Runaan%27s_Hurricane_%28Teamfight_Tactics%29.png/revision/latest",
+    "Spear of Shojin": "https://static.wikia.nocookie.net/leagueoflegends/images/1/1e/Spear_of_Shojin_%28Teamfight_Tactics%29.png/revision/latest",
+  };
+  
+  // Final URL to use for the image
+  const finalImageUrl = directImageUrls[name] || imageUrl;
+  
+  // Guaranteed fallback image in case all else fails (using Bloodthirster as fallback)
+  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Bloodthirster_%28Teamfight_Tactics%29.png/revision/latest';
+  
+  // Display name for fallback text, used if images fail to load
+  const displayName = name.length > 12 ? name.substring(0, 10) + '...' : name;
+  
   const handleImageError = () => {
-    console.log(`Image source failed for ${name} at index ${currentSourceIndex}: ${sources[currentSourceIndex]}`);
-    const nextIndex = currentSourceIndex + 1;
-    if (nextIndex < sources.length) {
-      setCurrentSourceIndex(nextIndex);
-    } else {
-      console.log(`All image sources failed for ${name}, using fallback text`);
-      setImgError(true);
-    }
+    console.error(`Failed to load image for ${name}`);
+    setImgError(true);
   };
   
   const icon = (
@@ -127,7 +119,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
         </div>
       ) : (
         <img
-          src={sources[currentSourceIndex] || fallbackUrl}
+          src={finalImageUrl}
           alt={name}
           className="w-full h-full object-cover"
           onError={handleImageError}

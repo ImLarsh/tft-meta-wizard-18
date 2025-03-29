@@ -1,4 +1,3 @@
-
 /* TFT Board Builder styles */
 
 .tft-board-grid {
@@ -81,6 +80,18 @@
   height: 100%;
   border-radius: 4px;
   overflow: hidden;
+  position: relative;
+}
+
+.carry-stars {
+  position: absolute;
+  top: -14px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  z-index: 5;
 }
 
 .items-container {

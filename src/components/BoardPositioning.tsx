@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
@@ -138,14 +137,13 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   onDragStart={(e) => handleDragStart(e, championAtPosition)}
                 >
                   {championAtPosition.isCarry && (
-                    <div className="absolute -top-2 z-10 w-full flex justify-center">
-                      <div className="flex">
-                        <Star size={8} fill="#FFD700" color="#FFD700" />
-                        <Star size={8} fill="#FFD700" color="#FFD700" />
-                        <Star size={8} fill="#FFD700" color="#FFD700" />
-                      </div>
+                    <div className="carry-stars">
+                      <Star size={10} fill="#FFD700" color="#FFD700" />
+                      <Star size={10} fill="#FFD700" color="#FFD700" />
+                      <Star size={10} fill="#FFD700" color="#FFD700" />
                     </div>
                   )}
+                  
                   <div className="champion-icon-wrapper">
                     <TooltipProvider>
                       <Tooltip>
@@ -168,7 +166,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                     </TooltipProvider>
                   </div>
                   
-                  {/* Items display under champion */}
                   {championAtPosition.items && championAtPosition.items.length > 0 && (
                     <div className="items-container">
                       {championAtPosition.items.map((item, idx) => (

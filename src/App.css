@@ -4,6 +4,8 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
@@ -38,6 +40,7 @@
   padding: 2em;
   border-radius: var(--radius);
   transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
 }
 
 .card:hover {
@@ -70,4 +73,16 @@
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(155, 135, 245, 0.2);
+}
+
+/* Glass effect for components to work with particles background */
+.glass-effect {
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-effect {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }

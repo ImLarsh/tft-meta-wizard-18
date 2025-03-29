@@ -9,6 +9,7 @@ import NotFound from './pages/NotFound';
 import { CompsProvider } from './contexts/CompsContext';
 import { Toaster } from './components/ui/toaster';
 import { ThemeProvider } from './providers/ThemeProvider';
+import ParticlesBackground from './components/ParticlesBackground';
 import './App.css';
 import './index.css';
 
@@ -16,6 +17,7 @@ function App() {
   return (
     <ThemeProvider>
       <CompsProvider>
+        <ParticlesBackground />
         <Router>
           <Routes>
             <Route path="/" element={<Index />} />

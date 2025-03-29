@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
 import { MapPin } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface BoardPositioningProps {
   champions: Champion[];
@@ -68,7 +69,10 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   };
 
   const handleDragStart = (e: React.DragEvent, champion: Champion) => {
-    if (readonly) return;
+    if (readonly) {
+      e.preventDefault();
+      return;
+    }
     e.dataTransfer.setData('championIndex', positionedChampions.indexOf(champion).toString());
     setIsDragging(true);
     setSelectedChampion(champion);
@@ -145,20 +149,26 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                 draggable={!readonly}
                 onDragStart={(e) => handleDragStart(e, championAtPosition)}
               >
-                <ChampionIcon
-                  name={championAtPosition.name}
-                  cost={championAtPosition.cost}
-                  size="md"
-                  isCarry={championAtPosition.isCarry}
-                  onClick={() => !readonly && handleChampionClick(championAtPosition)}
-                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <ChampionIcon
+                          name={championAtPosition.name}
+                          cost={championAtPosition.cost}
+                          size="md"
+                          isCarry={championAtPosition.isCarry}
+                          onClick={() => !readonly && handleChampionClick(championAtPosition)}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{championAtPosition.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
-            ) : (
-              // Show empty cell indicator 
-              <div className="text-muted-foreground/20 text-xs">
-                {row},{col}
-              </div>
-            )}
+            ) : null}
           </div>
         );
       }

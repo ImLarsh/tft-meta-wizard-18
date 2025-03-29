@@ -19,22 +19,26 @@ export const isUsingDefaultCredentials = (): boolean => {
  */
 export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, any>> => {
   try {
+    // Query the tft_trait_mappings table
     const { data, error } = await supabase
       .from('tft_trait_mappings')
-      .select('*')
-      .single();
+      .select('*');
     
     if (error) {
       console.error('Error fetching trait mappings:', error);
       return {};
     }
     
-    // Add a type check to ensure we're returning an object
-    const mappings = data?.mappings;
-    if (mappings && typeof mappings === 'object' && !Array.isArray(mappings)) {
-      return mappings as Record<string, any>;
+    // If we have data, return the first record's mappings
+    if (data && data.length > 0) {
+      const mappings = data[0]?.mappings;
+      if (mappings && typeof mappings === 'object' && !Array.isArray(mappings)) {
+        console.log('Successfully fetched trait mappings from Supabase:', mappings);
+        return mappings as Record<string, any>;
+      }
     }
     
+    console.log('No trait mappings found in Supabase or invalid format');
     return {};
   } catch (error) {
     console.error('Error in fetchTraitMappingsFromSupabase:', error);
@@ -69,6 +73,8 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
         console.error('Error updating trait mappings:', error);
         return false;
       }
+      
+      console.log('Successfully updated trait mappings in Supabase');
     } else {
       // Insert new record
       const { error } = await supabase
@@ -79,6 +85,8 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
         console.error('Error inserting trait mappings:', error);
         return false;
       }
+      
+      console.log('Successfully inserted trait mappings in Supabase');
     }
     
     return true;
@@ -94,21 +102,26 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
  */
 export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
   try {
+    // Query the tft_comps table
     const { data, error } = await supabase
       .from('tft_comps')
-      .select('*')
-      .single();
+      .select('*');
     
     if (error) {
       console.error('Error fetching comps:', error);
       return [];
     }
     
-    // Check if data.comps is an array and cast it to TFTComp[] with a type assertion
-    if (data?.comps && Array.isArray(data.comps)) {
-      return data.comps as unknown as TFTComp[];
+    // If we have data, return the first record's comps
+    if (data && data.length > 0) {
+      const comps = data[0]?.comps;
+      if (comps && Array.isArray(comps)) {
+        console.log('Successfully fetched comps from Supabase:', comps);
+        return comps as TFTComp[];
+      }
     }
     
+    console.log('No comps found in Supabase or invalid format');
     return [];
   } catch (error) {
     console.error('Error in fetchCompsFromSupabase:', error);
@@ -143,6 +156,8 @@ export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> =>
         console.error('Error updating comps:', error);
         return false;
       }
+      
+      console.log('Successfully updated comps in Supabase');
     } else {
       // Insert new record with type coercion
       const { error } = await supabase
@@ -153,6 +168,8 @@ export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> =>
         console.error('Error inserting comps:', error);
         return false;
       }
+      
+      console.log('Successfully inserted comps in Supabase');
     }
     
     return true;

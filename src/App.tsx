@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import CompEditor from './pages/CompEditor';
 import CompEditExisting from './pages/CompEditExisting';
+import CompBuilder from './pages/CompBuilder';
 import SetManager from './pages/SetManager';
 import AuthCallback from './pages/AuthCallback';
 import NotFound from './pages/NotFound';
@@ -27,6 +28,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/create" element={<CompEditor />} />
+                <Route path="/builder" element={<CompBuilder />} />
                 <Route path="/edit/:compId" element={<CompEditExisting />} />
                 <Route path="/sets" element={<SetManager />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />

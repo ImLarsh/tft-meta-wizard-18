@@ -1,0 +1,83 @@
+
+/* TFT Board Builder Styles */
+.tft-board-builder {
+  width: 100%;
+}
+
+/* Hexagon grid styles */
+.tft-board {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.hexagon {
+  aspect-ratio: 1/1;
+  position: relative;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.hexagon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px -5px rgba(255, 105, 180, 0.4);
+}
+
+.hexagon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transition: opacity 0.3s ease;
+}
+
+.hexagon:hover::before {
+  opacity: 0.3;
+}
+
+/* Champions pool styles */
+.champion-item {
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: grab;
+}
+
+.champion-item:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.champion-item:hover {
+  transform: translateY(-2px);
+}
+
+/* Cost filter buttons */
+.cost-filter-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .tft-board {
+    gap: 2px;
+  }
+  
+  .hexagon {
+    border-radius: 8px;
+  }
+  
+  .cost-filter-btn {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+}

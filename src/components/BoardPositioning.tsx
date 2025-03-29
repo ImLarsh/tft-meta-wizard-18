@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
@@ -112,7 +113,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     const cols = 7;
     const board = [];
     
-    for (let row = 0; row < rows; row++) {
+    // Flipped board: we render from rows-1 down to 0 instead of 0 up to rows-1
+    for (let row = rows - 1; row >= 0; row--) {
       const rowCells = [];
       for (let col = 0; col < cols; col++) {
         const championAtPosition = positionedChampions.find(
@@ -122,6 +124,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
         const isEvenRow = row % 2 === 0;
         
         const cellSize = compact ? 10 : 14;
+        const hexSpacing = compact ? 1 : 2;
         
         rowCells.push(
           <div 
@@ -135,7 +138,8 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
             style={{
-              transform: isEvenRow ? 'translateX(8px)' : ''
+              transform: isEvenRow ? 'translateX(8px)' : '',
+              margin: `0 ${hexSpacing}px` // Add consistent horizontal spacing
             }}
           >
             <div className={`hexagon ${

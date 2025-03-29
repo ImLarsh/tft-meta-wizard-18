@@ -11,11 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@/components/ui/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash, X, Loader2, MapPin } from 'lucide-react';
+import { Plus, Trash, X, Loader2, MapPin, Crown, Shield } from 'lucide-react';
 import ChampionIcon from './ChampionIcon';
 import BoardPositioning from './BoardPositioning';
 import { useComps } from '@/contexts/CompsContext';
 import { ChampionTraitMap, PositionedChampion } from '@/types/champion';
+import { Label } from '@/components/ui/label';
+import { Card } from '@/components/ui/card';
 
 const commonItems = [
   "Infinity Edge", "Giant Slayer", "Rapid Firecannon", "Runaan's Hurricane", 
@@ -468,37 +470,53 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsContent>
 
           <TabsContent value="champions" className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Early Game Champions</h3>
-              
-              <div className="flex flex-wrap gap-2">
-                {earlyGame.map((champ, index) => (
-                  <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
-                    <ChampionIcon name={champ.name} cost={champ.cost} size="sm" />
-                    <span className="text-sm">{champ.name}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 p-0"
-                      onClick={() => removeChampion(index, "early")}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
+            <Card className="p-6 border border-primary/20 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="h-5 w-5 text-primary" />
+                <h3 className="text-xl font-medium">Early Game Champions</h3>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3 p-4 border border-border rounded-md bg-card/50">
-                <div className="flex-1">
-                  <FormLabel className="text-xs">Champion Name</FormLabel>
+              {earlyGame.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mb-6">
+                  {earlyGame.map((champ, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center p-2 bg-card border border-border rounded-md group hover:border-primary/40 transition-all"
+                    >
+                      <ChampionIcon name={champ.name} cost={champ.cost} size="md" />
+                      <div className="ml-2 flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{champ.name}</p>
+                        <p className="text-xs text-muted-foreground">{champ.cost} Cost</p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removeChampion(index, "early")}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 bg-muted/40 rounded-md mb-6">
+                  <p className="text-muted-foreground">No early game champions added yet</p>
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                <div className="sm:col-span-2">
+                  <Label className="mb-2 block">Champion Name</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Input 
                         value={newChampName} 
                         onChange={(e) => setNewChampName(e.target.value)}
-                        placeholder={filteredChampions.length > 0 ? "Champion Name" : `No champions for ${currentTftVersion}`}
+                        placeholder={filteredChampions.length > 0 ? "Search champions..." : `No champions for ${currentTftVersion}`}
                         disabled={filteredChampions.length === 0}
+                        className="w-full"
                       />
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
@@ -521,27 +539,26 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   </Popover>
                 </div>
                 
-                <div className="w-24">
-                  <FormLabel className="text-xs">Cost</FormLabel>
-                  <Select 
-                    value={newChampCost.toString()} 
-                    onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Cost" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 Cost</SelectItem>
-                      <SelectItem value="2">2 Cost</SelectItem>
-                      <SelectItem value="3">3 Cost</SelectItem>
-                      <SelectItem value="4">4 Cost</SelectItem>
-                      <SelectItem value="5">5 Cost</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="flex-shrink-0">
-                  <FormLabel className="text-xs invisible sm:visible">Add</FormLabel>
+                <div className="flex gap-3">
+                  <div className="w-full sm:w-2/3">
+                    <Label className="mb-2 block">Cost</Label>
+                    <Select 
+                      value={newChampCost.toString()} 
+                      onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Cost" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 Cost</SelectItem>
+                        <SelectItem value="2">2 Cost</SelectItem>
+                        <SelectItem value="3">3 Cost</SelectItem>
+                        <SelectItem value="4">4 Cost</SelectItem>
+                        <SelectItem value="5">5 Cost</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
                   <Button 
                     type="button" 
                     onClick={() => {
@@ -549,59 +566,96 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                       handleAddChampion();
                     }}
                     disabled={!newChampName || filteredChampions.length === 0}
+                    className="flex-1"
                   >
-                    Add Champion
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
                   </Button>
                 </div>
               </div>
-            </div>
+            </Card>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Final Comp</h3>
-              
-              <div className="flex flex-wrap gap-2">
-                {finalComp.map((champ, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex items-center gap-1 ${champ.isCarry ? 'bg-primary/20' : 'bg-secondary/50'} rounded-md p-1 pr-2`}
-                  >
-                    <ChampionIcon name={champ.name} cost={champ.cost} size="sm" />
-                    <div className="flex flex-col text-sm">
-                      <span>{champ.name}{champ.isCarry && ' (Carry)'}</span>
-                      {champ.items && champ.items.length > 0 && (
-                        <span className="text-xs text-muted-foreground">
-                          {champ.items.join(', ')}
-                        </span>
-                      )}
-                      {champ.position && (
-                        <span className="text-xs text-primary">
-                          Pos: ({champ.position.row}, {champ.position.col})
-                        </span>
-                      )}
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 w-5 p-0"
-                      onClick={() => removeChampion(index, "final")}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
+            <Card className="p-6 border border-primary/20 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Crown className="h-5 w-5 text-primary" />
+                <h3 className="text-xl font-medium">Final Composition</h3>
               </div>
               
-              <div className="space-y-4 p-4 border border-border rounded-md bg-card/50">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {finalComp.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                  {finalComp.map((champ, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex p-3 rounded-md group transition-all border ${
+                        champ.isCarry 
+                          ? 'bg-primary/10 border-primary' 
+                          : 'bg-card border-border hover:border-primary/40'
+                      }`}
+                    >
+                      <ChampionIcon name={champ.name} cost={champ.cost} size="lg" />
+                      <div className="ml-3 flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium truncate">{champ.name}</p>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => removeChampion(index, "final")}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="flex items-center gap-1 text-xs">
+                          <span className={`px-1.5 py-0.5 rounded ${
+                            champ.cost >= 4 ? 'bg-primary/20 text-primary' : 'bg-muted'
+                          }`}>
+                            {champ.cost} Cost
+                          </span>
+                          
+                          {champ.isCarry && (
+                            <span className="bg-primary/20 text-primary px-1.5 py-0.5 rounded flex items-center">
+                              <Crown className="h-3 w-3 mr-0.5" />
+                              Carry
+                            </span>
+                          )}
+                        </div>
+                        
+                        {champ.items && champ.items.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-xs text-muted-foreground mb-1">Items:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {champ.items.map((item, idx) => (
+                                <span key={idx} className="text-xs bg-secondary/30 px-1.5 py-0.5 rounded">
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 bg-muted/40 rounded-md mb-6">
+                  <p className="text-muted-foreground">No final comp champions added yet</p>
+                </div>
+              )}
+              
+              <div className="space-y-4 border border-border rounded-md p-4 bg-card/50">
+                <h4 className="font-medium text-sm">Add Champion to Final Comp</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <FormLabel className="text-xs">Champion Name</FormLabel>
+                    <Label className="mb-2 block">Champion Name</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Input 
                           value={newChampName} 
                           onChange={(e) => setNewChampName(e.target.value)}
-                          placeholder={filteredChampions.length > 0 ? "Champion Name" : `No champions for ${currentTftVersion}`}
+                          placeholder={filteredChampions.length > 0 ? "Search champions..." : `No champions for ${currentTftVersion}`}
                           disabled={filteredChampions.length === 0}
                         />
                       </PopoverTrigger>
@@ -625,9 +679,9 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                     </Popover>
                   </div>
                   
-                  <div className="flex gap-3">
-                    <div className="w-full sm:w-24">
-                      <FormLabel className="text-xs">Cost</FormLabel>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="mb-2 block">Cost</Label>
                       <Select 
                         value={newChampCost.toString()} 
                         onValueChange={(val) => setNewChampCost(parseInt(val) as 1 | 2 | 3 | 4 | 5)}
@@ -645,31 +699,34 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                       </Select>
                     </div>
                     
-                    <div className="flex items-end">
+                    <div className="flex items-end mb-1">
                       <div className="flex items-center gap-2">
-                        <FormLabel className="text-xs">Carry?</FormLabel>
                         <input
                           type="checkbox"
+                          id="carry-checkbox"
                           checked={newChampIsCarry}
                           onChange={(e) => setNewChampIsCarry(e.target.checked)}
-                          className="h-4 w-4"
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                         />
+                        <Label htmlFor="carry-checkbox" className="cursor-pointer">
+                          Is Carry?
+                        </Label>
                       </div>
                     </div>
                   </div>
                 </div>
                 
                 <div>
-                  <FormLabel className="text-xs">Items</FormLabel>
-                  <div className="flex flex-wrap gap-2 mb-2">
+                  <Label className="mb-2 block">Items</Label>
+                  <div className="flex flex-wrap gap-2 mb-3 min-h-[32px]">
                     {newChampItems.map((item, index) => (
-                      <div key={index} className="flex items-center gap-1 bg-secondary/50 rounded-md p-1 pr-2">
+                      <div key={index} className="flex items-center gap-1 bg-secondary/30 rounded-md px-2 py-1">
                         <span className="text-xs">{item}</span>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-5 w-5 p-0"
+                          className="h-4 w-4 p-0 ml-1"
                           onClick={() => removeChampionItem(index)}
                         >
                           <X className="h-3 w-3" />
@@ -684,7 +741,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                         <Input 
                           value={newItemName} 
                           onChange={(e) => setNewItemName(e.target.value)}
-                          placeholder="Item name"
+                          placeholder="Search for an item..."
                           className="flex-1"
                         />
                       </PopoverTrigger>
@@ -731,14 +788,14 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               </div>
               
               {filteredChampions.length > 0 && (
-                <div className="bg-secondary/20 p-4 rounded-md">
+                <div className="mt-4 bg-secondary/20 p-4 rounded-md">
                   <h4 className="text-sm font-medium mb-2">Champions in {traitMappings[currentTftVersion]?.name || currentTftVersion}</h4>
                   <p className="text-xs text-muted-foreground mb-2">
                     {filteredChampions.length} champions available in this set
                   </p>
                 </div>
               )}
-            </div>
+            </Card>
           </TabsContent>
 
           <TabsContent value="traits" className="space-y-6">

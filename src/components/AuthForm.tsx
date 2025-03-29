@@ -14,6 +14,7 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,22 +26,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
 
     try {
       if (mode === 'signup') {
-        if (!username.trim()) {
-          throw new Error('Username is required');
+        if (!username.trim() || !email.trim()) {
+          throw new Error('Username and email are required');
         }
-        
-        // Generate a fake email based on username for Supabase
-        const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '_')}@example.com`;
         
         // For signup, create the account without email confirmation
         const { data, error: signUpError } = await supabase.auth.signUp({
-          email: fakeEmail,
+          email,
           password,
           options: {
             data: {
               username,
             },
-            // Don't redirect for email confirmation
             emailRedirectTo: undefined,
           },
         });
@@ -53,23 +50,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
           description: "You are now logged in.",
         });
       } else {
-        // For login, we need to find the user by username first
-        // Get all users with this username
-        const { data: users, error: getUserError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('username', username)
-          .single();
-
-        if (getUserError) {
-          throw new Error('Invalid username or password');
-        }
-
-        // Now login with the associated email
-        const fakeEmail = `${username.toLowerCase().replace(/\s+/g, '_')}@example.com`;
-        
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: fakeEmail,
+          email,
           password,
         });
 
@@ -98,16 +80,31 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      {mode === 'signup' && (
+        <div className="space-y-2">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            id="username"
+            type="text"
+            placeholder="your_username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            autoComplete="username"
+          />
+        </div>
+      )}
+      
       <div className="space-y-2">
-        <Label htmlFor="username">Username</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
-          id="username"
-          type="text"
-          placeholder="your_username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          id="email"
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
-          autoComplete="username"
+          autoComplete="email"
         />
       </div>
       

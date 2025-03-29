@@ -1,12 +1,11 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import CompTierList from '@/components/CompTierList';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Plus, LogIn, UserPlus } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/providers/AuthProvider';
 import AppLogo from '@/components/AppLogo';
 import {
   Dialog,
@@ -20,26 +19,9 @@ import AuthForm from '@/components/AuthForm';
 const Index: React.FC = () => {
   const { comps, traitMappings } = useComps();
   const hasTraitMappings = Object.keys(traitMappings).length > 0;
-  const [user, setUser] = useState<any>(null);
+  const { user } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
   const [signupOpen, setSignupOpen] = useState(false);
-  
-  // Check for authentication
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-    });
-
-    // Set up listener for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
   
   const handleCreateCompClick = (e: React.MouseEvent) => {
     if (!user) {

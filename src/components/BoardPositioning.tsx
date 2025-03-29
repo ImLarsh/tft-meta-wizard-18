@@ -5,7 +5,6 @@ import { Champion } from '@/data/comps';
 import { MapPin, FlipHorizontal, Star } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import '../components/TFTBoardBuilder.css';
-
 interface BoardPositioningProps {
   champions: Champion[];
   onChange?: (champions: Champion[]) => void;
@@ -13,7 +12,6 @@ interface BoardPositioningProps {
   readonly?: boolean;
   compact?: boolean;
 }
-
 const BoardPositioning: React.FC<BoardPositioningProps> = ({
   champions,
   onChange,
@@ -24,11 +22,9 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   const [positionedChampions, setPositionedChampions] = useState<Champion[]>([]);
   const [selectedChampion, setSelectedChampion] = useState<Champion | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-
   useEffect(() => {
     setPositionedChampions(champions || []);
   }, [champions]);
-
   const handleCellClick = (row: number, col: number) => {
     if (readonly) return;
     if (selectedChampion) {
@@ -59,12 +55,10 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       }
     }
   };
-
   const handleChampionClick = (champion: Champion) => {
     if (readonly) return;
     setSelectedChampion(selectedChampion === champion ? null : champion);
   };
-
   const handleDragStart = (e: React.DragEvent, champion: Champion) => {
     if (readonly) {
       e.preventDefault();
@@ -74,12 +68,10 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
     setIsDragging(true);
     setSelectedChampion(champion);
   };
-
   const handleDragOver = (e: React.DragEvent) => {
     if (readonly) return;
     e.preventDefault();
   };
-
   const handleDrop = (e: React.DragEvent, row: number, col: number) => {
     if (readonly) return;
     e.preventDefault();
@@ -105,55 +97,29 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
       onUpdatePositions(updatedChampions);
     }
   };
-
   const renderBoard = () => {
     const rows = 4;
     const cols = 7;
     const boardPositions = [];
-
     for (let row = rows - 1; row >= 0; row--) {
       const rowCells = [];
       for (let col = 0; col < cols; col++) {
-        const championAtPosition = positionedChampions.find(champ => 
-          champ.position && champ.position.row === row && champ.position.col === col
-        );
-        
-        rowCells.push(
-          <div 
-            key={`${row}-${col}`} 
-            onClick={() => handleCellClick(row, col)} 
-            onDragOver={handleDragOver} 
-            onDrop={e => handleDrop(e, row, col)} 
-            className="hexagon-cell py-0 px-0 mx-[12px] my-[24px]"
-          >
-            {championAtPosition?.isCarry && (
-              <div className="carry-stars my-[12px]">
+        const championAtPosition = positionedChampions.find(champ => champ.position && champ.position.row === row && champ.position.col === col);
+        rowCells.push(<div key={`${row}-${col}`} onClick={() => handleCellClick(row, col)} onDragOver={handleDragOver} onDrop={e => handleDrop(e, row, col)} className="hexagon-cell px-0 mx-0 py-0 my-[10px] bg-indigo-950">
+            {championAtPosition?.isCarry && <div className="carry-stars my-[7px]">
                 <Star size={14} fill="#FFD700" color="#FFD700" />
                 <Star size={14} fill="#FFD700" color="#FFD700" />
                 <Star size={14} fill="#FFD700" color="#FFD700" />
-              </div>
-            )}
+              </div>}
             
             <div className={`hexagon ${championAtPosition ? 'occupied' : 'empty'} ${selectedChampion === championAtPosition ? 'selected' : ''}`}>
-              {championAtPosition && (
-                <div 
-                  className="champion-content" 
-                  draggable={!readonly} 
-                  onDragStart={e => handleDragStart(e, championAtPosition)}
-                >
+              {championAtPosition && <div className="champion-content" draggable={!readonly} onDragStart={e => handleDragStart(e, championAtPosition)}>
                   <div className="champion-icon-wrapper">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="w-full h-full">
-                            <ChampionIcon 
-                              name={championAtPosition.name} 
-                              cost={championAtPosition.cost} 
-                              size="md" 
-                              isCarry={false} 
-                              className="w-full h-full" 
-                              onClick={() => !readonly && handleChampionClick(championAtPosition)} 
-                            />
+                            <ChampionIcon name={championAtPosition.name} cost={championAtPosition.cost} size="md" isCarry={false} className="w-full h-full" onClick={() => !readonly && handleChampionClick(championAtPosition)} />
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -162,33 +128,21 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                </div>
-              )}
+                </div>}
             </div>
             
-            {championAtPosition?.items && championAtPosition.items.length > 0 && (
-              <div className="items-container my-[6px] py-0 mx-0 px-0">
-                {championAtPosition.items.map((item, idx) => (
-                  <ItemIcon key={idx} name={item} size="xs" />
-                ))}
-              </div>
-            )}
-          </div>
-        );
+            {championAtPosition?.items && championAtPosition.items.length > 0 && <div className="items-container my-[6px] py-0 mx-0 px-0">
+                {championAtPosition.items.map((item, idx) => <ItemIcon key={idx} name={item} size="xs" />)}
+              </div>}
+          </div>);
       }
-      
-      boardPositions.push(
-        <div key={row} className="board-row">
+      boardPositions.push(<div key={row} className="board-row py-0 my-0 mx-0 px-0">
           {rowCells}
-        </div>
-      );
+        </div>);
     }
-    
     return boardPositions;
   };
-
-  return (
-    <div className={`board-wrapper ${compact ? 'compact' : ''}`}>
+  return <div className={`board-wrapper ${compact ? 'compact' : ''}`}>
       {!readonly && !compact && <div className="board-instructions">
           <MapPin className="h-4 w-4 mr-1" />
           {selectedChampion ? <span>
@@ -228,8 +182,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             <p>Tip: Click a champion then click on a board position, or drag and drop directly.</p>
           </div>
         </>}
-    </div>
-  );
+    </div>;
 };
-
 export default BoardPositioning;

@@ -38,8 +38,10 @@ const Header: React.FC = () => {
             <Link to="/" className={`flex items-center space-x-2 transition-transform duration-300 ${mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
               <div className="flex items-center group">
                 <Sparkles className="h-6 w-6 text-primary animate-pulse-subtle group-hover:animate-spin-slow transition-all duration-300" />
-                <span className="text-2xl font-bold ml-2 gradient-text group-hover:opacity-80 transition-opacity duration-300">TFT</span>
-                <span className="text-2xl font-bold glow-text group-hover:text-primary transition-colors duration-300">Genie</span>
+                <Link to="/">
+                  <span className="text-2xl font-bold ml-2 gradient-text group-hover:opacity-80 transition-opacity duration-300">TFT</span>
+                  <span className="text-2xl font-bold glow-text group-hover:text-primary transition-colors duration-300">Genie</span>
+                </Link>
               </div>
             </Link>
             

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
@@ -15,7 +16,9 @@ const CompEditor = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleAddComp = (comp: TFTComp) => {
+  const handleAddComp = async (comp: TFTComp) => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
     setIsSubmitting(true);
     
     try {
@@ -25,7 +28,7 @@ const CompEditor = () => {
       }
       
       // Add comp to context
-      addComp(comp);
+      await addComp(comp);
       
       toast({
         title: "Comp Created",

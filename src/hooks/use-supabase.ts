@@ -14,8 +14,12 @@ export const useSupabaseData = () => {
   const [traitMappings, setTraitMappings] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // Only load data once to prevent constant refreshes
+    if (isInitialized) return;
+    
     const loadData = async () => {
       try {
         setLoading(true);
@@ -39,6 +43,7 @@ export const useSupabaseData = () => {
         }
         
         setError(null);
+        setIsInitialized(true);
       } catch (err) {
         console.error('Error loading data from Supabase:', err);
         setError('Failed to load data from Supabase');
@@ -53,7 +58,7 @@ export const useSupabaseData = () => {
     };
 
     loadData();
-  }, []);
+  }, [isInitialized]);
 
   return { comps, traitMappings, loading, error };
 };

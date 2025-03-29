@@ -108,7 +108,7 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
       items: selectedItems.length > 0 ? [...selectedItems] : undefined,
     };
     
-    setFinalComp([...finalComp, newChampion]);
+    setFinalComp(prevComp => [...prevComp, newChampion]);
     setNewChampName("");
     setNewChampIsCarry(false);
     setSelectedItems([]);
@@ -116,18 +116,20 @@ const SimpleCompForm: React.FC<SimpleCompFormProps> = ({ initialData, onSubmit, 
 
   const addItemToChampion = () => {
     if (!selectedItem || selectedItems.length >= 3) return;
-    setSelectedItems([...selectedItems, selectedItem]);
+    setSelectedItems(prevItems => [...prevItems, selectedItem]);
     setSelectedItem("");
   };
 
   const removeItemFromSelection = (index: number) => {
-    const newItems = [...selectedItems];
-    newItems.splice(index, 1);
-    setSelectedItems(newItems);
+    setSelectedItems(prevItems => {
+      const newItems = [...prevItems];
+      newItems.splice(index, 1);
+      return newItems;
+    });
   };
 
   const removeChampion = (index: number) => {
-    setFinalComp(finalComp.filter((_, i) => i !== index));
+    setFinalComp(prevComp => prevComp.filter((_, i) => i !== index));
   };
 
   const handleUpdatePositions = (champions: Champion[]) => {

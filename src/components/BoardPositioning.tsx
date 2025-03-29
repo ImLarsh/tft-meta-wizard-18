@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import { Champion } from '@/data/comps';
@@ -121,55 +122,32 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
         
         const isEvenRow = row % 2 === 0;
         
-        const cellSize = compact ? 10 : 16;
-        const hexSpacing = compact ? 2 : 4;
-        
         rowCells.push(
           <div 
             key={`${row}-${col}`}
-            className={`relative hexagon-cell w-${cellSize} h-${cellSize} ${
-              !readonly && (!championAtPosition && selectedChampion) 
-                ? 'cursor-pointer hover:bg-primary/20' 
-                : ''
-            } flex items-center justify-center`}
+            className={`hexagon-container ${isEvenRow ? 'even-row' : ''}`}
             onClick={() => handleCellClick(row, col)}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, row, col)}
-            style={{
-              transform: isEvenRow ? `translateX(${compact ? 10 : 16}px)` : '',
-              margin: `0 ${hexSpacing}px`
-            }}
           >
-            <div className={`hexagon ${
-              championAtPosition ? 'tft-board-hex-occupied' : 'tft-board-hex-empty'
-            } ${
-              !readonly && selectedChampion === championAtPosition ? 'ring-1 ring-primary' : ''
-            } w-full h-full`}>
-              {championAtPosition ? (
+            <div className={`hexagon ${championAtPosition ? 'occupied' : 'empty'} ${selectedChampion === championAtPosition ? 'selected' : ''}`}>
+              {championAtPosition && (
                 <div 
-                  className={`absolute inset-0 flex items-center justify-center ${
-                    !readonly && selectedChampion === championAtPosition ? 'ring-1 ring-primary' : ''
-                  }`}
+                  className="champion-content"
                   draggable={!readonly}
                   onDragStart={(e) => handleDragStart(e, championAtPosition)}
                 >
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="hexagon-content">
+                        <div>
                           <ChampionIcon
                             name={championAtPosition.name}
                             cost={championAtPosition.cost}
                             size={compact ? "sm" : "md"}
                             isCarry={championAtPosition.isCarry}
                             onClick={() => !readonly && handleChampionClick(championAtPosition)}
-                            className="hexagon-icon"
                           />
-                          {!compact && (
-                            <div className="absolute bottom-1 left-0 right-0 text-center text-white text-xs font-bold text-shadow-sm">
-                              {championAtPosition.name}
-                            </div>
-                          )}
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
@@ -178,13 +156,13 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         );
       }
       board.push(
-        <div key={row} className="flex gap-1 my-1">
+        <div key={row} className="board-row">
           {rowCells}
         </div>
       );
@@ -194,56 +172,52 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
   };
 
   return (
-    <div className={`space-y-4 ${compact ? 'scale-75 origin-top-left' : ''}`}>
-      <div className={`flex flex-col items-center tft-board p-4 rounded-md ${compact ? 'p-2' : ''}`}>
-        {!readonly && !compact && (
-          <div className="flex items-center mb-4 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 mr-1" />
-            {selectedChampion ? (
-              <span>
-                Place <strong>{selectedChampion.name}</strong> on the board or click another champion
-              </span>
-            ) : isDragging ? (
-              <span>Drag champion to a position on the board</span>
-            ) : (
-              <span>Select a champion to position or drag directly onto the board</span>
-            )}
-          </div>
-        )}
-        
-        <div className={`board-container ${compact ? 'p-1' : 'p-2'} rounded-md`}>
-          <div className="board-wrapper">
-            {renderBoard()}
-          </div>
+    <div className={`board-wrapper ${compact ? 'compact' : ''}`}>
+      {!readonly && !compact && (
+        <div className="board-instructions">
+          <MapPin className="h-4 w-4 mr-1" />
+          {selectedChampion ? (
+            <span>
+              Place <strong>{selectedChampion.name}</strong> on the board or click another champion
+            </span>
+          ) : isDragging ? (
+            <span>Drag champion to a position on the board</span>
+          ) : (
+            <span>Select a champion to position or drag directly onto the board</span>
+          )}
+        </div>
+      )}
+      
+      <div className="board-container">
+        <div className="board-grid">
+          {renderBoard()}
         </div>
       </div>
       
       {!readonly && !compact && (
         <>
-          <h3 className="text-sm font-medium mt-4">Available Champions</h3>
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2">
+          <h3 className="champions-title">Available Champions</h3>
+          <div className="champions-grid">
             {positionedChampions.map((champion, index) => (
               <div
                 key={index}
-                className={`relative border border-border rounded p-2 ${
-                  selectedChampion === champion ? 'bg-primary/20 ring-1 ring-primary' : 'bg-card/50'
-                } ${champion.position ? 'border-primary/30' : ''}`}
+                className={`champion-card ${selectedChampion === champion ? 'selected' : ''} ${champion.position ? 'positioned' : ''}`}
                 onClick={() => handleChampionClick(champion)}
                 draggable={!readonly}
                 onDragStart={(e) => handleDragStart(e, champion)}
               >
-                <div className="flex flex-col items-center">
+                <div className="champion-info">
                   <ChampionIcon
                     name={champion.name}
                     cost={champion.cost}
                     size="sm"
                     isCarry={champion.isCarry}
                   />
-                  <div className="text-xs mt-1 text-center truncate w-full">
+                  <div className="champion-name">
                     {champion.name}
                   </div>
                   {champion.position && (
-                    <div className="text-xs text-primary flex items-center mt-1">
+                    <div className="position-indicator">
                       <MapPin className="h-3 w-3 mr-0.5" />
                       {champion.position.row},{champion.position.col}
                     </div>
@@ -253,7 +227,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             ))}
           </div>
           
-          <div className="text-xs text-muted-foreground mt-2">
+          <div className="board-tip">
             <p>Tip: Click a champion then click on a board position, or drag and drop directly.</p>
           </div>
         </>

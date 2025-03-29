@@ -1,7 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import defaultComps, { TFTComp } from '@/data/comps';
 import { ChampionTraitMap } from '@/types/champion';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 interface TraitMapping {
   name: string;
@@ -151,54 +152,161 @@ const CompsContext = createContext<CompsContextType | undefined>(undefined);
 export function CompsProvider({ children }: { children: React.ReactNode }) {
   const [comps, setComps] = useState<TFTComp[]>([]);
   const [traitMappings, setTraitMappings] = useState<Record<string, TraitMapping>>(defaultTraitMappings);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load comps and trait mappings from localStorage or use defaults
+  // Initialize data from Supabase, fallback to localStorage
   useEffect(() => {
-    // Load comps
-    const savedComps = localStorage.getItem('tftComps');
-    if (savedComps) {
+    const loadData = async () => {
       try {
-        const parsedComps = JSON.parse(savedComps);
+        // Try to get data from Supabase first
+        const { data: compsData, error: compsError } = await supabase
+          .from('tft_comps')
+          .select('*')
+          .single();
+          
+        const { data: mappingsData, error: mappingsError } = await supabase
+          .from('tft_trait_mappings')
+          .select('*')
+          .single();
+          
+        let loadedComps = [];
+        let loadedMappings = { ...defaultTraitMappings };
         
-        // Check for boardPositions property and add it if it doesn't exist
-        const updatedComps = parsedComps.map((comp: TFTComp) => {
-          if (!('boardPositions' in comp)) {
-            return {
-              ...comp,
-              boardPositions: comp.finalComp.some(champ => champ.position !== null),
-              tftVersion: comp.tftVersion || "Set 10"
-            };
+        // If Supabase data exists, use it
+        if (compsData && !compsError) {
+          loadedComps = compsData.comps;
+        } else {
+          // Try localStorage as fallback
+          const savedComps = localStorage.getItem('tftComps');
+          if (savedComps) {
+            try {
+              const parsedComps = JSON.parse(savedComps);
+              
+              // Check for boardPositions property and add it if it doesn't exist
+              loadedComps = parsedComps.map((comp: TFTComp) => {
+                if (!('boardPositions' in comp)) {
+                  return {
+                    ...comp,
+                    boardPositions: comp.finalComp.some(champ => champ.position !== null),
+                    tftVersion: comp.tftVersion || "Set 10"
+                  };
+                }
+                return comp;
+              });
+            } catch (e) {
+              console.error('Failed to parse saved comps', e);
+              loadedComps = defaultComps;
+            }
+          } else {
+            loadedComps = defaultComps;
           }
-          return comp;
+        }
+        
+        // If Supabase trait mappings exist, use it
+        if (mappingsData && !mappingsError) {
+          loadedMappings = mappingsData.mappings;
+        } else {
+          // Try localStorage as fallback
+          const savedTraitMappings = localStorage.getItem('tftTraitMappings');
+          if (savedTraitMappings) {
+            try {
+              loadedMappings = JSON.parse(savedTraitMappings);
+            } catch (e) {
+              console.error('Failed to parse saved trait mappings', e);
+              loadedMappings = defaultTraitMappings;
+            }
+          }
+        }
+        
+        setComps(loadedComps);
+        setTraitMappings(loadedMappings);
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Error initializing data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load data. Using default values.",
+          variant: "destructive",
         });
         
-        setComps(updatedComps);
-      } catch (e) {
-        console.error('Failed to parse saved comps', e);
+        // Fallback to defaults if all else fails
         setComps(defaultComps);
-        localStorage.setItem('tftComps', JSON.stringify(defaultComps));
-      }
-    } else {
-      setComps(defaultComps);
-      localStorage.setItem('tftComps', JSON.stringify(defaultComps));
-    }
-    
-    // Load trait mappings
-    const savedTraitMappings = localStorage.getItem('tftTraitMappings');
-    if (savedTraitMappings) {
-      try {
-        const parsedMappings = JSON.parse(savedTraitMappings);
-        setTraitMappings(parsedMappings);
-      } catch (e) {
-        console.error('Failed to parse saved trait mappings', e);
         setTraitMappings(defaultTraitMappings);
-        localStorage.setItem('tftTraitMappings', JSON.stringify(defaultTraitMappings));
+        setIsInitialized(true);
       }
-    } else {
-      setTraitMappings(defaultTraitMappings);
-      localStorage.setItem('tftTraitMappings', JSON.stringify(defaultTraitMappings));
-    }
+    };
+    
+    loadData();
   }, []);
+  
+  // When data changes and after initialization, save to Supabase
+  useEffect(() => {
+    if (!isInitialized) return;
+    
+    const saveData = async () => {
+      try {
+        // Save to localStorage as backup
+        localStorage.setItem('tftComps', JSON.stringify(comps));
+        localStorage.setItem('tftTraitMappings', JSON.stringify(traitMappings));
+        
+        // Save to Supabase
+        const { data: existingComps, error: checkError } = await supabase
+          .from('tft_comps')
+          .select('*');
+          
+        if (existingComps && existingComps.length > 0) {
+          // Update existing record
+          const { error: updateError } = await supabase
+            .from('tft_comps')
+            .update({ comps: comps })
+            .eq('id', existingComps[0].id);
+            
+          if (updateError) {
+            console.error('Error updating comps:', updateError);
+          }
+        } else {
+          // Insert new record
+          const { error: insertError } = await supabase
+            .from('tft_comps')
+            .insert([{ comps: comps }]);
+            
+          if (insertError) {
+            console.error('Error inserting comps:', insertError);
+          }
+        }
+        
+        // Save trait mappings
+        const { data: existingMappings, error: checkMappingsError } = await supabase
+          .from('tft_trait_mappings')
+          .select('*');
+          
+        if (existingMappings && existingMappings.length > 0) {
+          // Update existing record
+          const { error: updateError } = await supabase
+            .from('tft_trait_mappings')
+            .update({ mappings: traitMappings })
+            .eq('id', existingMappings[0].id);
+            
+          if (updateError) {
+            console.error('Error updating trait mappings:', updateError);
+          }
+        } else {
+          // Insert new record
+          const { error: insertError } = await supabase
+            .from('tft_trait_mappings')
+            .insert([{ mappings: traitMappings }]);
+            
+          if (insertError) {
+            console.error('Error inserting trait mappings:', insertError);
+          }
+        }
+      } catch (error) {
+        console.error('Error saving data:', error);
+      }
+    };
+    
+    saveData();
+  }, [comps, traitMappings, isInitialized]);
 
   // Add a new comp
   const addComp = (comp: TFTComp) => {
@@ -215,14 +323,12 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
     }
     
     setComps(updatedComps);
-    localStorage.setItem('tftComps', JSON.stringify(updatedComps));
   };
 
   // Remove a comp
   const removeComp = (compId: string) => {
     const updatedComps = comps.filter(comp => comp.id !== compId);
     setComps(updatedComps);
-    localStorage.setItem('tftComps', JSON.stringify(updatedComps));
   };
   
   // Add or update a trait mapping
@@ -233,13 +339,11 @@ export function CompsProvider({ children }: { children: React.ReactNode }) {
     };
     
     setTraitMappings(updatedMappings);
-    localStorage.setItem('tftTraitMappings', JSON.stringify(updatedMappings));
   };
 
   // Update all trait mappings
   const updateTraitMappings = (mappings: Record<string, TraitMapping>) => {
     setTraitMappings(mappings);
-    localStorage.setItem('tftTraitMappings', JSON.stringify(mappings));
   };
 
   return (

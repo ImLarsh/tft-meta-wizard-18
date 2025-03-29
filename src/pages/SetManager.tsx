@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -47,22 +46,19 @@ const SetManager: React.FC = () => {
   const [selectedTraits, setSelectedTraits] = useState<string[]>([]);
   
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   
-  // Load initial data for the active set
   useEffect(() => {
     if (traitMappings[activeSet]) {
       const mapping = traitMappings[activeSet];
       setSetName(mapping.name || "");
       setTraits(mapping.traits || []);
       
-      // Extract champions from trait mappings
       const champList = Object.keys(mapping.championTraits || {});
       setChampions(champList);
       
-      // Set champion traits mapping
       setChampionTraits(mapping.championTraits || {});
     } else {
-      // Initialize with empty data for a new set
       setSetName("");
       setTraits([]);
       setChampions([]);
@@ -84,7 +80,6 @@ const SetManager: React.FC = () => {
     newTraits.splice(index, 1);
     setTraits(newTraits);
     
-    // Also remove this trait from all champions
     const updatedChampionTraits = { ...championTraits };
     Object.keys(updatedChampionTraits).forEach(champion => {
       updatedChampionTraits[champion] = updatedChampionTraits[champion].filter(
@@ -101,7 +96,7 @@ const SetManager: React.FC = () => {
     setChampions([...champions, newChampion]);
     setChampionTraits({
       ...championTraits,
-      [newChampion]: [] // Initialize with no traits
+      [newChampion]: []
     });
     setNewChampion("");
   };
@@ -112,11 +107,9 @@ const SetManager: React.FC = () => {
     newChampions.splice(index, 1);
     setChampions(newChampions);
     
-    // Remove this champion from trait mappings
     const { [champToRemove]: _, ...remainingChampionTraits } = championTraits;
     setChampionTraits(remainingChampionTraits);
     
-    // Reset selection if the removed champion was selected
     if (selectedChampion === champToRemove) {
       setSelectedChampion("");
       setSelectedTraits([]);
@@ -134,23 +127,20 @@ const SetManager: React.FC = () => {
     let newTraits: string[];
     
     if (selectedTraits.includes(trait)) {
-      // Remove trait
       newTraits = selectedTraits.filter(t => t !== trait);
     } else {
-      // Add trait
       newTraits = [...selectedTraits, trait];
     }
     
     setSelectedTraits(newTraits);
     
-    // Update champion traits mapping
     setChampionTraits({
       ...championTraits,
       [selectedChampion]: newTraits
     });
   };
   
-  const handleSaveSet = () => {
+  const handleSaveSet = async () => {
     if (!setName) {
       toast({
         title: "Validation Error",
@@ -169,14 +159,14 @@ const SetManager: React.FC = () => {
       return;
     }
     
-    // Create updated trait mapping
+    setIsSaving(true);
+    
     const updatedMapping = {
       name: setName,
       traits: traits,
       championTraits: championTraits
     };
     
-    // Save to context
     addTraitMapping(activeSet, updatedMapping);
     
     toast({
@@ -185,10 +175,10 @@ const SetManager: React.FC = () => {
     });
     
     setIsEditing(false);
+    setIsSaving(false);
   };
   
   const handleNewSet = () => {
-    // Create a new set name based on the next available set number
     const existingSets = Object.keys(traitMappings);
     const setNumbers = existingSets
       .map(set => parseInt(set.replace("Set ", "")))
@@ -200,7 +190,6 @@ const SetManager: React.FC = () => {
     
     const newSetName = `Set ${nextSetNumber}`;
     
-    // Initialize the new set with empty data
     const newTraitMappings = {
       ...traitMappings,
       [newSetName]: {
@@ -225,13 +214,9 @@ const SetManager: React.FC = () => {
       return;
     }
     
-    // Create a copy of trait mappings without the current set
     const { [activeSet]: _, ...remainingMappings } = traitMappings;
     
-    // Update the context
     setTraitMappings(remainingMappings);
-    
-    // Switch to the first available set
     setActiveSet(Object.keys(remainingMappings)[0]);
     
     toast({
@@ -334,7 +319,6 @@ const SetManager: React.FC = () => {
                   variant="outline" 
                   onClick={() => {
                     setIsEditing(false);
-                    // Reset to original values
                     if (traitMappings[activeSet]) {
                       setSetName(traitMappings[activeSet].name);
                     }
@@ -583,6 +567,13 @@ const SetManager: React.FC = () => {
             </Button>
           )}
         </div>
+        
+        {isSaving && (
+          <div className="fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-md shadow-lg flex items-center space-x-2">
+            <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" aria-hidden="true"></span>
+            <span>Saving changes...</span>
+          </div>
+        )}
       </main>
     </>
   );

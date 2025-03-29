@@ -29,22 +29,22 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     setImgError(false);
   }, [name]);
   
-  // Format the item name for LoL Fandom wiki URL
-  const formatNameForFandom = (itemName: string) => {
+  // Format the item name for various URL formats
+  const formatNameForUrl = (itemName: string) => {
     // Replace spaces with underscores and handle special characters
     return itemName
-      .replace(/'/g, '%27')  // Replace apostrophes with URL encoding
+      .replace(/'/g, '')  // Remove apostrophes
       .replace(/\s+/g, '_'); // Replace spaces with underscores
   };
   
-  // Format for other sources as fallback
-  const normalizedName = name
+  // Format for dash-separated sources
+  const dashedName = name
     .toLowerCase()
     .replace(/[']/g, '') // Remove apostrophes
     .replace(/\s+/g, '-'); // Replace spaces with dashes
   
-  // For fallback sources that don't use dashes
-  const normalizedNameNoDashes = name
+  // For sources that don't use dashes or spaces
+  const compactName = name
     .toLowerCase()
     .replace(/[']/g, '')
     .replace(/\s+/g, '')
@@ -55,75 +55,71 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   
   // Common item name mappings for consistent URL formatting
   const specialCaseMap: Record<string, string> = {
-    "Blue Buff": "Blue_Buff",
-    "Jeweled Gauntlet": "Jeweled_Gauntlet",
-    "Giant Slayer": "Giant_Slayer",
-    "Spear of Shojin": "Spear_of_Shojin",
-    "Guinsoo's Rageblade": "Guinsoo%27s_Rageblade",
-    "Infinity Edge": "Infinity_Edge",
-    "Rapid Firecannon": "Rapid_Firecannon",
-    "Runaan's Hurricane": "Runaan%27s_Hurricane",
-    "Titan's Resolve": "Titan%27s_Resolve",
-    "Hand of Justice": "Hand_of_Justice",
-    "Bloodthirster": "Bloodthirster",
-    "Quicksilver": "Quicksilver_Sash", // Note: Full name might be needed
-    "Ionic Spark": "Ionic_Spark",
-    "Last Whisper": "Last_Whisper",
-    "Sunfire Cape": "Sunfire_Cape",
-    "Warmog's Armor": "Warmog%27s_Armor",
-    "Death's Defiance": "Death%27s_Defiance",
-    "Hextech Gunblade": "Hextech_Gunblade",
-    "Bramble Vest": "Bramble_Vest",
-    "Dragon's Claw": "Dragon%27s_Claw",
-    "Zeke's Herald": "Zeke%27s_Herald",
-    "Zz'Rot Portal": "Zz%27Rot_Portal",
-    "Gargoyle Stoneplate": "Gargoyle_Stoneplate",
-    "Chalice of Power": "Chalice_of_Power",
-    "Locket of the Iron Solari": "Locket_of_the_Iron_Solari",
-    "Statikk Shiv": "Statikk_Shiv",
-    "Redemption": "Redemption",
-    "Shroud of Stillness": "Shroud_of_Stillness",
-    "Banshee's Claw": "Banshee%27s_Claw",
-    "Thief's Gloves": "Thief%27s_Gloves",
-    "Archangel's Staff": "Archangel%27s_Staff",
-    "Morellonomicon": "Morellonomicon",
-    "Deathblade": "Deathblade",
-    "Frozen Heart": "Frozen_Heart",
-    "Spirit Visage": "Spirit_Visage",
-    "Edge of Night": "Edge_of_Night",
+    "Bloodthirster": "bloodthirster",
+    "Blue Buff": "bluebuff",
+    "Jeweled Gauntlet": "jeweledgauntlet",
+    "Giant Slayer": "giantslayer",
+    "Spear of Shojin": "spearofshojin",
+    "Guinsoo's Rageblade": "guinsoosrageblade",
+    "Infinity Edge": "infinityedge",
+    "Rapid Firecannon": "rapidfirecannon",
+    "Runaan's Hurricane": "runaanshurricane",
+    "Titan's Resolve": "titansresolve",
+    "Hand of Justice": "handofjustice",
+    "Quicksilver": "quicksilver",
+    "Ionic Spark": "ionicspark",
+    "Last Whisper": "lastwhisper",
+    "Sunfire Cape": "sunfirecape",
+    "Warmog's Armor": "warmogsarmor",
+    "Hextech Gunblade": "hextechgunblade",
+    "Bramble Vest": "bramblevest",
+    "Dragon's Claw": "dragonsclaw",
+    "Zeke's Herald": "zekesherald",
+    "Zz'Rot Portal": "zzrotportal",
+    "Gargoyle Stoneplate": "gargoylestoneplate",
+    "Chalice of Power": "chaliceofpower",
+    "Statikk Shiv": "statikkshiv",
+    "Redemption": "redemption",
+    "Shroud of Stillness": "shroudofstillness",
+    "Banshee's Claw": "bansheesclaw",
+    "Thief's Gloves": "thiefsgloves",
+    "Archangel's Staff": "archangelsstaff",
+    "Morellonomicon": "morellonomicon",
+    "Deathblade": "deathblade",
+    "Frozen Heart": "frozenheart",
+    "Spirit Visage": "spiritvisage",
+    "Edge of Night": "edgeofnight",
   };
   
-  // Get the formatted name for wiki URL
-  const wikiName = specialCaseMap[name] || formatNameForFandom(name);
+  // Get the simplified name for URL
+  const simplifiedName = specialCaseMap[name] || compactName;
+  const formattedName = formatNameForUrl(name);
   
   // Image sources in priority order
   const sources = [
-    // LoL Fandom TFT item icons - primary source
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/${wikiName}_TFT_item.png/64px-${wikiName}_TFT_item.png`,
-    `https://static.wikia.nocookie.net/leagueoflegends/images/5/55/${wikiName}_TFT_item.png`,
+    // Direct link to Fandom wiki image for Bloodthirster and other items
+    `https://static.wikia.nocookie.net/leagueoflegends/images/6/66/${formattedName}_TFT_item.png`,
     
-    // Try with different resolutions
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/${wikiName}_TFT_item.png/120px-${wikiName}_TFT_item.png`,
+    // League of Legends Fandom wiki - more reliable transparent images
+    `https://static.wikia.nocookie.net/leagueoflegends/images/6/66/${formattedName}_TFT_item.png/revision/latest?cb=20190925202641`,
     
-    // Try with slightly different naming patterns
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/${wikiName}_TFT.png/64px-${wikiName}_TFT.png`,
-    `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/TFT_${wikiName}.png/64px-TFT_${wikiName}.png`,
+    // TFT specific sites
+    `https://cdn.metatft.com/file/metatft/items/${dashedName}.png`,
+    `https://tftactics.gg/itemicons/${simplifiedName}.png`,
+    `https://rerollcdn.com/items/${simplifiedName}.png`,
+    `https://tactics.tools/img/items/${dashedName}.png`,
     
-    // Try standard image name without specifying thumbnail
-    `https://static.wikia.nocookie.net/leagueoflegends/images/5/55/${wikiName}_TFT_item.png`,
+    // Community Dragon source - reliable for some items
+    `https://raw.communitydragon.org/latest/game/assets/items/icons/${dashedName}.png`,
     
-    // Fallback to older reliable sources
-    `https://raw.communitydragon.org/latest/game/assets/items/icons/${normalizedName.toLowerCase()}.png`,
-    `https://raw.communitydragon.org/latest/game/assets/maps/particles/tft/item_icons/${normalizedName.toLowerCase()}.png`,
-    `https://tftactics.gg/cdn-cgi/image/width=160,height=160/itemicons/${normalizedName.toLowerCase()}.png`,
-    `https://www.mobafire.com/images/tft/item/${normalizedName}.png`,
-    `https://cdn.metatft.com/file/metatft/items/${normalizedName}.png`,
-    `https://tactics.tools/img/items/${normalizedName}.png`,
-    `https://lolchess.gg/images/tft/items/${normalizedName}.png`,
+    // Try with various patterns from external sites
+    `https://tft.mobalytics.gg/images/items/${simplifiedName}.png`,
+    `https://lolchess.gg/images/tft/items/${dashedName}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/12.23.1/img/item/${compactName}.png`,
   ];
   
-  // Fallback item image that's likely to exist
-  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/thumb/5/55/Deathblade_TFT_item.png/64px-Deathblade_TFT_item.png';
+  // Fallback item image that's very likely to exist
+  const fallbackUrl = 'https://static.wikia.nocookie.net/leagueoflegends/images/6/66/Deathblade_TFT_item.png';
   
   const sizeClasses = {
     sm: 'w-6 h-6',
@@ -165,7 +161,6 @@ const ItemIcon: React.FC<ItemIconProps> = ({
           onError={handleImageError}
           loading="lazy"
           title={name}
-          crossOrigin="anonymous"
         />
       )}
     </div>

@@ -50,6 +50,16 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
   // Get all tiers sorted
   const tiers = Object.keys(compsByTier).sort((a, b) => getTierValue(a) - getTierValue(b));
 
+  // Helper function to convert difficulty string to number
+  const getDifficultyValue = (difficulty: string): number => {
+    switch (difficulty) {
+      case 'Easy': return 1;
+      case 'Medium': return 3;
+      case 'Hard': return 5;
+      default: return 3; // Default to medium if unknown
+    }
+  };
+
   return (
     <div className="space-y-6">
       {tiers.length > 0 ? (
@@ -71,7 +81,7 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">{comp.difficulty}/5</span>
-                  <Progress value={comp.difficulty * 20} className="w-20" />
+                  <Progress value={getDifficultyValue(comp.difficulty) * 20} className="w-20" />
                 </div>
               </Card>
             ))}

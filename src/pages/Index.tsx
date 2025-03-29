@@ -70,7 +70,11 @@ const Index: React.FC = () => {
           </div>
         )}
         
-        {comps.length > 0 && <CompTierList />}
+        {comps.length > 0 && (
+          <div className="container">
+            <CompTierList comps={comps} />
+          </div>
+        )}
       </main>
       
       {/* Footer */}

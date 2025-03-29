@@ -18,17 +18,14 @@ interface CompTierListProps {
 
 type SortOption = 'tier' | 'name-asc' | 'name-desc' | 'difficulty' | 'most-liked';
 
-// This component renders a tier list of compositions
 const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
   const [expandedCompId, setExpandedCompId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('tier');
 
-  // Toggle expanded state for a composition
   const toggleExpand = (compId: string) => {
     setExpandedCompId(expandedCompId === compId ? null : compId);
   };
 
-  // Sort comps by tier (S, A, B, C)
   const getTierValue = (tier: string): number => {
     switch (tier.toUpperCase()) {
       case 'S': return 0;
@@ -39,7 +36,6 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
     }
   };
 
-  // Get sorted comps based on sortBy option
   const getSortedComps = () => {
     switch (sortBy) {
       case 'tier':
@@ -54,8 +50,6 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
           return diffValues[a.difficulty] - diffValues[b.difficulty];
         });
       case 'most-liked':
-        // In a real implementation, this would sort by actual like counts
-        // For now, we'll just return the regular tier sort
         return [...comps].sort((a, b) => getTierValue(a.tier) - getTierValue(b.tier));
       default:
         return [...comps];
@@ -74,7 +68,6 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
     }
   };
 
-  // Group comps by tier if sorted by tier
   const getCompsByTier = () => {
     if (sortBy !== 'tier') return null;
     
@@ -89,26 +82,22 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
     return byTier;
   };
 
-  // Get all tiers sorted
   const compsByTier = getCompsByTier();
   const tiers = compsByTier ? Object.keys(compsByTier).sort((a, b) => getTierValue(a) - getTierValue(b)) : [];
 
-  // Helper function to convert difficulty string to number
   const getDifficultyValue = (difficulty: string): number => {
     switch (difficulty) {
       case 'Easy': return 1;
       case 'Medium': return 3;
       case 'Hard': return 5;
-      default: return 3; // Default to medium if unknown
+      default: return 3;
     }
   };
 
-  // Check if a composition has positioning data
   const hasPositioningData = (comp: TFTComp) => {
     return comp.boardPositions || comp.finalComp.some(champ => champ.position);
   };
 
-  // Render a single comp card
   const renderCompCard = (comp: TFTComp) => (
     <Collapsible 
       key={comp.id} 
@@ -170,7 +159,7 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
                   <h4 className="text-sm font-medium text-muted-foreground mb-2">Final Composition</h4>
                   <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
                     {comp.finalComp.map((champion) => (
-                      <div key={champion.name} className="flex flex-col items-center gap-1">
+                      <div key={champion.name} className="flex flex-col items-center gap-1 pt-4">
                         <ChampionIcon 
                           name={champion.name} 
                           cost={champion.cost}
@@ -287,7 +276,6 @@ const CompTierList: React.FC<CompTierListProps> = ({ comps }) => {
 
   return (
     <div className="space-y-6">
-      {/* Sorting controls */}
       <div className="flex flex-wrap gap-2 mb-4">
         <Button
           variant={sortBy === 'tier' ? 'default' : 'outline'}

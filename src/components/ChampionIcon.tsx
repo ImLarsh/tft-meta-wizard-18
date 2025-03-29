@@ -133,8 +133,8 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
       onClick={onClick}
     >
       {isCarry && (
-        <div className="absolute -top-2 -left-1 w-full flex justify-center z-10">
-          <div className="flex">
+        <div className="absolute -top-4 w-full flex justify-center z-10">
+          <div className="flex space-x-0.5">
             <Star size={10} fill="#FFD700" color="#FFD700" />
             <Star size={10} fill="#FFD700" color="#FFD700" />
             <Star size={10} fill="#FFD700" color="#FFD700" />

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -16,7 +15,6 @@ import { Plus, Trash, X, Loader2, MapPin } from 'lucide-react';
 import ChampionIcon from './ChampionIcon';
 import BoardPositioning from './BoardPositioning';
 
-// Schema for form validation
 const formSchema = z.object({
   id: z.string().min(3, { message: "ID must be at least 3 characters" }),
   name: z.string().min(3, { message: "Name must be at least 3 characters" }),
@@ -34,7 +32,6 @@ interface CompFormProps {
   isSubmitting?: boolean;
 }
 
-// Common champion names for dropdown suggestions
 const commonChampions = [
   "Ahri", "Akali", "Amumu", "Annie", "Aphelios", "Bard", "Caitlyn", 
   "Corki", "Ekko", "Evelynn", "Garen", "Gragas", "Illaoi", "Jax", 
@@ -45,7 +42,6 @@ const commonChampions = [
   "Twitch", "Urgot", "Vex", "Vi", "Viego", "Yasuo", "Yone", "Yorick", "Zac", "Ziggs"
 ];
 
-// Common traits for dropdown suggestions by TFT version
 const traitsByVersion: Record<string, string[]> = {
   "Set 9": [
     "8-Bit", "Disco", "Superfan", "Guardian", "Bruiser", "Crowd Diver", 
@@ -62,7 +58,6 @@ const traitsByVersion: Record<string, string[]> = {
   ]
 };
 
-// Common items for dropdown suggestions
 const commonItems = [
   "Blue Buff", "Infinity Edge", "Jeweled Gauntlet", "Giant Slayer", 
   "Bloodthirster", "Titan's Resolve", "Last Whisper", "Runaan's Hurricane", 
@@ -70,6 +65,117 @@ const commonItems = [
   "Quicksilver", "Archangel's Staff", "Hextech Gunblade", "Guinsoo's Rageblade", 
   "Sunfire Cape", "Bramble Vest", "Ionic Spark", "Redemption", "Chalice of Power"
 ];
+
+const championTraits: ChampionTraitMap = {
+  "Ahri": ["K/DA", "Spellweaver"],
+  "Akali": ["K/DA", "Assassin"],
+  "Amumu": ["Pentakill", "Guardian"],
+  "Annie": ["Hyperpop", "Spellweaver"],
+  "Aphelios": ["Heartsteel", "Deadeye"],
+  "Bard": ["Jazz", "Support"],
+  "Caitlyn": ["True Damage", "Deadeye"],
+  "Corki": ["8-Bit", "Big Shot"],
+  "Ekko": ["True Damage", "Superfan"],
+  "Evelynn": ["K/DA", "Crowd Diver"],
+  "Garen": ["Pentakill", "Juggernaut"],
+  "Gragas": ["Disco", "Bruiser"],
+  "Illaoi": ["Pentakill", "Bruiser"],
+  "Jax": ["EDM", "Mosher"],
+  "Jhin": ["Maestro", "Big Shot"],
+  "Jinx": ["Punk", "Rapidfire"],
+  "Kayle": ["Pentakill", "Slayer"],
+  "Kayn": ["Heartsteel", "Edgelord"],
+  "Kennen": ["True Damage", "Superfan"],
+  "Karthus": ["Pentakill", "Executioner"],
+  "Lillia": ["K/DA", "Guardian"],
+  "Lucian": ["Jazz", "Deadeye"],
+  "Lulu": ["Hyperpop", "Support"],
+  "Lux": ["EDM", "Spellweaver"],
+  "Miss Fortune": ["Jazz", "Big Shot"],
+  "Mordekaiser": ["Pentakill", "Sentinel"],
+  "Neeko": ["K/DA", "Guardian"],
+  "Olaf": ["Pentakill", "Bruiser"],
+  "Pantheon": ["Punk", "Guardian"],
+  "Poppy": ["Emo", "Guardian"],
+  "Qiyana": ["True Damage", "Crowd Diver"],
+  "Samira": ["Country", "Challenger"],
+  "Senna": ["True Damage", "Rapidfire"],
+  "Seraphine": ["K/DA", "Spellweaver"],
+  "Sett": ["Heartsteel", "Bruiser"],
+  "Sona": ["Mixer", "Spellweaver"],
+  "Tahm Kench": ["Country", "Bruiser"],
+  "Taric": ["Disco", "Guardian"],
+  "Thresh": ["Country", "Guardian"],
+  "Twisted Fate": ["Disco", "Spellweaver"],
+  "Twitch": ["Punk", "Executioner"],
+  "Urgot": ["Country", "Mosher"],
+  "Vex": ["Emo", "Executioner"],
+  "Vi": ["Punk", "Mosher"],
+  "Viego": ["Pentakill", "Edgelord"],
+  "Yasuo": ["True Damage", "Edgelord"],
+  "Yone": ["Heartsteel", "Challenger"],
+  "Yorick": ["Pentakill", "Guardian"],
+  "Zac": ["EDM", "Bruiser"],
+  "Ziggs": ["Hyperpop", "Spellweaver"]
+};
+
+const set11ChampionTraits: ChampionTraitMap = {
+  "Ahri": ["Mythic", "Spellweaver"],
+  "Akali": ["Empress", "Assassin"],
+  "Amumu": ["Darkin", "Guardian"],
+  "Annie": ["Void", "Sorcerer"],
+  "Aphelios": ["Darkin", "Deadeye"],
+  "Caitlyn": ["Quickdraw", "Deadeye"],
+  "Ekko": ["Slayer", "Tactician"],
+  "Garen": ["Juggernaut", "Slayer"],
+  "Illaoi": ["Void", "Juggernaut"],
+  "Jax": ["Darkin", "Slayer"],
+  "Jhin": ["Mythic", "Deadeye"],
+  "Jinx": ["Gunner", "Duskwalker"],
+  "Kayle": ["Empress", "Slayer"],
+  "Kayn": ["Slayer", "Assassin"],
+  "Karthus": ["Void", "Sorcerer"],
+  "Lux": ["Mythic", "Sorcerer"],
+  "Mordekaiser": ["Darkin", "Juggernaut"],
+  "Olaf": ["Juggernaut", "Berserker"],
+  "Pantheon": ["Mythic", "Guardian"],
+  "Samira": ["Empress", "Gunner"],
+  "Sett": ["Juggernaut", "Brawler"],
+  "Vi": ["Armored", "Brawler"],
+  "Viego": ["Slayer", "Assassin"],
+  "Yasuo": ["Empress", "Duskwalker"],
+  "Zac": ["Void", "Guardian"]
+};
+
+const set9ChampionTraits: ChampionTraitMap = {
+  "Ahri": ["Ionia", "Sorcerer"],
+  "Akali": ["Ionia", "Assassin"],
+  "Amumu": ["Guardian", "Empath"],
+  "Annie": ["Fiddle", "Sorcerer"],
+  "Aphelios": ["Deadeye", "Targon"],
+  "Bard": ["Wanderer", "Support"],
+  "Caitlyn": ["Deadeye", "Piltover"],
+  "Corki": ["Big Shot", "Yordle"],
+  "Ekko": ["Piltover", "Rogue"],
+  "Garen": ["Demacia", "Juggernaut"],
+  "Gragas": ["Freljord", "Bruiser"],
+  "Illaoi": ["Illaoi", "Bruiser"],
+  "Jax": ["Wanderer", "Juggernaut"],
+  "Jinx": ["Zaun", "Gunner"],
+  "Kayle": ["Demacia", "Slayer"],
+  "Kennen": ["Ionia", "Ninja"],
+  "Lux": ["Demacia", "Sorcerer"],
+  "Mordekaiser": ["Shadow Isles", "Juggernaut"],
+  "Olaf": ["Freljord", "Berserker"],
+  "Pantheon": ["Shurima", "Guardian"],
+  "Sett": ["Ionia", "Juggernaut"]
+};
+
+const traitMapsByVersion: Record<string, ChampionTraitMap> = {
+  "Set 9": set9ChampionTraits,
+  "Set 10": championTraits,
+  "Set 11": set11ChampionTraits
+};
 
 const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting = false }) => {
   const [earlyGame, setEarlyGame] = useState<Champion[]>(initialData?.earlyGame || []);
@@ -94,7 +200,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
 
   const [activeTab, setActiveTab] = useState("general");
 
-  // Initialize form with initial data if provided
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData ? {
@@ -118,15 +223,18 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
     },
   });
 
-  // Get current TFT version from form value
   const currentTftVersion = form.watch("tftVersion") || "Set 10";
   
-  // Get available traits based on the current TFT version
   const availableTraits = traitsByVersion[currentTftVersion] || traitsByVersion["Set 10"];
+  
+  const currentTraitMap = traitMapsByVersion[currentTftVersion] || traitMapsByVersion["Set 10"];
 
-  // Update positions for champions
   const handleUpdatePositions = (updatedChampions: Champion[]) => {
     setFinalComp(updatedChampions);
+  };
+
+  const getChampionTraits = (championName: string): string[] => {
+    return currentTraitMap[championName] || [];
   };
 
   const handleAddChampion = () => {
@@ -146,7 +254,32 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
       setFinalComp([...finalComp, newChampion]);
     }
     
-    // Reset form fields
+    const championTraits = getChampionTraits(newChampName);
+    if (championTraits && championTraits.length > 0) {
+      const newTraits = [...traits];
+      
+      championTraits.forEach(traitName => {
+        const existingTrait = newTraits.find(t => t.name === traitName);
+        
+        if (existingTrait) {
+          existingTrait.count += 1;
+        } else if (availableTraits.includes(traitName)) {
+          newTraits.push({
+            name: traitName,
+            count: 1,
+            version: currentTftVersion
+          });
+        }
+      });
+      
+      setTraits(newTraits);
+      
+      toast({
+        title: "Traits Auto-Added",
+        description: `Added traits for ${newChampName}: ${championTraits.join(', ')}`,
+      });
+    }
+    
     setNewChampName("");
     setNewChampCost(1);
     setNewChampItems([]);
@@ -217,7 +350,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
   };
 
   const handleFormSubmit = (values: z.infer<typeof formSchema>) => {
-    // Validate that we have at least some champions
     if (finalComp.length === 0) {
       toast({
         title: "Validation Error",
@@ -236,7 +368,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
       return;
     }
 
-    // Construct the final comp object
     const newComp: TFTComp = {
       id: values.id,
       name: values.name,
@@ -453,7 +584,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsContent>
 
           <TabsContent value="champions" className="space-y-6">
-            {/* Early Game Champions */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Early Game Champions</h3>
               
@@ -475,7 +605,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 ))}
               </div>
               
-              {/* Add Champion Form */}
               <div className="flex flex-col sm:flex-row gap-3 p-4 border border-border rounded-md bg-card/50">
                 <div className="flex-1">
                   <FormLabel className="text-xs">Champion Name</FormLabel>
@@ -542,7 +671,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               </div>
             </div>
 
-            {/* Final Comp Champions */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Final Comp</h3>
               
@@ -579,7 +707,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 ))}
               </div>
               
-              {/* Add Final Comp Champion Form */}
               <div className="space-y-4 p-4 border border-border rounded-md bg-card/50">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
@@ -646,7 +773,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                   </div>
                 </div>
                 
-                {/* Champion Items */}
                 <div>
                   <FormLabel className="text-xs">Items</FormLabel>
                   <div className="flex flex-wrap gap-2 mb-2">
@@ -721,7 +847,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsContent>
 
           <TabsContent value="traits" className="space-y-6">
-            {/* Traits */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Traits</h3>
               
@@ -816,7 +941,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsContent>
 
           <TabsContent value="items" className="space-y-6">
-            {/* Key Items */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Key Items</h3>
               
@@ -885,7 +1009,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
               
               <div className="bg-card/50 border border-border rounded-lg p-6">
                 <BoardPositioning
-                  champions={finalComp.map(champ => ({ ...champ, position: champ.position || null }))}
+                  champions={finalComp}
                   editable={true}
                   onUpdatePositions={handleUpdatePositions}
                 />
@@ -898,9 +1022,7 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
           </TabsContent>
 
           <TabsContent value="strategy" className="space-y-6">
-            {/* Strengths & Weaknesses */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Strengths */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Strengths</h3>
                 
@@ -938,7 +1060,6 @@ const CompForm: React.FC<CompFormProps> = ({ initialData, onSubmit, isSubmitting
                 </div>
               </div>
               
-              {/* Weaknesses */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Weaknesses</h3>
                 

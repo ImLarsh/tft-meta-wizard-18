@@ -1,17 +1,17 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import CompTierList from '@/components/CompTierList';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Edit, Trash2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import AppLogo from '@/components/AppLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from '@/components/ui/use-toast';
 
 const Index: React.FC = () => {
-  const { comps, traitMappings, removeComp } = useComps();
+  const { comps, traitMappings, removeComp, isLoading } = useComps();
   const hasTraitMappings = Object.keys(traitMappings).length > 0;
   const isMobile = useIsMobile();
   
@@ -34,6 +34,11 @@ const Index: React.FC = () => {
         });
     }
   };
+
+  useEffect(() => {
+    console.log("Comps in Index:", comps?.length || 0);
+    console.log("Trait mappings in Index:", Object.keys(traitMappings).length);
+  }, [comps, traitMappings]);
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -65,40 +70,48 @@ const Index: React.FC = () => {
       </section>
       
       <main className="flex-grow">
-        {!hasTraitMappings && (
+        {isLoading ? (
           <div className="container my-6 md:my-12 p-4 md:p-8 border border-border rounded-lg bg-card/50 text-center">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Welcome to TFT Genie!</h2>
-            <p className="mb-4 md:mb-6 text-muted-foreground">
-              You need to add at least one TFT set before you can create compositions.
-            </p>
-            <Link to="/sets">
-              <Button variant="default" size={isMobile ? "default" : "lg"}>
-                Add Your First Set
-              </Button>
-            </Link>
+            <p className="text-muted-foreground">Loading compositions...</p>
           </div>
-        )}
-        
-        {hasTraitMappings && comps.length === 0 && (
-          <div className="container my-6 md:my-12 p-4 md:p-8 border border-border rounded-lg bg-card/50 text-center">
-            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">No Compositions Yet</h2>
-            <p className="mb-4 md:mb-6 text-muted-foreground">
-              Create your first team composition to get started.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link to="/create">
-                <Button variant="default" size={isMobile ? "default" : "lg"} className="w-full sm:w-auto">
-                  Create Your First Comp
-                </Button>
-              </Link>
-            </div>
-          </div>
-        )}
-        
-        {comps.length > 0 && (
-          <div className="container">
-            <CompTierList comps={comps} onDelete={handleDeleteComp} />
-          </div>
+        ) : (
+          <>
+            {!hasTraitMappings && (
+              <div className="container my-6 md:my-12 p-4 md:p-8 border border-border rounded-lg bg-card/50 text-center">
+                <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Welcome to TFT Genie!</h2>
+                <p className="mb-4 md:mb-6 text-muted-foreground">
+                  You need to add at least one TFT set before you can create compositions.
+                </p>
+                <Link to="/sets">
+                  <Button variant="default" size={isMobile ? "default" : "lg"}>
+                    Add Your First Set
+                  </Button>
+                </Link>
+              </div>
+            )}
+            
+            {hasTraitMappings && comps.length === 0 && (
+              <div className="container my-6 md:my-12 p-4 md:p-8 border border-border rounded-lg bg-card/50 text-center">
+                <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">No Compositions Yet</h2>
+                <p className="mb-4 md:mb-6 text-muted-foreground">
+                  Create your first team composition to get started.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                  <Link to="/create">
+                    <Button variant="default" size={isMobile ? "default" : "lg"} className="w-full sm:w-auto">
+                      Create Your First Comp
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
+            
+            {comps.length > 0 && (
+              <div className="container">
+                <CompTierList comps={comps} onDelete={handleDeleteComp} />
+              </div>
+            )}
+          </>
         )}
       </main>
       

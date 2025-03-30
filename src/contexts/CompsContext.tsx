@@ -54,7 +54,51 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [votes, setVotes] = useState<Record<string, boolean>>({});
   const { user } = useAuth();
   
-  const traitMappings = traitMappingsData as TraitMappings;
+  const [traitMappings, setTraitMappings] = useState<TraitMappings>(traitMappingsData as TraitMappings);
+
+  // Load trait mappings
+  useEffect(() => {
+    const loadTraitMappings = async () => {
+      try {
+        if (supabase) {
+          // Try to fetch from Supabase using the tft_trait_mappings table
+          const { data: mappingsData, error: mappingsError } = await supabase
+            .from('tft_trait_mappings')
+            .select('*')
+            .limit(1);
+            
+          if (mappingsError) {
+            console.error("Error fetching trait mappings from Supabase:", mappingsError);
+            // Fall back to local data
+          } else if (mappingsData && mappingsData.length > 0 && mappingsData[0].mappings) {
+            // Extract the mappings from the first record
+            const mappings = mappingsData[0].mappings as unknown as TraitMappings;
+            console.log("Fetched trait mappings from Supabase");
+            if (Object.keys(mappings).length > 0) {
+              setTraitMappings(mappings);
+            }
+          } else {
+            console.log("No trait mappings found in Supabase, using default");
+            
+            // If user is authenticated, let's insert the initial trait mappings into Supabase
+            if (user) {
+              const { error: insertError } = await supabase
+                .from('tft_trait_mappings')
+                .insert({ mappings: traitMappingsData as unknown as Json });
+                  
+              if (insertError) {
+                console.error("Error inserting trait mappings:", insertError);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error loading trait mappings:", err);
+      }
+    };
+    
+    loadTraitMappings();
+  }, [user]);
 
   // Load comps
   useEffect(() => {

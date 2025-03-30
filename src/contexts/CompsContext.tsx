@@ -6,6 +6,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { toast } from '@/components/ui/use-toast';
 import { initialComps } from '@/data/initialComps';
 import { traitMappingsData } from '@/data/traitMappings';
+import { Json } from '@/integrations/supabase/types';
 
 interface ChampionTraitMap {
   [championName: string]: string[];
@@ -72,7 +73,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setComps(initialComps as TFTCompWithVotes[]);
           } else if (tftCompsData && tftCompsData.length > 0 && tftCompsData[0].comps) {
             // Extract the comps array from the first record
-            const compsArray = tftCompsData[0].comps as TFTCompWithVotes[];
+            const compsArray = tftCompsData[0].comps as unknown as TFTCompWithVotes[];
             console.log("Fetched comps from Supabase:", compsArray.length);
             setComps(compsArray);
           } else {
@@ -83,7 +84,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             if (user) {
               const { error: insertError } = await supabase
                 .from('tft_comps')
-                .insert({ comps: initialComps });
+                .insert({ comps: initialComps as unknown as Json });
                   
               if (insertError) {
                 console.error("Error inserting comps:", insertError);
@@ -143,7 +144,10 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Update existing record
           const { error } = await supabase
             .from('tft_comps')
-            .update({ comps: updatedComps, updated_at: new Date().toISOString() })
+            .update({ 
+              comps: updatedComps as unknown as Json, 
+              updated_at: new Date().toISOString() 
+            })
             .eq('id', data[0].id);
             
           if (error) {
@@ -153,7 +157,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Create new record
           const { error } = await supabase
             .from('tft_comps')
-            .insert({ comps: updatedComps });
+            .insert({ 
+              comps: updatedComps as unknown as Json 
+            });
             
           if (error) {
             throw error;
@@ -203,7 +209,10 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Update existing record
           const { error } = await supabase
             .from('tft_comps')
-            .update({ comps: updatedComps, updated_at: new Date().toISOString() })
+            .update({ 
+              comps: updatedComps as unknown as Json, 
+              updated_at: new Date().toISOString() 
+            })
             .eq('id', data[0].id);
             
           if (error) {
@@ -213,7 +222,9 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Create new record
           const { error } = await supabase
             .from('tft_comps')
-            .insert({ comps: updatedComps });
+            .insert({ 
+              comps: updatedComps as unknown as Json 
+            });
             
           if (error) {
             throw error;
@@ -265,7 +276,10 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           // Update existing record
           const { error } = await supabase
             .from('tft_comps')
-            .update({ comps: updatedComps, updated_at: new Date().toISOString() })
+            .update({ 
+              comps: updatedComps as unknown as Json, 
+              updated_at: new Date().toISOString() 
+            })
             .eq('id', data[0].id);
             
           if (error) {

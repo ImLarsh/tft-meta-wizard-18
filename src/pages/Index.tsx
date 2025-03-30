@@ -17,11 +17,21 @@ const Index: React.FC = () => {
   
   const handleDeleteComp = (compId: string, compName: string) => {
     if (window.confirm(`Are you sure you want to delete "${compName}"?`)) {
-      removeComp(compId);
-      toast({
-        title: "Composition Deleted",
-        description: `"${compName}" has been successfully deleted.`,
-      });
+      removeComp(compId)
+        .then(() => {
+          toast({
+            title: "Composition Deleted",
+            description: `"${compName}" has been successfully deleted.`,
+          });
+        })
+        .catch((error) => {
+          console.error("Error deleting comp:", error);
+          toast({
+            title: "Error",
+            description: "Failed to delete composition. Please try again.",
+            variant: "destructive",
+          });
+        });
     }
   };
   

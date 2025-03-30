@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TFTComp } from '@/data/comps';
@@ -33,14 +34,26 @@ const CompEditExisting = () => {
     
     try {
       updatedComp.id = compId || updatedComp.id;
-      updateComp(updatedComp);
       
-      toast({
-        title: "Comp Updated",
-        description: `"${updatedComp.name}" has been updated successfully!`,
-      });
-      
-      navigate('/');
+      updateComp(updatedComp)
+        .then(() => {
+          toast({
+            title: "Comp Updated",
+            description: `"${updatedComp.name}" has been updated successfully!`,
+          });
+          navigate('/');
+        })
+        .catch((error) => {
+          console.error('Error updating comp:', error);
+          toast({
+            title: "Error",
+            description: "Failed to update composition. Please try again.",
+            variant: "destructive",
+          });
+        })
+        .finally(() => {
+          setIsSubmitting(false);
+        });
     } catch (error) {
       console.error('Error updating comp:', error);
       toast({
@@ -48,7 +61,6 @@ const CompEditExisting = () => {
         description: "Failed to update composition. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };

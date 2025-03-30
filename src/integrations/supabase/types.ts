@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      champion_traits: {
+        Row: {
+          champion_id: number | null
+          id: number
+          trait_name: string
+        }
+        Insert: {
+          champion_id?: number | null
+          id?: number
+          trait_name: string
+        }
+        Update: {
+          champion_id?: number | null
+          id?: number
+          trait_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "champion_traits_champion_id_fkey"
+            columns: ["champion_id"]
+            isOneToOne: false
+            referencedRelation: "champions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      champions: {
+        Row: {
+          cost: number | null
+          id: number
+          name: string
+        }
+        Insert: {
+          cost?: number | null
+          id?: number
+          name: string
+        }
+        Update: {
+          cost?: number | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       comp_votes: {
         Row: {
           comp_id: string
@@ -30,6 +74,21 @@ export type Database = {
           id?: string
           user_id?: string | null
           vote_type?: string
+        }
+        Relationships: []
+      }
+      cyber_city: {
+        Row: {
+          id: number
+          name: string
+        }
+        Insert: {
+          id?: number
+          name: string
+        }
+        Update: {
+          id?: number
+          name?: string
         }
         Relationships: []
       }
@@ -98,6 +157,32 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      traits: {
+        Row: {
+          city_id: number | null
+          id: number
+          trait_name: string
+        }
+        Insert: {
+          city_id?: number | null
+          id?: number
+          trait_name: string
+        }
+        Update: {
+          city_id?: number | null
+          id?: number
+          trait_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traits_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cyber_city"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

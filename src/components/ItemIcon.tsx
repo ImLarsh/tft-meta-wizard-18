@@ -23,13 +23,11 @@ const ItemIcon: React.FC<ItemIconProps> = ({
   const [imgError, setImgError] = useState(false);
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   
-  // Reset error state when name changes
   useEffect(() => {
     setImgError(false);
     setCurrentSourceIndex(0);
   }, [name]);
   
-  // Size classes for the icon container - added 'xs' size
   const sizeClasses = {
     xs: 'w-4 h-4',
     sm: 'w-6 h-6',
@@ -37,9 +35,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     lg: 'w-10 h-10'
   };
   
-  // Enhanced mapping of TFT item names to their correct IDs
   const formatItemId = (itemName: string): string => {
-    // More comprehensive map of TFT item names to their item IDs
     const itemIdMap: Record<string, string> = {
       "B.F. Sword": "1038",
       "Needlessly Large Rod": "1058",
@@ -51,7 +47,6 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       "Spatula": "3311",
       "Sparring Gloves": "3177",
       
-      // Combined items
       "Infinity Edge": "3031",
       "Giant Slayer": "3036",
       "Rapid Firecannon": "3094",
@@ -70,7 +65,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       "Redemption": "3107",
       "Hand of Justice": "3158",
       "Guardian Angel": "3026",
-      "Jeweled Gauntlet": "3137", // Fixed correct ID for Jeweled Gauntlet
+      "Jeweled Gauntlet": "3137",
       "Rabadon's Deathcap": "3089",
       "Zeke's Herald": "3050",
       "Ionic Spark": "3100",
@@ -97,7 +92,6 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     return itemIdMap[itemName] || "";
   };
   
-  // Improved function to clean item name for URL paths
   const getCleanItemName = (itemName: string): string => {
     return itemName
       .replace(/'/g, '')
@@ -105,9 +99,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
       .toLowerCase();
   };
   
-  // Special case handling for specific items that need custom paths
   const getSpecialCaseUrl = (itemName: string): string | null => {
-    // Special handling for Jeweled Gauntlet which seems to be problematic
     if (itemName === "Jeweled Gauntlet") {
       return "https://rerollcdn.com/items/JeweledGauntlet.png";
     }
@@ -115,16 +107,13 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     return null;
   };
   
-  // Get TFT-specific CDNs for the various sites
   const getTFTSpecificUrl = (itemName: string): string => {
     const cleanName = getCleanItemName(itemName);
     
     return `https://cdn.metatft.com/file/metatft/items/${cleanName}.png`;
   };
   
-  // Get item sources in priority order of reliability
   const getItemSources = (itemName: string): string[] => {
-    // Check for special cases first
     const specialCaseUrl = getSpecialCaseUrl(itemName);
     if (specialCaseUrl) {
       return [specialCaseUrl];
@@ -135,38 +124,30 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     const tftSpecificUrl = getTFTSpecificUrl(itemName);
     
     const sources = [
-      // TFT-specific sources first (most reliable)
       tftSpecificUrl,
       `https://rerollcdn.com/items/${cleanName.replace(/_/g, '')}.png`,
       
-      // Riot Data Dragon sources
       ...(itemId ? [
         `https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/${itemId}.png`,
         `https://ddragon.leagueoflegends.com/cdn/latest/img/item/${itemId}.png`,
       ] : []),
       
-      // Mobalytics
       `https://cdn.mobalytics.gg/assets/tft/images/items/${cleanName}.png`,
       `https://cdn.mobalytics.gg/assets/tft/images/items/${cleanName.replace(/_/g, '')}.png`,
       
-      // Alternative Community sources
       `https://raw.communitydragon.org/latest/game/assets/items/icons/${cleanName}.png`,
       `https://raw.communitydragon.org/latest/game/assets/items/icons/${cleanName.replace(/_/g, '')}.png`,
       
-      // TFT Tactics
       `https://cdn.tft.tools/items/${cleanName.replace(/_/g, '')}.png`,
       
-      // League Wiki specific pattern (less reliable)
       `https://static.wikia.nocookie.net/leagueoflegends/images/thumb/9/9d/${itemName.replace(/'/g, '').replace(/\s+/g, '_')}_TFT_item.png/revision/latest/scale-to-width-down/42?cb=20190708222736`,
     ];
     
-    // Filter out empty strings
     return sources.filter(source => source);
   };
 
   const sources = getItemSources(name);
   
-  // Fallback (use a reliable default image)
   const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/3089.png';
   
   const handleImageError = () => {
@@ -180,7 +161,6 @@ const ItemIcon: React.FC<ItemIconProps> = ({
     }
   };
   
-  // Display name for fallback text, used if images fail to load
   const displayName = name.length > 12 ? name.substring(0, 10) + '...' : name;
 
   const icon = (
@@ -190,6 +170,7 @@ const ItemIcon: React.FC<ItemIconProps> = ({
         'rounded overflow-hidden relative border border-border/50 shadow-sm bg-secondary/30',
         className
       )}
+      style={{ zIndex: 20 }}
     >
       {imgError ? (
         <div className={cn(

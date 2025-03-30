@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
@@ -177,7 +178,7 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   {championAtPosition.items && championAtPosition.items.length > 0 && (
                     <div className="items-container" style={{ pointerEvents: 'none' }}>
                       {championAtPosition.items.map((item, idx) => (
-                        <ItemIcon key={idx} name={item} size="sm" />
+                        <ItemIcon key={idx} name={item} size="sm" showTooltip={true} />
                       ))}
                     </div>
                   )}

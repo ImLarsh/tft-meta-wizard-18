@@ -1,4 +1,3 @@
-
 /* TFT Board Builder Styles */
 
 .hex-grid {
@@ -6,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  max-width: 1000px; /* Increased from 840px for a larger grid */
+  max-width: 1000px;
   padding: 1.5rem;
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: 12px;
@@ -15,23 +14,23 @@
 .hex-row {
   display: flex;
   justify-content: center;
-  margin-bottom: -20px; /* Adjusted for better vertical alignment */
+  margin-bottom: -20px;
 }
 
 .hex-row.offset {
-  margin-left: 46px; /* Adjusted for proper honeycomb staggering */
+  margin-left: 46px;
 }
 
 .hex-cell {
-  margin: 10px; /* Increased spacing between hexagons */
+  margin: 10px;
   cursor: pointer;
   position: relative;
 }
 
 .hex {
   position: relative;
-  width: 90px; /* Increased from 70px */
-  height: 104px; /* Increased from 80px to maintain proportions */
+  width: 90px;
+  height: 104px;
   background-color: rgba(128, 128, 128, 0.2);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
@@ -77,13 +76,13 @@
 
 .items-container {
   position: absolute;
-  bottom: -8px;
+  bottom: -25px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 4px;
-  z-index: 10; /* Increased z-index to ensure items appear on top */
-  pointer-events: none; /* Prevents items from blocking clicks */
+  z-index: 10;
+  pointer-events: none;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 2px 4px;
   border-radius: 4px;
@@ -91,13 +90,13 @@
 
 .carry-stars {
   position: absolute;
-  top: -18px;
+  top: -25px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 2px;
-  z-index: 10; /* Increased z-index to ensure stars appear on top */
-  pointer-events: none; /* Prevents stars from blocking clicks */
+  z-index: 10;
+  pointer-events: none;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 2px 4px;
   border-radius: 4px;
@@ -108,7 +107,7 @@
 }
 
 .board-wrapper.compact .hex-grid {
-  max-width: 700px; /* Increased from 600px for compact view */
+  max-width: 700px;
 }
 
 .board-instructions {
@@ -129,7 +128,7 @@
 
 .champions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Increased from 90px */
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
@@ -194,7 +193,6 @@
   margin-top: 1rem;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .hex {
     width: 70px;
@@ -215,7 +213,6 @@
   }
 }
 
-/* Extra small screens */
 @media (max-width: 480px) {
   .hex {
     width: 50px;

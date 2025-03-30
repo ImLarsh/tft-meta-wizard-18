@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
@@ -141,6 +140,14 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
             onDrop={e => handleDrop(e, row, col)} 
             className="hex-cell"
           >
+            {championAtPosition && championAtPosition.isCarry && (
+              <div className="carry-stars">
+                <Star size={12} fill="#FFD700" color="#FFD700" />
+                <Star size={12} fill="#FFD700" color="#FFD700" />
+                <Star size={12} fill="#FFD700" color="#FFD700" />
+              </div>
+            )}
+            
             <div className={`hex ${championAtPosition ? 'occupied' : 'empty'} ${selectedChampion === championAtPosition ? 'selected' : ''}`}>
               {championAtPosition && (
                 <div 
@@ -148,14 +155,6 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                   draggable={!readonly} 
                   onDragStart={e => handleDragStart(e, championAtPosition)}
                 >
-                  {championAtPosition.isCarry && (
-                    <div className="carry-stars" style={{ pointerEvents: 'none' }}>
-                      <Star size={12} fill="#FFD700" color="#FFD700" />
-                      <Star size={12} fill="#FFD700" color="#FFD700" />
-                      <Star size={12} fill="#FFD700" color="#FFD700" />
-                    </div>
-                  )}
-                  
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -174,17 +173,17 @@ const BoardPositioning: React.FC<BoardPositioningProps> = ({
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                  
-                  {championAtPosition.items && championAtPosition.items.length > 0 && (
-                    <div className="items-container" style={{ pointerEvents: 'none' }}>
-                      {championAtPosition.items.map((item, idx) => (
-                        <ItemIcon key={idx} name={item} size="sm" showTooltip={true} />
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+            
+            {championAtPosition && championAtPosition.items && championAtPosition.items.length > 0 && (
+              <div className="items-container">
+                {championAtPosition.items.map((item, idx) => (
+                  <ItemIcon key={idx} name={item} size="sm" showTooltip={true} />
+                ))}
+              </div>
+            )}
           </div>
         );
       }

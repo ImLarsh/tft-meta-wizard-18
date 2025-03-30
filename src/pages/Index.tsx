@@ -4,15 +4,26 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import CompTierList from '@/components/CompTierList';
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Edit, Trash2 } from 'lucide-react';
 import { useComps } from '@/contexts/CompsContext';
 import AppLogo from '@/components/AppLogo';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from '@/components/ui/use-toast';
 
 const Index: React.FC = () => {
-  const { comps, traitMappings } = useComps();
+  const { comps, traitMappings, removeComp } = useComps();
   const hasTraitMappings = Object.keys(traitMappings).length > 0;
   const isMobile = useIsMobile();
+  
+  const handleDeleteComp = (compId: string, compName: string) => {
+    if (window.confirm(`Are you sure you want to delete "${compName}"?`)) {
+      removeComp(compId);
+      toast({
+        title: "Composition Deleted",
+        description: `"${compName}" has been successfully deleted.`,
+      });
+    }
+  };
   
   return (
     <div className="min-h-screen flex flex-col">

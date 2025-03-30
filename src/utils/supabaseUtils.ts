@@ -56,15 +56,10 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
   try {
     console.log('Saving trait mappings to Supabase');
     // First check if we have an existing record
-    const { data: existingRecord, error: fetchError } = await supabase
+    const { data: existingRecord } = await supabase
       .from('tft_trait_mappings')
       .select('id')
       .limit(1);
-    
-    if (fetchError) {
-      console.error('Error checking existing trait mappings:', fetchError);
-      return false;
-    }
     
     if (existingRecord && existingRecord.length > 0) {
       // Update existing record - convert Date to ISO string
@@ -147,15 +142,10 @@ export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> =>
   try {
     console.log('Saving comps to Supabase');
     // First check if we have an existing record
-    const { data: existingRecord, error: fetchError } = await supabase
+    const { data: existingRecord } = await supabase
       .from('tft_comps')
       .select('id')
       .limit(1);
-    
-    if (fetchError) {
-      console.error('Error checking existing comps:', fetchError);
-      return false;
-    }
     
     if (existingRecord && existingRecord.length > 0) {
       // Update existing record with type coercion

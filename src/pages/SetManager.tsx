@@ -14,17 +14,11 @@ import { saveTraitMappingsToSupabase } from '@/utils/supabaseUtils';
 import PageLayout from '@/components/PageLayout';
 
 const SetManager: React.FC = () => {
-  const { traitMappings, updateTraitMappings } = useComps();
+  const { traitMappings } = useComps();
   const [sets, setSets] = useState(traitMappings || {});
   const [newSetName, setNewSetName] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
   
-  useEffect(() => {
-    // Update local state when context traitMappings change
-    setSets(traitMappings || {});
-  }, [traitMappings]);
-  
-  const handleAddSet = async () => {
+  const handleAddSet = () => {
     if (!newSetName.trim()) {
       toast({
         title: "Validation Error",
@@ -56,56 +50,25 @@ const SetManager: React.FC = () => {
     setSets(newSets);
     setNewSetName('');
     
-    try {
-      // Save to context and Supabase
-      if (updateTraitMappings) {
-        await updateTraitMappings(newSets);
-        
-        toast({
-          title: "Set Added",
-          description: `Set "${newSetName}" has been added successfully.`
-        });
-      } else {
-        // Fallback to direct Supabase save if context method not available
-        const saved = await saveTraitMappingsToSupabase(newSets);
-        if (saved) {
-          toast({
-            title: "Set Added",
-            description: `Set "${newSetName}" has been added successfully.`
-          });
-        } else {
-          throw new Error("Failed to save set");
-        }
-      }
-    } catch (error) {
-      console.error("Error adding set:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add set. Please try again.",
-        variant: "destructive"
-      });
-    }
+    toast({
+      title: "Set Added",
+      description: `Set "${newSetName}" has been added. You can now add traits and champions.`
+    });
   };
   
   const handleSaveSets = async () => {
     try {
-      setIsSaving(true);
+      // Save to Supabase
+      const saved = await saveTraitMappingsToSupabase(sets);
       
-      // Save through context if available
-      if (updateTraitMappings) {
-        await updateTraitMappings(sets);
+      if (saved) {
+        toast({
+          title: "Sets Saved",
+          description: "Your TFT sets have been saved successfully."
+        });
       } else {
-        // Fallback to direct Supabase save
-        const saved = await saveTraitMappingsToSupabase(sets);
-        if (!saved) {
-          throw new Error("Failed to save sets");
-        }
+        throw new Error("Failed to save sets");
       }
-      
-      toast({
-        title: "Sets Saved",
-        description: "Your TFT sets have been saved successfully."
-      });
     } catch (error) {
       console.error("Error saving sets:", error);
       toast({
@@ -113,44 +76,22 @@ const SetManager: React.FC = () => {
         description: "Failed to save sets. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsSaving(false);
     }
   };
   
-  const handleDeleteSet = async (setName: string) => {
+  const handleDeleteSet = (setName: string) => {
     if (!window.confirm(`Are you sure you want to delete set "${setName}"? This cannot be undone.`)) {
       return;
     }
     
-    try {
-      const newSets = {...sets};
-      delete newSets[setName];
-      setSets(newSets);
-      
-      // Save through context if available
-      if (updateTraitMappings) {
-        await updateTraitMappings(newSets);
-      } else {
-        // Fallback to direct Supabase save
-        const saved = await saveTraitMappingsToSupabase(newSets);
-        if (!saved) {
-          throw new Error("Failed to delete set");
-        }
-      }
-      
-      toast({
-        title: "Set Deleted",
-        description: `Set "${setName}" has been deleted successfully.`
-      });
-    } catch (error) {
-      console.error("Error deleting set:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete set. Please try again.",
-        variant: "destructive"
-      });
-    }
+    const newSets = {...sets};
+    delete newSets[setName];
+    setSets(newSets);
+    
+    toast({
+      title: "Set Deleted",
+      description: `Set "${setName}" has been deleted.`
+    });
   };
   
   return (
@@ -167,17 +108,9 @@ const SetManager: React.FC = () => {
             <h1 className="text-2xl font-bold">Manage TFT Sets</h1>
           </div>
           
-          <Button 
-            onClick={handleSaveSets} 
-            className="gap-2"
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : (
-              <>
-                <Save className="h-4 w-4" />
-                Save All Sets
-              </>
-            )}
+          <Button onClick={handleSaveSets} className="gap-2">
+            <Save className="h-4 w-4" />
+            Save All Sets
           </Button>
         </div>
         

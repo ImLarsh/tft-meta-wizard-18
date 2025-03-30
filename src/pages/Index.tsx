@@ -87,7 +87,7 @@ const Index: React.FC = () => {
         
         {comps.length > 0 && (
           <div className="container">
-            <CompTierList comps={comps} />
+            <CompTierList comps={comps} onDelete={handleDeleteComp} />
           </div>
         )}
       </main>

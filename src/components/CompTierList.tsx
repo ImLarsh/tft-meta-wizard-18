@@ -4,7 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { TFTComp } from '@/data/comps';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, ArrowUpDown, ArrowDownAZ, ThumbsUp, ThumbsDown, ArrowDownZA, ArrowUp, ArrowDown, Edit, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, ArrowUpDown, ArrowDownAZ, ThumbsUp, ThumbsDown, ArrowDownZA, ArrowUp, ArrowDown } from 'lucide-react';
 import BoardPositioning from './BoardPositioning';
 import ChampionIcon from './ChampionIcon';
 import ItemIcon from './ItemIcon';
@@ -12,26 +12,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import CompVoteSystem from './CompVoteSystem';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Link } from 'react-router-dom';
-
 interface CompTierListProps {
   comps: TFTComp[];
-  onDelete?: (compId: string, compName: string) => void;
 }
-
 type SortOption = 'tier' | 'name-asc' | 'name-desc' | 'difficulty-easy' | 'difficulty-hard' | 'most-liked' | 'least-liked';
-
 const CompTierList: React.FC<CompTierListProps> = ({
-  comps,
-  onDelete
+  comps
 }) => {
   const [expandedCompId, setExpandedCompId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('tier');
-  
   const toggleExpand = (compId: string) => {
     setExpandedCompId(expandedCompId === compId ? null : compId);
   };
-  
   const getTierValue = (tier: string): number => {
     switch (tier.toUpperCase()) {
       case 'S':
@@ -46,7 +38,6 @@ const CompTierList: React.FC<CompTierListProps> = ({
         return 4;
     }
   };
-  
   const getSortedComps = () => {
     switch (sortBy) {
       case 'tier':
@@ -81,9 +72,7 @@ const CompTierList: React.FC<CompTierListProps> = ({
         return [...comps];
     }
   };
-  
   const sortedComps = getSortedComps();
-  
   const getColorForTier = (tier: string): string => {
     switch (tier.toUpperCase()) {
       case 'S':
@@ -98,7 +87,6 @@ const CompTierList: React.FC<CompTierListProps> = ({
         return 'bg-gray-500 hover:bg-gray-600';
     }
   };
-  
   const getCompsByTier = () => {
     if (sortBy !== 'tier') return null;
     const byTier: Record<string, TFTComp[]> = {};
@@ -111,10 +99,8 @@ const CompTierList: React.FC<CompTierListProps> = ({
     }
     return byTier;
   };
-  
   const compsByTier = getCompsByTier();
   const tiers = compsByTier ? Object.keys(compsByTier).sort((a, b) => getTierValue(a) - getTierValue(b)) : [];
-  
   const getDifficultyValue = (difficulty: string): number => {
     switch (difficulty) {
       case 'Easy':
@@ -127,11 +113,9 @@ const CompTierList: React.FC<CompTierListProps> = ({
         return 3;
     }
   };
-  
   const hasPositioningData = (comp: TFTComp) => {
     return comp.boardPositions || comp.finalComp.some(champ => champ.position);
   };
-  
   const toggleSort = (option: SortOption) => {
     if (option === 'name-asc' && sortBy === 'name-asc') {
       setSortBy('name-desc');
@@ -149,9 +133,7 @@ const CompTierList: React.FC<CompTierListProps> = ({
       setSortBy(option);
     }
   };
-  
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="flex flex-wrap gap-2 mb-4">
         <TooltipProvider>
           <Tooltip>
@@ -199,32 +181,23 @@ const CompTierList: React.FC<CompTierListProps> = ({
         </TooltipProvider>
       </div>
 
-      {compsByTier && (
-        <div className="space-y-8">
-          {tiers.map(tier => (
-            <div key={tier} className="space-y-4">
+      {compsByTier && <div className="space-y-8">
+          {tiers.map(tier => <div key={tier} className="space-y-4">
               <h3 className="text-xl font-bold">
                 {tier} Tier
               </h3>
               <div className="space-y-4">
                 {compsByTier[tier].map(comp => renderCompCard(comp))}
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            </div>)}
+        </div>}
 
-      {!compsByTier && (
-        <div className="space-y-4">
+      {!compsByTier && <div className="space-y-4">
           {sortedComps.map(comp => renderCompCard(comp))}
-        </div>
-      )}
-    </div>
-  );
-  
+        </div>}
+    </div>;
   function renderCompCard(comp: TFTComp) {
-    return (
-      <Collapsible key={comp.id} open={expandedCompId === comp.id} onOpenChange={() => toggleExpand(comp.id)} className="border rounded-md overflow-hidden mb-4">
+    return <Collapsible key={comp.id} open={expandedCompId === comp.id} onOpenChange={() => toggleExpand(comp.id)} className="border rounded-md overflow-hidden mb-4">
         <div className="bg-card">
           <div className="p-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -240,30 +213,6 @@ const CompTierList: React.FC<CompTierListProps> = ({
               <span className="text-sm text-muted-foreground">{comp.difficulty}</span>
               <Progress value={getDifficultyValue(comp.difficulty) * 20} className="w-20" />
               <CompVoteSystem compId={comp.id} />
-              
-              <div className="flex items-center gap-1">
-                <Link to={`/edit/${comp.id}`}>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                </Link>
-                {onDelete && (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 text-destructive hover:text-destructive" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(comp.id, comp.name);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                )}
-              </div>
-              
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="sm">
                   {expandedCompId === comp.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -344,9 +293,7 @@ const CompTierList: React.FC<CompTierListProps> = ({
             </div>
           </CollapsibleContent>
         </div>
-      </Collapsible>
-    );
+      </Collapsible>;
   }
 };
-
 export default CompTierList;

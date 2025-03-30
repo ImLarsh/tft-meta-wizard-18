@@ -6,7 +6,6 @@ import { useAuth } from '@/providers/AuthProvider';
 import { toast } from '@/components/ui/use-toast';
 import { initialComps } from '@/data/initialComps';
 import { traitMappingsData } from '@/data/traitMappings';
-import { Json } from '@/integrations/supabase/types';
 
 interface ChampionTraitMap {
   [championName: string]: string[];
@@ -40,65 +39,15 @@ interface CompsContextProps {
   getVotes: () => Record<string, boolean>;
 }
 
-// Extend TFTComp for voting functionality
-interface TFTCompWithVotes extends TFTComp {
-  upvotes?: number;
-  downvotes?: number;
-}
-
 const CompsContext = createContext<CompsContextProps | undefined>(undefined);
 
 export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [comps, setComps] = useState<TFTCompWithVotes[]>([]);
+  const [comps, setComps] = useState<TFTComp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [votes, setVotes] = useState<Record<string, boolean>>({});
   const { user } = useAuth();
   
-  const [traitMappings, setTraitMappings] = useState<TraitMappings>(traitMappingsData as TraitMappings);
-
-  // Load trait mappings
-  useEffect(() => {
-    const loadTraitMappings = async () => {
-      try {
-        if (supabase) {
-          // Try to fetch from Supabase using the tft_trait_mappings table
-          const { data: mappingsData, error: mappingsError } = await supabase
-            .from('tft_trait_mappings')
-            .select('*')
-            .limit(1);
-            
-          if (mappingsError) {
-            console.error("Error fetching trait mappings from Supabase:", mappingsError);
-            // Fall back to local data
-          } else if (mappingsData && mappingsData.length > 0 && mappingsData[0].mappings) {
-            // Extract the mappings from the first record
-            const mappings = mappingsData[0].mappings as unknown as TraitMappings;
-            console.log("Fetched trait mappings from Supabase");
-            if (Object.keys(mappings).length > 0) {
-              setTraitMappings(mappings);
-            }
-          } else {
-            console.log("No trait mappings found in Supabase, using default");
-            
-            // If user is authenticated, let's insert the initial trait mappings into Supabase
-            if (user) {
-              const { error: insertError } = await supabase
-                .from('tft_trait_mappings')
-                .insert({ mappings: traitMappingsData as unknown as Json });
-                  
-              if (insertError) {
-                console.error("Error inserting trait mappings:", insertError);
-              }
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Error loading trait mappings:", err);
-      }
-    };
-    
-    loadTraitMappings();
-  }, [user]);
+  const traitMappings = traitMappingsData as TraitMappings;
 
   // Load comps
   useEffect(() => {
@@ -106,38 +55,38 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setIsLoading(true);
       try {
         if (supabase) {
-          // Try to fetch from Supabase using the tft_comps table
-          const { data: tftCompsData, error: tftCompsError } = await supabase
-            .from('tft_comps')
+          // Try to fetch from Supabase
+          const { data, error } = await supabase
+            .from('compositions')
             .select('*');
             
-          if (tftCompsError) {
-            console.error("Error fetching comps from Supabase:", tftCompsError);
+          if (error) {
+            console.error("Error fetching comps from Supabase:", error);
             // Fall back to local data if there's an error
-            setComps(initialComps as TFTCompWithVotes[]);
-          } else if (tftCompsData && tftCompsData.length > 0 && tftCompsData[0].comps) {
-            // Extract the comps array from the first record
-            const compsArray = tftCompsData[0].comps as unknown as TFTCompWithVotes[];
-            console.log("Fetched comps from Supabase:", compsArray.length);
-            setComps(compsArray);
+            setComps(initialComps);
+          } else if (data && data.length > 0) {
+            console.log("Fetched comps from Supabase:", data.length);
+            setComps(data as TFTComp[]);
           } else {
             console.log("No comps in Supabase, using initial comps");
-            setComps(initialComps as TFTCompWithVotes[]);
+            setComps(initialComps);
             
             // If user is authenticated, let's insert the initial comps into Supabase
             if (user) {
-              const { error: insertError } = await supabase
-                .from('tft_comps')
-                .insert({ comps: initialComps as unknown as Json });
+              for (const comp of initialComps) {
+                const { error: insertError } = await supabase
+                  .from('compositions')
+                  .insert(comp);
                   
-              if (insertError) {
-                console.error("Error inserting comps:", insertError);
+                if (insertError) {
+                  console.error(`Error inserting comp ${comp.id}:`, insertError);
+                }
               }
             }
           }
         } else {
           // No Supabase, use local data
-          setComps(initialComps as TFTCompWithVotes[]);
+          setComps(initialComps);
         }
         
         // Load votes from localStorage
@@ -147,7 +96,7 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       } catch (err) {
         console.error("Error in loadComps:", err);
-        setComps(initialComps as TFTCompWithVotes[]);
+        setComps(initialComps);
       } finally {
         setIsLoading(false);
       }
@@ -164,54 +113,17 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         comp.id = `${comp.id}-${timestamp}`;
       }
       
-      // Add voting properties
-      const compWithVotes: TFTCompWithVotes = {
-        ...comp,
-        upvotes: 0,
-        downvotes: 0
-      };
-      
       if (supabase && user) {
-        // Get the current comps from Supabase
-        const { data, error: fetchError } = await supabase
-          .from('tft_comps')
-          .select('*')
-          .limit(1);
+        const { error } = await supabase
+          .from('compositions')
+          .insert(comp);
           
-        if (fetchError) {
-          throw fetchError;
-        }
-        
-        const updatedComps = [...comps, compWithVotes];
-        
-        if (data && data.length > 0) {
-          // Update existing record
-          const { error } = await supabase
-            .from('tft_comps')
-            .update({ 
-              comps: updatedComps as unknown as Json, 
-              updated_at: new Date().toISOString() 
-            })
-            .eq('id', data[0].id);
-            
-          if (error) {
-            throw error;
-          }
-        } else {
-          // Create new record
-          const { error } = await supabase
-            .from('tft_comps')
-            .insert({ 
-              comps: updatedComps as unknown as Json 
-            });
-            
-          if (error) {
-            throw error;
-          }
+        if (error) {
+          throw error;
         }
       }
       
-      setComps(prev => [compWithVotes, ...prev]);
+      setComps(prev => [comp, ...prev]);
       
       toast({
         title: "Composition Added",
@@ -232,47 +144,16 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const updateComp = async (updatedComp: TFTCompWithVotes) => {
+  const updateComp = async (updatedComp: TFTComp) => {
     try {
       if (supabase && user) {
-        // Get the current comps from Supabase
-        const { data, error: fetchError } = await supabase
-          .from('tft_comps')
-          .select('*')
-          .limit(1);
+        const { error } = await supabase
+          .from('compositions')
+          .update(updatedComp)
+          .eq('id', updatedComp.id);
           
-        if (fetchError) {
-          throw fetchError;
-        }
-        
-        const updatedComps = comps.map(comp => 
-          comp.id === updatedComp.id ? updatedComp : comp
-        );
-        
-        if (data && data.length > 0) {
-          // Update existing record
-          const { error } = await supabase
-            .from('tft_comps')
-            .update({ 
-              comps: updatedComps as unknown as Json, 
-              updated_at: new Date().toISOString() 
-            })
-            .eq('id', data[0].id);
-            
-          if (error) {
-            throw error;
-          }
-        } else {
-          // Create new record
-          const { error } = await supabase
-            .from('tft_comps')
-            .insert({ 
-              comps: updatedComps as unknown as Json 
-            });
-            
-          if (error) {
-            throw error;
-          }
+        if (error) {
+          throw error;
         }
       }
       
@@ -304,31 +185,13 @@ export const CompsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const removeComp = async (compId: string) => {
     try {
       if (supabase && user) {
-        // Get the current comps from Supabase
-        const { data, error: fetchError } = await supabase
-          .from('tft_comps')
-          .select('*')
-          .limit(1);
+        const { error } = await supabase
+          .from('compositions')
+          .delete()
+          .eq('id', compId);
           
-        if (fetchError) {
-          throw fetchError;
-        }
-        
-        const updatedComps = comps.filter(comp => comp.id !== compId);
-        
-        if (data && data.length > 0) {
-          // Update existing record
-          const { error } = await supabase
-            .from('tft_comps')
-            .update({ 
-              comps: updatedComps as unknown as Json, 
-              updated_at: new Date().toISOString() 
-            })
-            .eq('id', data[0].id);
-            
-          if (error) {
-            throw error;
-          }
+        if (error) {
+          throw error;
         }
       }
       

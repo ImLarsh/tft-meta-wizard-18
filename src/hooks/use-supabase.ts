@@ -23,13 +23,12 @@ export const useSupabaseData = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        console.log("Loading data from Supabase...");
         
         // Fetch trait mappings
         const mappings = await fetchTraitMappingsFromSupabase();
         if (Object.keys(mappings).length > 0) {
           setTraitMappings(mappings);
-          console.log('Trait mappings loaded from Supabase:', Object.keys(mappings).length);
+          console.log('Trait mappings loaded from Supabase');
         } else {
           console.log('No trait mappings found in Supabase');
         }
@@ -38,7 +37,7 @@ export const useSupabaseData = () => {
         const tftComps = await fetchCompsFromSupabase();
         if (tftComps.length > 0) {
           setComps(tftComps);
-          console.log('Comps loaded from Supabase:', tftComps.length);
+          console.log('Comps loaded from Supabase');
         } else {
           console.log('No comps found in Supabase');
         }

@@ -19,7 +19,6 @@ export const isUsingDefaultCredentials = (): boolean => {
  */
 export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, any>> => {
   try {
-    console.log('Fetching trait mappings from Supabase');
     // Query the tft_trait_mappings table
     const { data, error } = await supabase
       .from('tft_trait_mappings')
@@ -34,7 +33,7 @@ export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, a
     if (data && data.length > 0) {
       const mappings = data[0]?.mappings;
       if (mappings && typeof mappings === 'object' && !Array.isArray(mappings)) {
-        console.log('Successfully fetched trait mappings from Supabase:', Object.keys(mappings).length);
+        console.log('Successfully fetched trait mappings from Supabase:', mappings);
         return mappings as Record<string, any>;
       }
     }
@@ -54,7 +53,6 @@ export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, a
  */
 export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>): Promise<boolean> => {
   try {
-    console.log('Saving trait mappings to Supabase');
     // First check if we have an existing record
     const { data: existingRecord } = await supabase
       .from('tft_trait_mappings')
@@ -104,7 +102,6 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
  */
 export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
   try {
-    console.log('Fetching comps from Supabase');
     // Query the tft_comps table
     const { data, error } = await supabase
       .from('tft_comps')
@@ -119,7 +116,7 @@ export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
     if (data && data.length > 0) {
       const comps = data[0]?.comps;
       if (comps && Array.isArray(comps)) {
-        console.log('Successfully fetched comps from Supabase:', comps.length);
+        console.log('Successfully fetched comps from Supabase:', comps);
         // Type assertion to convert Json[] to TFTComp[] safely
         return comps as unknown as TFTComp[];
       }
@@ -140,7 +137,6 @@ export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
  */
 export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> => {
   try {
-    console.log('Saving comps to Supabase');
     // First check if we have an existing record
     const { data: existingRecord } = await supabase
       .from('tft_comps')

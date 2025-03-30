@@ -5,24 +5,55 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Save, Trash2, Edit } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useComps } from '@/contexts/CompsContext';
 import { toast } from '@/components/ui/use-toast';
-import { saveTraitMappingsToSupabase } from '@/utils/supabaseUtils';
+import { fetchTraitMappingsFromSupabase, saveTraitMappingsToSupabase } from '@/utils/supabaseUtils';
 import PageLayout from '@/components/PageLayout';
 
 const SetManager: React.FC = () => {
   const { traitMappings } = useComps();
   const [sets, setSets] = useState(traitMappings || {});
   const [newSetName, setNewSetName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [selectedSet, setSelectedSet] = useState<string | null>(null);
+  const [newTrait, setNewTrait] = useState('');
+  const [newChampion, setNewChampion] = useState('');
+  const [newChampionTraits, setNewChampionTraits] = useState<string[]>([]);
+  const [newChampionCost, setNewChampionCost] = useState<number>(1);
   
   // Update local state when traitMappings change
   useEffect(() => {
     if (Object.keys(traitMappings).length > 0) {
       setSets(traitMappings);
+    } else {
+      // If no sets are found, load from Supabase directly
+      loadSets();
     }
   }, [traitMappings]);
+
+  const loadSets = async () => {
+    setLoading(true);
+    try {
+      const mappingsData = await fetchTraitMappingsFromSupabase();
+      if (Object.keys(mappingsData).length > 0) {
+        setSets(mappingsData);
+        console.log('Successfully loaded sets from Supabase:', Object.keys(mappingsData));
+      }
+    } catch (error) {
+      console.error('Error loading sets:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load sets from Supabase',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const handleAddSet = () => {
     if (!newSetName.trim()) {
@@ -63,6 +94,7 @@ const SetManager: React.FC = () => {
   };
   
   const handleSaveSets = async () => {
+    setLoading(true);
     try {
       // Save to Supabase
       const saved = await saveTraitMappingsToSupabase(sets);
@@ -82,6 +114,8 @@ const SetManager: React.FC = () => {
         description: "Failed to save sets. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -99,6 +133,159 @@ const SetManager: React.FC = () => {
       description: `Set "${setName}" has been deleted.`
     });
   };
+
+  const handleAddTrait = (setKey: string) => {
+    if (!newTrait.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Trait name cannot be empty",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (sets[setKey].traits.includes(newTrait)) {
+      toast({
+        title: "Validation Error",
+        description: `Trait "${newTrait}" already exists in this set`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const updatedSets = {
+      ...sets,
+      [setKey]: {
+        ...sets[setKey],
+        traits: [...sets[setKey].traits, newTrait]
+      }
+    };
+
+    setSets(updatedSets);
+    setNewTrait('');
+    
+    toast({
+      title: "Trait Added",
+      description: `Trait "${newTrait}" has been added to set "${setKey}".`
+    });
+  };
+
+  const handleDeleteTrait = (setKey: string, traitName: string) => {
+    if (!window.confirm(`Are you sure you want to delete trait "${traitName}"? Champions with this trait will be affected.`)) {
+      return;
+    }
+
+    // Remove trait from set's trait list
+    const updatedSets = {
+      ...sets,
+      [setKey]: {
+        ...sets[setKey],
+        traits: sets[setKey].traits.filter(trait => trait !== traitName)
+      }
+    };
+
+    // Remove trait from champion traits
+    const championTraits = sets[setKey].championTraits;
+    Object.keys(championTraits).forEach(champion => {
+      if (championTraits[champion].includes(traitName)) {
+        updatedSets[setKey].championTraits[champion] = championTraits[champion].filter(trait => trait !== traitName);
+      }
+    });
+
+    setSets(updatedSets);
+    
+    toast({
+      title: "Trait Deleted",
+      description: `Trait "${traitName}" has been deleted from set "${setKey}".`
+    });
+  };
+
+  const handleAddChampion = (setKey: string) => {
+    if (!newChampion.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Champion name cannot be empty",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (sets[setKey].championTraits[newChampion]) {
+      toast({
+        title: "Validation Error",
+        description: `Champion "${newChampion}" already exists in this set`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (newChampionTraits.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Champion must have at least one trait",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const updatedSets = {
+      ...sets,
+      [setKey]: {
+        ...sets[setKey],
+        championTraits: {
+          ...sets[setKey].championTraits,
+          [newChampion]: newChampionTraits
+        },
+        championCosts: {
+          ...sets[setKey].championCosts,
+          [newChampion]: newChampionCost
+        }
+      }
+    };
+
+    setSets(updatedSets);
+    setNewChampion('');
+    setNewChampionTraits([]);
+    setNewChampionCost(1);
+    
+    toast({
+      title: "Champion Added",
+      description: `Champion "${newChampion}" has been added to set "${setKey}".`
+    });
+  };
+
+  const handleChampionTraitToggle = (trait: string) => {
+    setNewChampionTraits(prev => 
+      prev.includes(trait) 
+        ? prev.filter(t => t !== trait) 
+        : [...prev, trait]
+    );
+  };
+
+  const handleDeleteChampion = (setKey: string, championName: string) => {
+    if (!window.confirm(`Are you sure you want to delete champion "${championName}"?`)) {
+      return;
+    }
+
+    const updatedSets = {
+      ...sets,
+      [setKey]: {
+        ...sets[setKey],
+        championTraits: { ...sets[setKey].championTraits },
+        championCosts: { ...sets[setKey].championCosts }
+      }
+    };
+
+    delete updatedSets[setKey].championTraits[championName];
+    delete updatedSets[setKey].championCosts[championName];
+
+    setSets(updatedSets);
+    
+    toast({
+      title: "Champion Deleted",
+      description: `Champion "${championName}" has been deleted from set "${setKey}".`
+    });
+  };
   
   return (
     <PageLayout>
@@ -114,9 +301,17 @@ const SetManager: React.FC = () => {
             <h1 className="text-2xl font-bold">Manage TFT Sets</h1>
           </div>
           
-          <Button onClick={handleSaveSets} className="gap-2">
-            <Save className="h-4 w-4" />
-            Save All Sets
+          <Button 
+            onClick={handleSaveSets} 
+            className="gap-2" 
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : (
+              <>
+                <Save className="h-4 w-4" />
+                Save All Sets
+              </>
+            )}
           </Button>
         </div>
         
@@ -149,17 +344,23 @@ const SetManager: React.FC = () => {
             </CardContent>
           </Card>
           
-          {Object.keys(sets).length === 0 && (
+          {Object.keys(sets).length === 0 && !loading && (
             <div className="text-center py-8 border border-dashed border-border rounded-md">
-              <p className="text-lg text-muted-foreground">No sets added yet</p>
+              <p className="text-lg text-muted-foreground">No sets found</p>
               <p className="text-sm text-muted-foreground mt-1">
                 Add your first set to get started
               </p>
             </div>
           )}
+
+          {loading && Object.keys(sets).length === 0 && (
+            <div className="text-center py-8 border border-dashed border-border rounded-md">
+              <p className="text-lg">Loading sets...</p>
+            </div>
+          )}
           
           {Object.keys(sets).map((setKey) => (
-            <Card key={setKey}>
+            <Card key={setKey} className="overflow-hidden">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div>
                   <CardTitle className="text-xl">{sets[setKey].name}</CardTitle>
@@ -178,10 +379,177 @@ const SetManager: React.FC = () => {
                 </Button>
               </CardHeader>
               
-              <CardContent className="mt-2">
-                <Link to={`/sets/${setKey}`}>
-                  <Button className="w-full">Edit Set Details</Button>
-                </Link>
+              <CardContent className="pt-4">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button 
+                      className="w-full" 
+                      onClick={() => setSelectedSet(setKey)}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      Manage Set Details
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent className="overflow-y-auto" side="right">
+                    <SheetHeader>
+                      <SheetTitle>Manage Set: {setKey}</SheetTitle>
+                    </SheetHeader>
+                    
+                    <div className="mt-6 space-y-8">
+                      {/* Traits Management Section */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">Traits</h3>
+                        <div className="flex gap-2 mb-3">
+                          <Input 
+                            placeholder="New trait name" 
+                            value={newTrait}
+                            onChange={(e) => setNewTrait(e.target.value)}
+                          />
+                          <Button onClick={() => handleAddTrait(setKey)}>Add</Button>
+                        </div>
+                        
+                        {sets[setKey].traits && sets[setKey].traits.length > 0 ? (
+                          <div className="border rounded-md overflow-hidden">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Trait Name</TableHead>
+                                  <TableHead className="w-[80px]">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {sets[setKey].traits.map((trait: string) => (
+                                  <TableRow key={trait}>
+                                    <TableCell>{trait}</TableCell>
+                                    <TableCell>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm"
+                                        className="h-8 w-8 p-0 text-destructive" 
+                                        onClick={() => handleDeleteTrait(setKey, trait)}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                        <span className="sr-only">Delete</span>
+                                      </Button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground italic">No traits added yet</p>
+                        )}
+                      </div>
+                      
+                      {/* Champions Management Section */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">Champions</h3>
+                        <div className="space-y-3 mb-3">
+                          <div>
+                            <Label htmlFor="championName">Champion Name</Label>
+                            <Input 
+                              id="championName" 
+                              placeholder="Champion name" 
+                              value={newChampion}
+                              onChange={(e) => setNewChampion(e.target.value)}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="championCost">Cost</Label>
+                            <Input 
+                              id="championCost" 
+                              type="number" 
+                              min="1" 
+                              max="5"
+                              value={newChampionCost}
+                              onChange={(e) => setNewChampionCost(Number(e.target.value))}
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label className="block mb-2">Traits</Label>
+                            {sets[setKey].traits && sets[setKey].traits.length > 0 ? (
+                              <div className="flex flex-wrap gap-2">
+                                {sets[setKey].traits.map((trait: string) => (
+                                  <Button
+                                    key={trait}
+                                    type="button"
+                                    size="sm"
+                                    variant={newChampionTraits.includes(trait) ? "default" : "outline"}
+                                    onClick={() => handleChampionTraitToggle(trait)}
+                                  >
+                                    {trait}
+                                  </Button>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-muted-foreground italic">No traits available. Add traits first.</p>
+                            )}
+                          </div>
+                          
+                          <Button 
+                            onClick={() => handleAddChampion(setKey)}
+                            disabled={!newChampion || newChampionTraits.length === 0}
+                            className="w-full"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Champion
+                          </Button>
+                        </div>
+                        
+                        {Object.keys(sets[setKey].championTraits || {}).length > 0 ? (
+                          <div className="border rounded-md overflow-hidden">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Champion</TableHead>
+                                  <TableHead>Cost</TableHead>
+                                  <TableHead>Traits</TableHead>
+                                  <TableHead className="w-[80px]">Actions</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {Object.keys(sets[setKey].championTraits).map((champion) => (
+                                  <TableRow key={champion}>
+                                    <TableCell>{champion}</TableCell>
+                                    <TableCell>{sets[setKey].championCosts[champion]}</TableCell>
+                                    <TableCell>
+                                      <div className="flex flex-wrap gap-1">
+                                        {sets[setKey].championTraits[champion].map((trait: string) => (
+                                          <span 
+                                            key={trait} 
+                                            className="bg-secondary text-secondary-foreground rounded px-2 py-1 text-xs"
+                                          >
+                                            {trait}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm"
+                                        className="h-8 w-8 p-0 text-destructive" 
+                                        onClick={() => handleDeleteChampion(setKey, champion)}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                        <span className="sr-only">Delete</span>
+                                      </Button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground italic">No champions added yet</p>
+                        )}
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </CardContent>
             </Card>
           ))}

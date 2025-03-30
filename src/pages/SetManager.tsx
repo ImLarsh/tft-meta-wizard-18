@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useComps } from '@/contexts/CompsContext';
 import { toast } from '@/components/ui/use-toast';
 import { saveTraitMappingsToSupabase } from '@/utils/supabaseUtils';
@@ -17,6 +16,13 @@ const SetManager: React.FC = () => {
   const { traitMappings } = useComps();
   const [sets, setSets] = useState(traitMappings || {});
   const [newSetName, setNewSetName] = useState('');
+  
+  // Update local state when traitMappings change
+  useEffect(() => {
+    if (Object.keys(traitMappings).length > 0) {
+      setSets(traitMappings);
+    }
+  }, [traitMappings]);
   
   const handleAddSet = () => {
     if (!newSetName.trim()) {

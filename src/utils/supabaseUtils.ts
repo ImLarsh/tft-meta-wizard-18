@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { TFTComp } from '@/data/comps';
-import { ChampionTraitMap } from '@/types/champion';
+import { Json } from '@/integrations/supabase/types';
 
 /**
  * Checks if the application is using the default Supabase credentials
@@ -64,7 +64,7 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
       const { error } = await supabase
         .from('tft_trait_mappings')
         .update({ 
-          mappings, 
+          mappings: mappings as Json, 
           updated_at: new Date().toISOString() 
         })
         .eq('id', existingRecord[0].id);
@@ -79,7 +79,7 @@ export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>)
       // Insert new record
       const { error } = await supabase
         .from('tft_trait_mappings')
-        .insert({ mappings });
+        .insert({ mappings: mappings as Json });
       
       if (error) {
         console.error('Error inserting trait mappings:', error);
@@ -117,7 +117,6 @@ export const fetchCompsFromSupabase = async (): Promise<TFTComp[]> => {
       const comps = data[0]?.comps;
       if (comps && Array.isArray(comps)) {
         console.log('Successfully fetched comps from Supabase:', comps);
-        // Type assertion to convert Json[] to TFTComp[] safely
         return comps as unknown as TFTComp[];
       }
     }
@@ -148,7 +147,7 @@ export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> =>
       const { error } = await supabase
         .from('tft_comps')
         .update({ 
-          comps: comps as any, 
+          comps: comps as unknown as Json, 
           updated_at: new Date().toISOString() 
         })
         .eq('id', existingRecord[0].id);
@@ -163,7 +162,7 @@ export const saveCompsToSupabase = async (comps: TFTComp[]): Promise<boolean> =>
       // Insert new record with type coercion
       const { error } = await supabase
         .from('tft_comps')
-        .insert({ comps: comps as any });
+        .insert({ comps: comps as unknown as Json });
       
       if (error) {
         console.error('Error inserting comps:', error);

@@ -27,39 +27,57 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   
   if (!name) {
     console.error('ChampionIcon received undefined or null name');
-  } else if (name === "MissFortune" || name === "Miss Fortune") {
-    normalizedName = "missfortune";
-  } else if (name === "AurelionSol" || name === "Aurelion Sol") {
-    normalizedName = "aurelionsol";
-  } else if (name === "TahmKench" || name === "Tahm Kench") {
-    normalizedName = "tahmkench";
-  } else if (name === "XinZhao" || name === "Xin Zhao") {
-    normalizedName = "xinzhao";
-  } else if (name === "MasterYi" || name === "Master Yi") {
-    normalizedName = "masteryi";
-  } else if (name === "TwistedFate" || name === "Twisted Fate") {
-    normalizedName = "twistedfate";
-  } else if (name === "KSante" || name === "K'Sante") {
-    normalizedName = "ksante";
-  } else if (name === "JarvanIV" || name === "Jarvan IV") {
-    normalizedName = "jarvaniv";
-  } else if (name === "LeBlanc" || name === "Le Blanc") {
-    normalizedName = "leblanc";
-  } else if (name === "Kobuko") {
-    normalizedName = "kobuko";
-  } else if (name === "Rhaast") {
-    normalizedName = "rhaast";
-  } else if (name === "Kog'Maw" || name === "KogMaw") {
-    normalizedName = "kogmaw";
-  } else if (name === "Aurora") {
-    normalizedName = "aurora";
-  } else if (name === "Naafiri") {
-    normalizedName = "naafiri";
   } else {
-    normalizedName = name ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unknown';
+    const trimmedName = name.trim();
+    
+    if (trimmedName === "MissFortune" || trimmedName === "Miss Fortune") {
+      normalizedName = "missfortune";
+    } else if (trimmedName === "AurelionSol" || trimmedName === "Aurelion Sol") {
+      normalizedName = "aurelionsol";
+    } else if (trimmedName === "TahmKench" || trimmedName === "Tahm Kench") {
+      normalizedName = "tahmkench";
+    } else if (trimmedName === "XinZhao" || trimmedName === "Xin Zhao") {
+      normalizedName = "xinzhao";
+    } else if (trimmedName === "MasterYi" || trimmedName === "Master Yi") {
+      normalizedName = "masteryi";
+    } else if (trimmedName === "TwistedFate" || trimmedName === "Twisted Fate") {
+      normalizedName = "twistedfate";
+    } else if (trimmedName === "KSante" || trimmedName === "K'Sante") {
+      normalizedName = "ksante";
+    } else if (trimmedName === "JarvanIV" || trimmedName === "Jarvan IV") {
+      normalizedName = "jarvaniv";
+    } else if (trimmedName === "LeBlanc" || trimmedName === "Le Blanc") {
+      normalizedName = "leblanc";
+    } else if (trimmedName === "Kobuko") {
+      normalizedName = "kobuko";
+    } else if (trimmedName === "Rhaast") {
+      normalizedName = "rhaast";
+    } else if (trimmedName === "Kog'Maw" || trimmedName === "KogMaw") {
+      normalizedName = "kogmaw";
+    } else if (trimmedName === "Aurora") {
+      normalizedName = "aurora";
+    } else if (trimmedName === "Naafiri") {
+      normalizedName = "naafiri";
+    } else {
+      normalizedName = trimmedName ? trimmedName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'unknown';
+    }
   }
   
-  const displayName = name ? name.replace(/([A-Z])/g, ' $1').trim() : 'Unknown';
+  const displayName = name ? name.trim().replace(/([A-Z])/g, ' $1').trim() : 'Unknown';
+  
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-11 h-11', 
+    lg: 'w-full h-full'
+  };
+  
+  const costTextColors = {
+    1: 'text-cost-1',
+    2: 'text-cost-2',
+    3: 'text-cost-3',
+    4: 'text-cost-4',
+    5: 'text-cost-5'
+  };
   
   const tftSources = [
     `https://raw.communitydragon.org/pbe/game/assets/characters/tft14_${normalizedName}/hud/tft14_${normalizedName}_square.tft_set14.png`,
@@ -75,10 +93,10 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
     `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
     `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1)}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name ? name.replace(/\s+/g, '') : 'Unknown'}.png`,
-    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name ? name.replace(/\s+/g, '') : 'Unknown'}_0.jpg`,
+    `https://ddragon.leagueoflegends.com/cdn/14.5.1/img/champion/${name ? name.trim().replace(/\s+/g, '') : 'Unknown'}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${name ? name.trim().replace(/\s+/g, '') : 'Unknown'}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${name ? name.trim().replace(/\s+/g, '') : 'Unknown'}.png`,
+    `https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/${name ? name.trim().replace(/\s+/g, '') : 'Unknown'}_0.jpg`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${normalizedName}.png`,
     `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${normalizedName}/${normalizedName}_0.jpg`,
     `https://cdn.mobalytics.gg/assets/common/images/lol/champions/standard/${normalizedName}.png`,
@@ -89,20 +107,6 @@ const ChampionIcon: React.FC<ChampionIconProps> = ({
   const sources = useTftImages ? tftSources : lolSources;
   
   const fallbackUrl = 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Ryze_0.jpg';
-  
-  const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-11 h-11', 
-    lg: 'w-full h-full'
-  };
-  
-  const costTextColors = {
-    1: 'text-cost-1',
-    2: 'text-cost-2',
-    3: 'text-cost-3',
-    4: 'text-cost-4',
-    5: 'text-cost-5'
-  };
   
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   

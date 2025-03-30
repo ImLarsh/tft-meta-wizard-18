@@ -22,7 +22,9 @@ export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, a
     // Query the tft_trait_mappings table
     const { data, error } = await supabase
       .from('tft_trait_mappings')
-      .select('*');
+      .select('*')
+      .order('updated_at', { ascending: false })
+      .limit(1);
     
     if (error) {
       console.error('Error fetching trait mappings:', error);
@@ -33,7 +35,7 @@ export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, a
     if (data && data.length > 0) {
       const mappings = data[0]?.mappings;
       if (mappings && typeof mappings === 'object' && !Array.isArray(mappings)) {
-        console.log('Successfully fetched trait mappings from Supabase:', mappings);
+        console.log('Successfully fetched trait mappings from Supabase:', Object.keys(mappings));
         return mappings as Record<string, any>;
       }
     }
@@ -54,10 +56,15 @@ export const fetchTraitMappingsFromSupabase = async (): Promise<Record<string, a
 export const saveTraitMappingsToSupabase = async (mappings: Record<string, any>): Promise<boolean> => {
   try {
     // First check if we have an existing record
-    const { data: existingRecord } = await supabase
+    const { data: existingRecord, error: fetchError } = await supabase
       .from('tft_trait_mappings')
       .select('id')
       .limit(1);
+    
+    if (fetchError) {
+      console.error('Error checking for existing trait mappings:', fetchError);
+      return false;
+    }
     
     if (existingRecord && existingRecord.length > 0) {
       // Update existing record - convert Date to ISO string

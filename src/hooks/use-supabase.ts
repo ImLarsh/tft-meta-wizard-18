@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { TFTComp } from '@/data/comps';
@@ -28,7 +27,7 @@ export const useSupabaseData = () => {
         const mappings = await fetchTraitMappingsFromSupabase();
         if (Object.keys(mappings).length > 0) {
           setTraitMappings(mappings);
-          console.log('Trait mappings loaded from Supabase');
+          console.log('Trait mappings loaded from Supabase:', mappings);
         } else {
           console.log('No trait mappings found in Supabase');
         }
